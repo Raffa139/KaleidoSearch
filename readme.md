@@ -1,0 +1,80 @@
+# KaleidoSearch
+
+## AI-Powered Personalized Product Discovery Engine
+
+![Project Version](https://img.shields.io/badge/Version-1.0-%23181717)
+![Project Status](https://img.shields.io/badge/Status-Development-blue)
+
+## Tech Stack
+
+![Python](https://img.shields.io/badge/-Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/-FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-D71F00?style=flat-square&logo=sqlalchemy&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
+![ChromaDB](https://img.shields.io/badge/-ChromaDB-orange?style=flat-square)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini-8E75B2?style=flat-square&logo=googlegemini&logoColor=white)
+
+## Overview
+
+This project leverages AI and semantic search to help users discover products in a more intuitive
+and personalized way. By utilizing natural language understanding and semantic search,
+it aims to provide more relevant and personalized search results compared to traditional
+keyword-based
+approaches. Users can describe what they're looking for in their own words, and the engine will
+intelligently surface relevant items from a product catalog and even guide the users through their
+search endeavours.
+
+## Features
+
+* **Text-Based Semantic Search:** Users can search using natural language queries.
+* **LLM Integration:** Enhanced query understanding, product description generation, and
+  personalized explanations.
+* **AI-Powered Recommendations:** Personalized product suggestions based on (future:
+  explicit/implicit) preferences.
+* **(Future): Attribute-Based Filtering:** Traditional filtering options to refine search results.
+* **(Future): "More Like This" Suggestions:** Find similar products to those being viewed.
+* **(Future): Visual Semantic Search:** Search using uploaded images.
+
+## Getting Started
+
+### Prerequisites
+
+* Python 3.x
+* Installation of necessary Python packages (see `requirements.txt`)
+* Access to a vector database
+* API key for your chosen LLM provider
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone [repository URL]
+   cd [repository directory]
+   ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   # Configure database settings in config file or environment variables
+   ```
+3. Set up your vector database and configure the connection details in the backend.
+4. Configure your LLM API key securely.
+
+### Running the Application
+
+1. Start the FastAPI server:
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+## Data
+
+* **(Initial):** Populate product catalog database and generate embeddings.
+
+## Future Enhancements
+
+* Implement visual semantic search.
+* Develop personalized recommendation algorithms based on user behavior.
+* Add user accounts and preference management.
+* Improve the UI/UX with more advanced filtering and visualization options.
