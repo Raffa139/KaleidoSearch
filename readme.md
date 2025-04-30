@@ -59,12 +59,20 @@ search endeavours.
    pip install -r requirements.txt
    # Configure database settings in config file or environment variables
    ```
-3. Set up your vector database and configure the connection details in the backend.
+3. Set up your environment:
+   ```.env
+   DATASOURCE_URL="postgresql+psycopg2://kaleidosearch:secret@localhost/kaleidosearch"
+   ```
 4. Configure your LLM API key securely.
 
 ### Running the Application
 
-1. Start the FastAPI server:
+1. Create the DB docker container:
+   ```bash
+   cd setup/docker
+   docker-compose up
+   ```
+2. Start the FastAPI server:
    ```bash
    uvicorn main:app --reload
    ```

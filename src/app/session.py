@@ -1,11 +1,9 @@
 from typing import Annotated
 from fastapi import Depends
 from sqlmodel import Session, create_engine
+from src.environment import datasource_url
 
-sqlite_file = "database.db"
-sqlite_url = f"sqlite:///{sqlite_file}"
-
-engine = create_engine(sqlite_url, connect_args={"check_same_thread": False})
+engine = create_engine(datasource_url())
 
 
 def db_session():

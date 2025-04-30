@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:17
+    container_name: KALEIDO_SEARCH_DB
+    environment:
+      - POSTGRES_USER=kaleidosearch
+      - POSTGRES_PASSWORD=secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - kaleido-search-pg-data:/var/lib/postgresql/data
+
+volumes:
+  kaleido-search-pg-data:

@@ -3,3 +3,5 @@ uvicorn
 pydantic
 sqlalchemy
 sqlmodel
+psycopg2
+dotenv
