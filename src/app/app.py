@@ -5,6 +5,7 @@ from sqlmodel import SQLModel
 from .session import engine
 from src.products.router import router as products_router
 from src.shops.router import router as shops_router
+from src.users.router import router as users_router
 
 
 def initialize_db():
@@ -20,6 +21,7 @@ def create_app():
 
     app.include_router(products_router)
     app.include_router(shops_router)
+    app.include_router(users_router)
 
     app.add_exception_handler(ValueError, handle_value_error)
 

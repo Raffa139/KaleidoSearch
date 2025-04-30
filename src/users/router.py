@@ -1,0 +1,27 @@
+from typing import Annotated
+
+from fastapi import APIRouter, HTTPException, Depends
+from src.users.models import UserOut, UserIn
+from src.users.service import UserService, user_service
+
+router = APIRouter(prefix="/users", tags=["users"])
+
+ServiceDep = Annotated[UserService, Depends(user_service)]
+
+
+@router.get("/", response_model=list[UserOut])
+def get_users(service: ServiceDep):
+    return service.find_all()
+
+
+@router.post("/", response_model=UserOut, status_code=201)
+def create_user(user_in: UserIn, service: ServiceDep):
+    return service.create(user_in)
+
+
+@router.get("/{id}", response_model=UserOut)
+def get_user_by_id(id: int, service: ServiceDep):
+    user = service.find_by_id(id)
+    if not user:
+        raise HTTPException(status_code=404)
+    return user
