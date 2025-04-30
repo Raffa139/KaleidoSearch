@@ -1,28 +1,27 @@
-from fastapi import APIRouter, HTTPException
-from sqlmodel import select
-from src.products.models import Product, ProductOut, ProductIn
-from src.app.session import SessionDep
+from typing import Annotated
+
+from fastapi import APIRouter, HTTPException, Depends
+from src.products.models import ProductOut, ProductIn
+from src.products.service import ProductService, product_service
 
 router = APIRouter(prefix="/products", tags=["products"])
 
+ServiceDep = Annotated[ProductService, Depends(product_service)]
+
 
 @router.get("/", response_model=list[ProductOut])
-def get_products(session: SessionDep):
-    return session.exec(select(Product)).all()
+def get_products(service: ServiceDep):
+    return service.find_all()
 
 
 @router.post("/", response_model=ProductOut, status_code=201)
-def create_product(product_in: ProductIn, session: SessionDep):
-    product = Product.model_validate(product_in)
-    session.add(product)
-    session.commit()
-    session.refresh(product)
-    return product
+def create_product(product_in: ProductIn, service: ServiceDep):
+    return service.create(product_in)
 
 
 @router.get("/{id}", response_model=ProductOut)
-def get_product_by_id(id: int, session: SessionDep):
-    product = session.get(Product, id)
+def get_product_by_id(id: int, service: ServiceDep):
+    product = service.find_by_id(id)
     if not product:
-        raise HTTPException(status_code=404, detail="Not found")
+        raise HTTPException(status_code=404)
     return product
