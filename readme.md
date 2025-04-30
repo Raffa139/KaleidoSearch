@@ -12,6 +12,7 @@
 ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-D71F00?style=flat-square&logo=sqlalchemy&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![ChromaDB](https://img.shields.io/badge/-ChromaDB-orange?style=flat-square)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
 ![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white)
 ![Gemini](https://img.shields.io/badge/Gemini-8E75B2?style=flat-square&logo=googlegemini&logoColor=white)
@@ -50,8 +51,8 @@ search endeavours.
 
 1. Clone the repository:
    ```bash
-   git clone [repository URL]
-   cd [repository directory]
+   git clone https://github.com/Raffa139/KaleidoSearch.git
+   cd KaleidoSearch
    ```
 2. Install dependencies:
    ```bash
