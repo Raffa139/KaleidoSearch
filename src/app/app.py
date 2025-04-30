@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from sqlmodel import SQLModel
 
 from .session import engine
@@ -10,11 +11,17 @@ def initialize_db():
     SQLModel.metadata.create_all(engine)
 
 
+def handle_value_error(_, error: Exception):
+    return JSONResponse(status_code=400, content={"detail": f"Bad request: {error}"})
+
+
 def create_app():
     app = FastAPI()
 
     app.include_router(products_router)
     app.include_router(shops_router)
+
+    app.add_exception_handler(ValueError, handle_value_error)
 
     app.add_event_handler("startup", initialize_db)
 
