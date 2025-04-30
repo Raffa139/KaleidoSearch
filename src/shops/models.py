@@ -1,10 +1,12 @@
+from pydantic import HttpUrl
 from sqlmodel import SQLModel, Field, Relationship
 from src.products.models import Product, ProductOut
+from src.common.http_url_type import HttpUrlType
 
 
 class ShopBase(SQLModel):
     name: str
-    url: str
+    url: HttpUrl = Field(sa_type=HttpUrlType)
 
 
 class ShopIn(ShopBase):
