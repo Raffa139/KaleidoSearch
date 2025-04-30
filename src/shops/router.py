@@ -1,28 +1,26 @@
-from fastapi import APIRouter, HTTPException
-from sqlmodel import select
-from src.shops.models import Shop, ShopOut, ShopIn
-from src.app.session import SessionDep
+from typing import Annotated
+from fastapi import APIRouter, HTTPException, Depends
+from src.shops.models import ShopOut, ShopIn
+from src.shops.service import ShopService, shop_service
 
 router = APIRouter(prefix="/shops", tags=["shops"])
 
+ServiceDep = Annotated[ShopService, Depends(shop_service)]
+
 
 @router.get("/", response_model=list[ShopOut])
-def get_shops(session: SessionDep):
-    return session.exec(select(Shop)).all()
+def get_shops(service: ServiceDep):
+    return service.find_all()
 
 
 @router.post("/", response_model=ShopOut, status_code=201)
-def create_shop(shop_in: ShopIn, session: SessionDep):
-    shop = Shop.model_validate(shop_in)
-    session.add(shop)
-    session.commit()
-    session.refresh(shop)
-    return shop
+def create_shop(shop_in: ShopIn, service: ServiceDep):
+    return service.create(shop_in)
 
 
 @router.get("/{id}", response_model=ShopOut)
-def get_shop_by_id(id: int, session: SessionDep):
-    shop = session.get(Shop, id)
+def get_shop_by_id(id: int, service: ServiceDep):
+    shop = service.find_by_id(id)
     if not shop:
-        raise HTTPException(status_code=404, detail="Not found")
+        raise HTTPException(status_code=404)
     return shop
