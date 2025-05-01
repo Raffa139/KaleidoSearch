@@ -1,12 +1,11 @@
-from sqlmodel import select
+from sqlmodel import Session, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
-from src.app.session import SessionDep
 from src.products.models import Product, ProductIn
-from src.shops.router import ServiceDep as ShopServiceDep
+from src.shops.service import ShopService
 
 
 class ProductService:
-    def __init__(self, session: SessionDep, shop_service: ShopServiceDep):
+    def __init__(self, session: Session, shop_service: ShopService):
         self._session = session
         self._shop_service = shop_service
 
@@ -29,7 +28,3 @@ class ProductService:
 
     def _query(self, query: Select | SelectOfScalar):
         return self._session.exec(query)
-
-
-def product_service(session: SessionDep, shop_service: ShopServiceDep):
-    return ProductService(session, shop_service)

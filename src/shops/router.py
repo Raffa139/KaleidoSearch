@@ -1,9 +1,15 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
+from src.app.session import SessionDep
 from src.shops.models import ShopOut, ShopIn
-from src.shops.service import ShopService, shop_service
+from src.shops.service import ShopService
 
 router = APIRouter(prefix="/shops", tags=["shops"])
+
+
+def shop_service(session: SessionDep):
+    return ShopService(session)
+
 
 ServiceDep = Annotated[ShopService, Depends(shop_service)]
 

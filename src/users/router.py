@@ -1,10 +1,15 @@
 from typing import Annotated
-
 from fastapi import APIRouter, HTTPException, Depends
+from src.app.session import SessionDep
 from src.users.models import UserOut, UserIn
-from src.users.service import UserService, user_service
+from src.users.service import UserService
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+
+def user_service(session: SessionDep):
+    return UserService(session)
+
 
 ServiceDep = Annotated[UserService, Depends(user_service)]
 

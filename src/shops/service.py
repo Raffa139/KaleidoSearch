@@ -1,11 +1,10 @@
-from sqlmodel import select
+from sqlmodel import Session, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
-from src.app.session import SessionDep
 from src.shops.models import Shop, ShopIn
 
 
 class ShopService:
-    def __init__(self, session: SessionDep):
+    def __init__(self, session: Session):
         self._session = session
 
     def find_all(self) -> list[Shop]:
@@ -23,7 +22,3 @@ class ShopService:
 
     def _query(self, query: Select | SelectOfScalar):
         return self._session.exec(query)
-
-
-def shop_service(session: SessionDep):
-    return ShopService(session)
