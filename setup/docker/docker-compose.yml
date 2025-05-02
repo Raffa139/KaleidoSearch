@@ -12,5 +12,16 @@ services:
     volumes:
       - kaleido-search-pg-data:/var/lib/postgresql/data
 
+  chromadb:
+    image: chromadb/chroma:0.6.3
+    container_name: KALEIDO_SEARCH_CHROMA
+    environment:
+      - IS_PERSISTENT=TRUE
+    ports:
+      - "5000:8000"
+    volumes:
+      - kaleido-search-chroma-data:/chroma/chroma
+
 volumes:
   kaleido-search-pg-data:
+  kaleido-search-chroma-data:

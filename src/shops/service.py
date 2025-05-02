@@ -13,6 +13,9 @@ class ShopService:
     def find_by_id(self, id: int) -> Shop | None:
         return self._session.get(Shop, id)
 
+    def find_by_name(self, name:str) -> Shop | None:
+        return self._query(select(Shop).where(Shop.name == name)).first()
+
     def create(self, shop_in: ShopIn) -> Shop:
         shop = Shop.model_validate(shop_in)
         self._session.add(shop)
