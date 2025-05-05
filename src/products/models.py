@@ -8,15 +8,15 @@ class ProductBase(SQLModel):
     title: str
     url: HttpUrl = Field(sa_type=HttpUrlType)
     thumbnail_url: HttpUrl | None = Field(default=None, sa_type=HttpUrlType)
-    shop_id: int
 
 
 class ProductIn(ProductBase):
-    pass
+    shop_id: int
 
 
 class ProductOut(ProductBase):
     id: int
+    shop_id: int
 
 
 class Product(ProductBase, table=True):

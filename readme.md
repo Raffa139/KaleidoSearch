@@ -79,7 +79,18 @@ search endeavours.
 
 ## Data
 
-* **(Initial):** Populate product catalog database and generate embeddings.
+To populate the product catalog you can download amazon product metadata from the
+[Amazon Reviews'23](https://amazon-reviews-2023.github.io/#grouped-by-category) page.
+Choose a category of your likings (or all) and download the product metadata via the 'meta' link.
+
+(TODO: Soon)
+
+1. Put the downloaded product metadata files into the `/data` directory
+2. Provide the file names in .env
+   ```.env
+   PRODUCT_CATALOGUES="<Filenames-Separated-By-Comma>"
+   ```
+3. Run the `import_data.py` file inside `/src/data_import`
 
 ## Future Enhancements
 
