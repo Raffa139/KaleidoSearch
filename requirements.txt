@@ -5,3 +5,10 @@ sqlalchemy
 sqlmodel
 psycopg2
 dotenv
+langchain==0.3.25
+langchain-core==0.3.58
+langchain-chroma==0.2.3
+langchain-huggingface==0.1.2
+langchain-google-genai==2.1.4
+langgraph==0.4.1
+chromadb==0.6.3
