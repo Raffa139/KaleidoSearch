@@ -1,12 +1,12 @@
 from typing import TypedDict, Annotated, List
 from pydantic import BaseModel, Field
+from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.memory import InMemorySaver
-from src.environment import gemini_api_key
+from src.app.dependencies import llm
 
 EVAL_QUERY_PROMPT = (
     "You are a evaluator assessing relevance of a user query.\n"
@@ -52,53 +52,58 @@ class State(TypedDict):
     query_evaluation: QueryEvaluation
 
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
-    temperature=0,
-    google_api_key=gemini_api_key()
-)
+class ConversationService:
+    def __init__(self, llm: BaseChatModel):
+        self._llm = llm
+        # TODO: Build graph only once on server startup
+        self._graph = self.__build_graph()
 
+    def invoke(self, user_query: str, thread_id: str) -> QueryEvaluation:
+        return self._graph.invoke(
+            input=State(messages=[SystemMessage(EVAL_QUERY_PROMPT), HumanMessage(user_query)]),
+            config=RunnableConfig(configurable={"thread_id": thread_id})
+        ).get("query_evaluation")
 
-def gemini(state: State):
-    return {
-        "messages": [llm.invoke(state["messages"])]
-    }
+    def __gemini(self, state: State):
+        return {
+            "messages": [self._llm.invoke(state["messages"])]
+        }
 
+    def __structured_response(self, state: State):
+        last_message = state["messages"][-1].content
+        response = self._llm.with_structured_output(QueryEvaluation).invoke(
+            [HumanMessage(content=last_message)]
+        )
+        return {"query_evaluation": response}
 
-def structured_response(state: State):
-    last_message = state["messages"][-1].content
-    res = llm.with_structured_output(QueryEvaluation).invoke([HumanMessage(content=last_message)])
-    return {"query_evaluation": res}
+    def __build_graph(self):
+        graph_builder = StateGraph(State)
 
+        graph_builder.add_node("llm", self.__gemini)
+        graph_builder.add_node("respond", self.__structured_response)
+        graph_builder.add_edge(START, "llm")
+        graph_builder.add_edge("llm", "respond")
+        graph_builder.add_edge("respond", END)
 
-graph_builder = StateGraph(State)
+        # TODO: Memory lost after each request, due to separate threads or compiled every request
+        return graph_builder.compile(checkpointer=InMemorySaver())
 
-graph_builder.add_node("llm", gemini)
-graph_builder.add_node("respond", structured_response)
-graph_builder.add_edge(START, "llm")
-graph_builder.add_edge("llm", "respond")
-graph_builder.add_edge("respond", END)
-
-graph = graph_builder.compile(checkpointer=InMemorySaver())
-config = RunnableConfig(configurable={"thread_id": "1"})
-
-sys_message = SystemMessage(EVAL_QUERY_PROMPT)
 
 if __name__ == '__main__':
+    service = ConversationService(llm)
+    thread = "1"
+
     while True:
         user_input = input("User: ")
         if user_input.lower() in ["q"]:
             break
 
         if user_input == "1":
-            config = RunnableConfig(configurable={"thread_id": "1"})
+            thread = "1"
             continue
         elif user_input == "2":
-            config = RunnableConfig(configurable={"thread_id": "2"})
+            thread = "2"
             continue
 
-        for event in graph.stream(State(messages=[sys_message, HumanMessage(user_input)]), config):
-            for node, update in event.items():
-                print("Update from node", node)
-                print(update)
-                print("\n")
+        res = service.invoke(user_input, thread)
+        print("EVAL", res.get("query_evaluation"))
