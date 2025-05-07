@@ -8,20 +8,29 @@ from src.products.service import ProductService
 EVAL_QUERY_PROMPT = (
     "You are a evaluator assessing relevance of a user query.\n"
     "Evaluate if the users query contains valid products, categories, or specific user needs "
-    "related to e-commerce products."
-    "Here is the user query: {query} \n"
+    "related to e-commerce products.\n"
+    "Here is the user query: {query}\n\n"
     "Give a binary 'yes' or 'no' score to indicate whether the query is valid."
 )
 
 RANK_DOCS_PROMPT = (
     "You are a grader assessing relevance of retrieved documents to a user query.\n"
     "Here are the retrieved documents: \n\n{documents}\n\n"
-    "Here is the user query: {query} \n\n"
+    "Here is the user query: {query}\n\n"
     "If the documents contain keywords or semantic meaning related to the user query, grade it as "
     "relevant.\n"
     "Treat each document, identified by its id, separately and provide individual scores.\n"
     "Give a binary 'yes' or 'no' score to indicate whether the documents are relevant to the "
     "question."
+)
+
+AGGR_QUERY_PROMPT = (
+    "Given the following user query and questions answered by the user, related to products, "
+    "categories or specific user needs in e-commerce, combine them into one full query.\n"
+    "Optimize the query for distance-based similarity search of a vector database.\n"
+    "Only provide the new query, do not include any other content, explanations or examples.\n"
+    "Here is the user query: {query}\n\n"
+    "Here are the questions in the format (Q=question, A=user answer): \n\n{questions}\n\n"
 )
 
 
@@ -40,7 +49,8 @@ class RecommendationService:
         if not self._evaluate_user_query(query):
             return None
 
-        documents = self._retrieve_relevant(query)
+        full_query = query if not query.questions else self._aggregate_user_query(query)
+        documents = self._retrieve_relevant(full_query)
         if not documents:
             return None
 
@@ -56,7 +66,6 @@ class RecommendationService:
         return self._filter_relevant_documents(query, documents)
 
     def _retrieve(self, query: UserQuery) -> list[Document]:
-        # TODO: Combine query & questions
         return self._vector_store.invoke(query.query)
 
     def _filter_relevant_documents(
@@ -77,6 +86,17 @@ class RecommendationService:
             return []
 
         return [d for d in documents if d.metadata.get("ref_id") in relevant_ids]
+
+    def _aggregate_user_query(self, query: UserQuery) -> UserQuery:
+        prompt = AGGR_QUERY_PROMPT.format(
+            query=query.query,
+            questions="\n\n".join(map(
+                lambda q: f"Q: {q.question}\nA: {q.answer}", query.questions
+            ))
+        )
+
+        response = self._llm.invoke(prompt)
+        return UserQuery(query=response.content)
 
     def _map_documents_to_products(self, documents: list[Document]) -> list[ProductRecommendation]:
         ref_ids = [doc.metadata.get("ref_id") for doc in documents]
