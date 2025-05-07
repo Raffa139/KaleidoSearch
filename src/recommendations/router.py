@@ -1,17 +1,26 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
-from .manual_agent import evaluate_user_query, retrieve, rank_documents
+from src.app.session import SessionDep, LLMDep, VectorStoreDep
+from src.recommendations.service import RecommendationService, UserQuery
+from src.products.service import ProductService
+from src.shops.service import ShopService
 
 router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 
 
-@router.get("/", response_model=list[str])
-def get_recommendations(q: str):
-    if not evaluate_user_query(q):
+def recommendation_service(session: SessionDep, llm: LLMDep, vector_store: VectorStoreDep):
+    shop_service = ShopService(session)
+    product_service = ProductService(session, shop_service)
+    return RecommendationService(product_service, llm, vector_store)
+
+
+ServiceDep = Annotated[RecommendationService, Depends(recommendation_service)]
+
+
+@router.post("/", response_model=list[str])
+def get_recommendations(query: UserQuery, service: ServiceDep):
+    recommendations = service.get_recommendations(query)
+    if not recommendations:
         raise HTTPException(status_code=400)
 
-    documents = retrieve(q)
-    if not rank_documents(q, documents):
-        raise HTTPException(status_code=400)
-
-    return documents
+    return recommendations
