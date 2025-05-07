@@ -15,6 +15,9 @@ class ProductService:
     def find_by_id(self, id: int) -> Product | None:
         return self._session.get(Product, id)
 
+    def find_by_ids(self, ids: list[int]) -> list[Product]:
+        return self._query(select(Product).where(Product.id.in_(ids))).all()
+
     def create(self, product_in: ProductIn) -> Product:
         shop = self._shop_service.find_by_id(product_in.shop_id)
         if not shop:
