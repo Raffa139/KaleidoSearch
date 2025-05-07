@@ -1,11 +1,10 @@
-from typing import TypedDict, Annotated
+from typing import TypedDict, Annotated, List
 from pydantic import BaseModel, Field
 from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
-from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.checkpoint.memory import InMemorySaver
 from src.environment import gemini_api_key
 
@@ -22,19 +21,21 @@ EVAL_QUERY_PROMPT = (
     "query scored a True."
 )
 
-"""
-retrieve documents related to the user query, but only if it contains a valid request for a 
-specific product/category or a group of products/categories or specific user needs.
-after retrieval of documents assess them based on keywords or semantic meaning related to the 
-user query, grade them as relevant by giving them a binary 'yes' or 'no' score.
-"""
+
+class QueryQuestion(BaseModel):
+    short: str = Field(
+        description="Brief summary of a question, only 1-3 words long"
+    )
+    long: str = Field(
+        description="Short and concise one sentence description of a question"
+    )
 
 
 class QueryEvaluation(BaseModel):
-    score: bool = Field(
-        description="Relevance score: True if valid, or False if not valid"
+    valid: bool = Field(
+        description="Query score: True if valid, or False if not valid"
     )
-    questions: list[str] = Field(
+    questions: List[QueryQuestion] = Field(
         description="Questions to guide the user, improve the query, and add information to it"
     )
     cleaned_query: str | None = Field(
