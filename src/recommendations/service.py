@@ -1,8 +1,6 @@
-from pydantic import BaseModel, Field
 from langchain_core.language_models import BaseChatModel
 from langchain_core.vectorstores import VectorStoreRetriever
-
-from src.products.models import ProductBase
+from src.recommendations.models import ProductRecommendation, UserQuery, BinaryScore
 from src.products.service import ProductService
 
 EVAL_QUERY_PROMPT = (
@@ -22,26 +20,6 @@ RANK_DOCS_PROMPT = (
     "Give a binary 'yes' or 'no' score to indicate whether the documents are relevant to the "
     "question."
 )
-
-
-class BinaryScore(BaseModel):
-    score: str = Field(
-        description="Relevance score: 'yes' if relevant, or 'no' if not relevant"
-    )
-
-
-class Question(BaseModel):
-    question: str
-    answer: str
-
-
-class UserQuery(BaseModel):
-    query: str
-    questions: list[Question] | None = None
-
-
-class ProductRecommendation(ProductBase):
-    description: str
 
 
 class RecommendationService:
