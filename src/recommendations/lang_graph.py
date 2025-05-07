@@ -34,10 +34,21 @@ class QueryEvaluation(BaseModel):
     score: bool = Field(
         description="Relevance score: True if valid, or False if not valid"
     )
+    questions: list[str] = Field(
+        description="Questions to guide the user, improve the query, and add information to it"
+    )
+    cleaned_query: str | None = Field(
+        default=None,
+        description=(
+            "Cleaned-up version of the query combined with all answered questions, "
+            "retaining semantic meaning, used for distance-based similarity search"
+        )
+    )
 
 
 class State(TypedDict):
     messages: Annotated[list, add_messages]
+    query_evaluation: QueryEvaluation
 
 
 llm = ChatGoogleGenerativeAI(
@@ -53,12 +64,19 @@ def gemini(state: State):
     }
 
 
+def structured_response(state: State):
+    last_message = state["messages"][-1].content
+    res = llm.with_structured_output(QueryEvaluation).invoke([HumanMessage(content=last_message)])
+    return {"query_evaluation": res}
+
 
 graph_builder = StateGraph(State)
 
 graph_builder.add_node("llm", gemini)
+graph_builder.add_node("respond", structured_response)
 graph_builder.add_edge(START, "llm")
-graph_builder.add_edge("llm", END)
+graph_builder.add_edge("llm", "respond")
+graph_builder.add_edge("respond", END)
 
 graph = graph_builder.compile(checkpointer=InMemorySaver())
 config = RunnableConfig(configurable={"thread_id": "1"})
