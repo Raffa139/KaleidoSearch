@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
-from src.app.session import SessionDep, LLMDep, VectorStoreDep
+from src.app.dependencies import SessionDep, LLMDep, VectorStoreDep
 from src.recommendations.service import RecommendationService, UserQuery
 from src.products.service import ProductService
 from src.shops.service import ShopService

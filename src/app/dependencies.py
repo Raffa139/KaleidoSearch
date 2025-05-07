@@ -9,7 +9,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from src.environment import datasource_url, gemini_api_key
 
-engine = create_engine(datasource_url())
+db_engine = create_engine(datasource_url())
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
@@ -26,7 +26,7 @@ chroma = Chroma(
 
 
 def db_session():
-    with Session(engine) as session:
+    with Session(db_engine) as session:
         yield session
 
 
