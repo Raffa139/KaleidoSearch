@@ -1,7 +1,8 @@
 from langchain_core.language_models import BaseChatModel
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_core.documents import Document
-from src.recommendations.models import ProductRecommendation, UserQuery, BinaryScore
+from src.recommendations.models import ProductRecommendation, UserQuery, BinaryScore, \
+    BinaryScoreList
 from src.products.service import ProductService
 
 EVAL_QUERY_PROMPT = (
@@ -15,9 +16,10 @@ EVAL_QUERY_PROMPT = (
 RANK_DOCS_PROMPT = (
     "You are a grader assessing relevance of retrieved documents to a user query.\n"
     "Here are the retrieved documents: \n\n{documents}\n\n"
-    "Here is the user query: {query} \n"
+    "Here is the user query: {query} \n\n"
     "If the documents contain keywords or semantic meaning related to the user query, grade it as "
     "relevant.\n"
+    "Treat each document, identified by its id, separately and provide individual scores.\n"
     "Give a binary 'yes' or 'no' score to indicate whether the documents are relevant to the "
     "question."
 )
@@ -38,8 +40,8 @@ class RecommendationService:
         if not self._evaluate_user_query(query):
             return None
 
-        documents = self._retrieve(query)
-        if not self._rank_documents(query, documents):
+        documents = self._retrieve_relevant(query)
+        if not documents:
             return None
 
         return self._map_documents_to_products(documents)
@@ -49,19 +51,32 @@ class RecommendationService:
         response = self._llm.with_structured_output(BinaryScore).invoke(prompt)
         return response.score == "yes"
 
+    def _retrieve_relevant(self, query: UserQuery) -> list[Document]:
+        documents = self._retrieve(query)
+        return self._filter_relevant_documents(query, documents)
+
     def _retrieve(self, query: UserQuery) -> list[Document]:
         # TODO: Combine query & questions
         return self._vector_store.invoke(query.query)
 
-    def _rank_documents(self, query: UserQuery, documents: list[Document]) -> bool:
-        # TODO: Rank documents individually
+    def _filter_relevant_documents(
+            self, query: UserQuery, documents: list[Document]
+    ) -> list[Document]:
         # TODO: Better formatting of documents
         prompt = RANK_DOCS_PROMPT.format(
             query=query.query,
-            documents=", ".join(map(lambda d: d.page_content, documents))
+            documents="\n\n".join(map(
+                lambda d: f"Id: {d.metadata.get('ref_id')}\nContent: {d.page_content}", documents
+            ))
         )
-        response = self._llm.with_structured_output(BinaryScore).invoke(prompt)
-        return response.score == "yes"
+
+        rankings = self._llm.with_structured_output(BinaryScoreList).invoke(prompt)
+        relevant_ids = [ranking.id for ranking in rankings.list if ranking.score == "yes"]
+
+        if not relevant_ids:
+            return []
+
+        return [d for d in documents if d.metadata.get("ref_id") in relevant_ids]
 
     def _map_documents_to_products(self, documents: list[Document]) -> list[ProductRecommendation]:
         ref_ids = [doc.metadata.get("ref_id") for doc in documents]
