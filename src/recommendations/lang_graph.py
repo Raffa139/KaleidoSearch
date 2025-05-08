@@ -6,7 +6,6 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.memory import InMemorySaver
-from src.app.dependencies import llm
 
 EVAL_QUERY_PROMPT = (
     "You are a evaluator assessing relevance of a user query.\n"
@@ -53,48 +52,22 @@ class State(TypedDict):
 
 
 class ConversationService:
-    def __init__(self, llm: BaseChatModel):
-        self._llm = llm
-        # TODO: Build graph only once on server startup
-        self._graph = self.__build_graph()
+    def __init__(self, agent):
+        self._agent = agent
 
     def invoke(self, user_query: str, thread_id: str) -> QueryEvaluation:
         config = RunnableConfig(configurable={"thread_id": thread_id})
-        past_messages = self._graph.get_state(config).values.get("messages")
+        past_messages = self._agent.get_state(config).values.get("messages")
         initial_messages = [SystemMessage(EVAL_QUERY_PROMPT)] if not past_messages else []
 
-        return self._graph.invoke(
+        return self._agent.invoke(
             input=State(messages=[*initial_messages, HumanMessage(user_query)]),
             config=config
         ).get("query_evaluation")
 
-    def __gemini(self, state: State):
-        return {
-            "messages": [self._llm.invoke(state["messages"])]
-        }
-
-    def __structured_response(self, state: State):
-        last_message = state["messages"][-1].content
-        response = self._llm.with_structured_output(QueryEvaluation).invoke(
-            [HumanMessage(content=last_message)]
-        )
-        return {"query_evaluation": response}
-
-    def __build_graph(self):
-        graph_builder = StateGraph(State)
-
-        graph_builder.add_node("llm", self.__gemini)
-        graph_builder.add_node("respond", self.__structured_response)
-        graph_builder.add_edge(START, "llm")
-        graph_builder.add_edge("llm", "respond")
-        graph_builder.add_edge("respond", END)
-
-        # TODO: Memory lost after each request, due to separate threads or compiled every request
-        return graph_builder.compile(checkpointer=InMemorySaver())
-
 
 if __name__ == '__main__':
-    service = ConversationService(llm)
+    # service = ConversationService(llm)
     thread = "1"
 
     while True:
@@ -109,5 +82,5 @@ if __name__ == '__main__':
             thread = "2"
             continue
 
-        res = service.invoke(user_input, thread)
-        print("EVAL", res.get("query_evaluation"))
+        # res = service.invoke(user_input, thread)
+        # print("EVAL", res.get("query_evaluation"))
