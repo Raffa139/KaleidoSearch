@@ -4,6 +4,7 @@ pydantic
 sqlalchemy
 sqlmodel
 psycopg[binary, pool]
+psycopg-pool
 dotenv
 langchain==0.3.25
 langchain-core==0.3.58

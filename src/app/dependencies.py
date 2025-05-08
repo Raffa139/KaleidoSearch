@@ -2,7 +2,7 @@ import chromadb
 from typing import Annotated
 from fastapi import Depends
 from sqlmodel import Session, create_engine
-from psycopg import Connection
+from psycopg_pool import ConnectionPool
 from langchain_core.language_models import BaseChatModel
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -30,8 +30,15 @@ chroma = Chroma(
 
 
 def query_agent():
-    with Connection.connect(datasource_url(), autocommit=True, prepare_threshold=0) as connection:
-        memory = PostgresSaver(connection)
+    with ConnectionPool(
+            datasource_url(),
+            max_size=20,
+            kwargs={
+                "autocommit": True,
+                "prepare_threshold": 0
+            }
+    ) as pool:
+        memory = PostgresSaver(pool)
         memory.setup()
         yield build_agent(llm, memory)
 
