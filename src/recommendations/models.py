@@ -3,18 +3,17 @@ from pydantic import BaseModel, Field
 from src.products.models import ProductBase
 
 
-class BinaryScore(BaseModel):
-    id: int | None = Field(
-        default=None,
-        description="Optional identifier for the related document"
+class RelevanceScore(BaseModel):
+    id: int = Field(
+        description="Identifier for the related document"
     )
-    score: str = Field(
-        description="Relevance score: 'yes' if relevant, or 'no' if not relevant"
+    relevant: bool = Field(
+        description="Relevance score: True if relevant, or False if not relevant"
     )
 
 
-class BinaryScoreList(BaseModel):
-    list: List[BinaryScore] = Field(description="Relevance scores of documents")
+class RelevanceScoreList(BaseModel):
+    list: List[RelevanceScore] = Field(description="Relevance scores of documents")
 
 
 class ProductRecommendation(ProductBase):

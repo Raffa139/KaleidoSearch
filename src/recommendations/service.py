@@ -5,7 +5,7 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.graph.state import CompiledStateGraph
 from src.products.service import ProductService
-from src.recommendations.models import ProductRecommendation, BinaryScoreList
+from src.recommendations.models import ProductRecommendation, RelevanceScoreList
 from src.recommendations.query_agent.state import QueryEvaluation, QueryAgentState
 
 EVAL_QUERY_PROMPT = (
@@ -23,13 +23,12 @@ EVAL_QUERY_PROMPT = (
 
 RANK_DOCS_PROMPT = (
     "You are a grader assessing relevance of retrieved documents to a user query.\n"
-    "Here are the retrieved documents: \n\n{documents}\n\n"
+    "Here are the retrieved documents:\n\n{documents}\n\n"
     "Here is the user query: {query}\n\n"
     "If the documents contain keywords or semantic meaning related to the user query, grade it as "
     "relevant.\n"
     "Treat each document, identified by its id, separately and provide individual scores.\n"
-    "Give a binary 'yes' or 'no' score to indicate whether the documents are relevant to the "
-    "question."
+    "Give a True or False to indicate whether the documents are relevant to the question."
 )
 
 
@@ -78,8 +77,8 @@ class RecommendationService:
             ))
         )
 
-        rankings = self._llm.with_structured_output(BinaryScoreList).invoke(prompt)
-        relevant_ids = [ranking.id for ranking in rankings.list if ranking.score == "yes"]
+        rankings = self._llm.with_structured_output(RelevanceScoreList).invoke(prompt)
+        relevant_ids = [ranking.id for ranking in rankings.list if ranking.relevant]
 
         if not relevant_ids:
             return []
