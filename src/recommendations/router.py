@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Header
 from src.app.dependencies import SessionDep, LLMDep, QueryAgentDep, VectorStoreDep
 from src.recommendations.service import RecommendationService, ProductRecommendation
 from src.recommendations.query_agent.state import QueryEvaluation
@@ -33,6 +33,5 @@ def get_recommendations(q: str, service: ServiceDep):
 
 
 @router.get("/query", response_model=QueryEvaluation)
-def evaluate_user_query(q: str, service: ServiceDep):
-    # TODO: Pass thread id in (e.g. via custom header)
-    return service.evaluate_user_query(q, "1")
+def evaluate_user_query(q: str, thread_id: Annotated[str, Header()], service: ServiceDep):
+    return service.evaluate_user_query(q, thread_id)
