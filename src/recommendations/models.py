@@ -17,15 +17,5 @@ class BinaryScoreList(BaseModel):
     list: List[BinaryScore] = Field(description="Relevance scores of documents")
 
 
-class Question(BaseModel):
-    question: str
-    answer: str
-
-
-class UserQuery(BaseModel):
-    query: str
-    questions: list[Question] | None = None
-
-
 class ProductRecommendation(ProductBase):
     description: str

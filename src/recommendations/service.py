@@ -1,16 +1,24 @@
 from langchain_core.language_models import BaseChatModel
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_core.documents import Document
-from src.recommendations.models import ProductRecommendation, UserQuery, BinaryScore, \
-    BinaryScoreList
+from langchain_core.runnables import RunnableConfig
+from langchain_core.messages import SystemMessage, HumanMessage
+from langgraph.graph.state import CompiledStateGraph
 from src.products.service import ProductService
+from src.recommendations.models import ProductRecommendation, BinaryScoreList
+from src.recommendations.query_agent.state import QueryEvaluation, QueryAgentState
 
 EVAL_QUERY_PROMPT = (
     "You are a evaluator assessing relevance of a user query.\n"
     "Evaluate if the users query contains valid products, categories, or specific user needs "
     "related to e-commerce products.\n"
-    "Here is the user query: {query}\n\n"
-    "Give a binary 'yes' or 'no' score to indicate whether the query is valid."
+    "Guide the user with questions to improve the query and to add information to it.\n"
+    "Once you gathered enough information consider the query to be valid and score it with True, "
+    "score False otherwise.\n"
+    "Also provide a cleaned-up version of the users query with the same semantic meaning and "
+    "incorporating all answered questions, used for distance-based similarity search.\n"
+    "There is always room for improvement, provide further guidance with questions, even if the "
+    "query scored a True."
 )
 
 RANK_DOCS_PROMPT = (
@@ -24,56 +32,47 @@ RANK_DOCS_PROMPT = (
     "question."
 )
 
-AGGR_QUERY_PROMPT = (
-    "Given the following user query and questions answered by the user, related to products, "
-    "categories or specific user needs in e-commerce, combine them into one full query.\n"
-    "Optimize the query for distance-based similarity search of a vector database.\n"
-    "Only provide the new query, do not include any other content, explanations or examples.\n"
-    "Here is the user query: {query}\n\n"
-    "Here are the questions in the format (Q=question, A=user answer): \n\n{questions}\n\n"
-)
-
 
 class RecommendationService:
     def __init__(
             self,
             product_service: ProductService,
             llm: BaseChatModel,
+            query_agent: CompiledStateGraph,
             vector_store: VectorStoreRetriever
     ):
         self._product_service = product_service
         self._llm = llm
+        self._query_agent = query_agent
         self._vector_store = vector_store
 
-    def get_recommendations(self, query: UserQuery) -> list[ProductRecommendation] | None:
-        if not self._evaluate_user_query(query):
-            return None
+    def evaluate_user_query(self, user_query: str, thread_id: str) -> QueryEvaluation:
+        config = RunnableConfig(configurable={"thread_id": thread_id})
+        past_messages = self._query_agent.get_state(config).values.get("messages")
+        initial_messages = [SystemMessage(EVAL_QUERY_PROMPT)] if not past_messages else []
 
-        full_query = query if not query.questions else self._aggregate_user_query(query)
-        documents = self._retrieve_relevant(full_query)
+        return self._query_agent.invoke(
+            input=QueryAgentState(messages=[*initial_messages, HumanMessage(user_query)]),
+            config=config
+        ).get("query_evaluation")
+
+    def get_recommendations(self, query: str) -> list[ProductRecommendation] | None:
+        documents = self._retrieve_relevant(query)
         if not documents:
             return None
 
         return self._map_documents_to_products(documents)
 
-    def _evaluate_user_query(self, query: UserQuery) -> bool:
-        prompt = EVAL_QUERY_PROMPT.format(query=query.query)
-        response = self._llm.with_structured_output(BinaryScore).invoke(prompt)
-        return response.score == "yes"
-
-    def _retrieve_relevant(self, query: UserQuery) -> list[Document]:
+    def _retrieve_relevant(self, query: str) -> list[Document]:
         documents = self._retrieve(query)
         return self._filter_relevant_documents(query, documents)
 
-    def _retrieve(self, query: UserQuery) -> list[Document]:
-        return self._vector_store.invoke(query.query)
+    def _retrieve(self, query: str) -> list[Document]:
+        return self._vector_store.invoke(query)
 
-    def _filter_relevant_documents(
-            self, query: UserQuery, documents: list[Document]
-    ) -> list[Document]:
-        # TODO: Better formatting of documents
+    def _filter_relevant_documents(self, query: str, documents: list[Document]) -> list[Document]:
         prompt = RANK_DOCS_PROMPT.format(
-            query=query.query,
+            query=query,
             documents="\n\n".join(map(
                 lambda d: f"Id: {d.metadata.get('ref_id')}\nContent: {d.page_content}", documents
             ))
@@ -86,17 +85,6 @@ class RecommendationService:
             return []
 
         return [d for d in documents if d.metadata.get("ref_id") in relevant_ids]
-
-    def _aggregate_user_query(self, query: UserQuery) -> UserQuery:
-        prompt = AGGR_QUERY_PROMPT.format(
-            query=query.query,
-            questions="\n\n".join(map(
-                lambda q: f"Q: {q.question}\nA: {q.answer}", query.questions
-            ))
-        )
-
-        response = self._llm.invoke(prompt)
-        return UserQuery(query=response.content)
 
     def _map_documents_to_products(self, documents: list[Document]) -> list[ProductRecommendation]:
         ref_ids = [doc.metadata.get("ref_id") for doc in documents]
