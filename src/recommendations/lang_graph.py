@@ -59,9 +59,13 @@ class ConversationService:
         self._graph = self.__build_graph()
 
     def invoke(self, user_query: str, thread_id: str) -> QueryEvaluation:
+        config = RunnableConfig(configurable={"thread_id": thread_id})
+        past_messages = self._graph.get_state(config).values.get("messages")
+        initial_messages = [SystemMessage(EVAL_QUERY_PROMPT)] if not past_messages else []
+
         return self._graph.invoke(
-            input=State(messages=[SystemMessage(EVAL_QUERY_PROMPT), HumanMessage(user_query)]),
-            config=RunnableConfig(configurable={"thread_id": thread_id})
+            input=State(messages=[*initial_messages, HumanMessage(user_query)]),
+            config=config
         ).get("query_evaluation")
 
     def __gemini(self, state: State):
