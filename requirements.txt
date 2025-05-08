@@ -3,7 +3,7 @@ uvicorn
 pydantic
 sqlalchemy
 sqlmodel
-psycopg2
+psycopg[binary, pool]
 dotenv
 langchain==0.3.25
 langchain-core==0.3.58

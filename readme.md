@@ -61,7 +61,7 @@ search endeavours.
    ```
 3. Set up your environment:
    ```.env
-   DATASOURCE_URL="postgresql+psycopg2://kaleidosearch:secret@localhost/kaleidosearch"
+   DATASOURCE_URL="postgresql://kaleidosearch:secret@localhost:5432/kaleidosearch"
    ```
 4. Configure your LLM API key securely.
 
