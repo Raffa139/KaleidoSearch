@@ -26,7 +26,7 @@ chroma = Chroma(
     client=chromadb.HttpClient(host="localhost", port=5000),
     collection_name="kaleido_search_products",
     embedding_function=embeddings
-).as_retriever(search_kwargs={"k": 2})
+).as_retriever(search_kwargs={"k": 4})
 
 
 def query_agent():

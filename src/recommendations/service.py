@@ -9,26 +9,99 @@ from src.recommendations.models import ProductRecommendation, RelevanceScoreList
 from src.recommendations.query_agent.state import QueryEvaluation, QueryAgentState
 
 EVAL_QUERY_PROMPT = (
-    "You are a evaluator assessing relevance of a user query.\n"
-    "Evaluate if the users query contains valid products, categories, or specific user needs "
-    "related to e-commerce products.\n"
-    "Guide the user with questions to improve the query and to add information to it.\n"
-    "Once you gathered enough information consider the query to be valid and score it with True, "
-    "score False otherwise.\n"
-    "Also provide a cleaned-up version of the users query with the same semantic meaning and "
-    "incorporating all answered questions, used for distance-based similarity search.\n"
-    "There is always room for improvement, provide further guidance with questions, even if the "
-    "query scored a True."
+    """
+You are an AI assistant designed to evaluate and refine user queries for e-commerce product 
+recommendations.
+
+Your primary goal is to determine if a user's query contains sufficient and specific information 
+to generate relevant product recommendations.
+
+**Evaluation Process:**
+
+1.  **Assess Information Specificity:** Analyze the user's query for the presence of valid 
+product names, categories, or specific user needs related to e-commerce (e.g., intended use, 
+desired features, brand preferences).
+
+2.  **Determine Validity:** A query is considered **valid (score: True)** when the cleaned-up 
+version contains at least **two distinct and meaningful pieces of information** about the user's 
+needs. Examples of distinct information include:
+    * Product Category (e.g., "dress", "laptop", "coffee maker")
+    * Specific Attribute (e.g., "red", "lightweight", "programmable")
+    * Target User/Occasion (e.g., "for hiking", "for a formal event", "for beginners")
+    * Price Range (e.g., "under $50", "between $100 and $200")
+    * Brand (e.g., "Nike shoes", "Samsung phone")
+
+    If the cleaned-up query contains fewer than two distinct pieces of information, the query is 
+    **not yet valid (score: False)**.
+
+3.  **Guidance and Question Generation:**
+    * **If the query is not yet valid (False):** Ask targeted questions to help the user provide 
+    more specific information. Focus on open-ended questions that encourage detail. Examples:
+        * "Could you tell me more about what kind of [product category] you're looking for?"
+        * "Are there any specific features or characteristics that are important to you?"
+        * "Who is this for, or what will you be using it for?"
+        * "Do you have a budget in mind?"
+        * "Are there any brands you prefer or want to avoid?"
+    * **Even if the query is valid (True):** Continue to gently encourage the user to provide 
+    even more detail for better recommendations. Offer further clarifying questions. Examples:
+        * "To help me find the perfect [product category] for you, are there any specific 
+        materials you have in mind?"
+        * "Are there any particular styles or designs you are interested in?"
+        * "Is there anything else I should know about your preferences?"
+
+4.  **Cleaned-up Query:** Provide a cleaned-up version of the user's query. This version should:
+    * Retain the semantic meaning of the original query.
+    * Incorporate the information provided by the user in response to your questions.
+    * Be suitable for distance-based similarity search in a vector store.
+    * Example: If the user initially says "I need a laptop" and then answers "for gaming under 
+    $1000", the cleaned-up query would be "gaming laptop under $1000".
+    * Be None if the user's query and responses contain absolutely no discernible information 
+    related to e-commerce products or needs (e.g., "test", "hello there", "what's the weather 
+    like?"), then the cleaned query should be None.
+
+**Output Format:**
+
+Your response should be structured as follows:
+
+**Query Score**: True or False
+
+**Questions**:
+    * Question 1
+    * Question 2
+    * Question 3
+    * Question 4
+
+**Cleand Query**: Users cleaned query
+    """
 )
 
 RANK_DOCS_PROMPT = (
-    "You are a grader assessing relevance of retrieved documents to a user query.\n"
-    "Here are the retrieved documents:\n\n{documents}\n\n"
-    "Here is the user query: {query}\n\n"
-    "If the documents contain keywords or semantic meaning related to the user query, grade it as "
-    "relevant.\n"
-    "Treat each document, identified by its id, separately and provide individual scores.\n"
-    "Give a True or False to indicate whether the documents are relevant to the question."
+    """
+You are an expert grader tasked with evaluating the relevance of retrieved documents to a given 
+user query. Your goal is to determine, for each document individually, whether it shares 
+significant semantic meaning or keywords with the query.
+
+Each document is presented in the following format:
+
+Document ID: [document_id]
+Content: [document_content]
+
+Here are the retrieved documents:
+
+{documents}
+
+Here is the user query:
+
+{query}
+
+For each document listed above, carefully analyze its content and compare it to the user query. 
+Consider both the presence of specific keywords and the overall semantic similarity.
+
+Provide your evaluation for each document, where 'True' indicates that the document is highly 
+relevant to the user query (sharing significant semantic meaning or keywords), and 'False' 
+indicates that the document is not relevant. Ensure you provide a True/False evaluation for every 
+document presented.
+    """
 )
 
 
@@ -73,7 +146,8 @@ class RecommendationService:
         prompt = RANK_DOCS_PROMPT.format(
             query=query,
             documents="\n\n".join(map(
-                lambda d: f"Id: {d.metadata.get('ref_id')}\nContent: {d.page_content}", documents
+                lambda d: f"Document ID: {d.metadata.get('ref_id')}\nContent: {d.page_content}",
+                documents
             ))
         )
 

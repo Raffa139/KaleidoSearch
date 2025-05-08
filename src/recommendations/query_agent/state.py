@@ -5,7 +5,7 @@ from langgraph.graph.message import add_messages
 
 class QueryQuestion(BaseModel):
     short: str = Field(
-        description="Brief summary of a question, only 1-3 words long"
+        description="Brief summary of a question, only 1-3 words long, capitalized and without '?'"
     )
     long: str = Field(
         description="Short and concise one sentence description of a question"
