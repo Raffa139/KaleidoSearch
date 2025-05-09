@@ -130,7 +130,7 @@ class SearchService:
         new_thread_id = self._user_service.create_thread(user_id).id if not thread_id else None
         thread_id = thread_id if thread_id else new_thread_id
 
-        config = RunnableConfig(configurable={"thread_id": thread_id})
+        config = self.__get_agent_config(thread_id)
         past_messages = self._search_agent.get_state(config).values.get("messages")
         initial_messages = [SystemMessage(EVAL_QUERY_PROMPT)] if not past_messages else []
 
@@ -144,12 +144,19 @@ class SearchService:
                 self._user_service.delete_thread(new_thread_id)
             raise
 
-    def get_recommendations(self, query: str) -> list[ProductRecommendation] | None:
-        documents = self._retrieve_relevant(query)
-        if not documents:
+    def get_recommendations(self, thread_id: int) -> list[ProductRecommendation] | None:
+        config = self.__get_agent_config(thread_id)
+        query_evaluation = self._search_agent.get_state(config).values.get("query_evaluation")
+        query = query_evaluation.cleaned_query if query_evaluation else None
+
+        if not query:
             return None
 
-        return self._map_documents_to_products(documents)
+        relevant_documents = self._retrieve_relevant(query)
+        if not relevant_documents:
+            return []
+
+        return self._map_documents_to_products(relevant_documents)
 
     def _retrieve_relevant(self, query: str) -> list[Document]:
         documents = self._retrieve(query)
@@ -189,3 +196,6 @@ class SearchService:
             ))
 
         return recommendations
+
+    def __get_agent_config(self, thread_id: int) -> RunnableConfig:
+        return RunnableConfig(configurable={"thread_id": thread_id})

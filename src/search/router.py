@@ -47,10 +47,17 @@ def evaluate_user_query(
 
 
 @router.get("/recommendations", response_model=list[ProductRecommendation])
-def get_recommendations(q: str, service: ServiceDep):
-    # TODO: Remove q, provide thread_id, access thread state and use cleaned query if exists
-    recommendations = service.get_recommendations(q)
-    if not recommendations:
-        raise HTTPException(status_code=400)
+def get_recommendations(
+        user_id: Annotated[int, Header()],
+        thread_id: Annotated[int, Header()],
+        service: ServiceDep,
+        user_service: UserServiceDep
+):
+    if not user_service.has_user_access_to_thread(user_id, thread_id):
+        raise HTTPException(status_code=403)
+
+    recommendations = service.get_recommendations(thread_id)
+    if recommendations is None:
+        raise HTTPException(status_code=400, detail="User query needs refinement")
 
     return recommendations
