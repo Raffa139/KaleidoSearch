@@ -1,13 +1,13 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends, Header
-from src.app.dependencies import SessionDep, LLMDep, QueryAgentDep, VectorStoreDep
-from src.recommendations.service import RecommendationService, ProductRecommendation
-from src.recommendations.query_agent.state import QueryEvaluation
+from src.app.dependencies import SessionDep, LLMDep, SearchAgentDep, VectorStoreDep
+from src.search.service import SearchService, ProductRecommendation
+from src.search.agent.state import QueryEvaluation
 from src.products.service import ProductService
 from src.shops.service import ShopService
 from src.users.service import UserService
 
-router = APIRouter(prefix="/recommendations", tags=["recommendations"])
+router = APIRouter(prefix="/search", tags=["searching"])
 
 
 def user_service_dep(session: SessionDep):
@@ -17,32 +17,22 @@ def user_service_dep(session: SessionDep):
 UserServiceDep = Annotated[UserService, Depends(user_service_dep)]
 
 
-def recommendation_service(
+def search_service(
         session: SessionDep,
         llm: LLMDep,
-        query_agent: QueryAgentDep,
+        search_agent: SearchAgentDep,
         vector_store: VectorStoreDep,
         user_service: UserServiceDep
 ):
     shop_service = ShopService(session)
     product_service = ProductService(session, shop_service)
-    return RecommendationService(product_service, user_service, llm, query_agent, vector_store)
+    return SearchService(product_service, user_service, llm, search_agent, vector_store)
 
 
-ServiceDep = Annotated[RecommendationService, Depends(recommendation_service)]
+ServiceDep = Annotated[SearchService, Depends(search_service)]
 
 
-@router.get("/", response_model=list[ProductRecommendation])
-def get_recommendations(q: str, service: ServiceDep):
-    # TODO: Remove q, provide thread_id, access thread state and use cleaned query if exists
-    recommendations = service.get_recommendations(q)
-    if not recommendations:
-        raise HTTPException(status_code=400)
-
-    return recommendations
-
-
-@router.get("/query", response_model=QueryEvaluation)
+@router.get("/", response_model=QueryEvaluation)
 def evaluate_user_query(
         q: str,
         service: ServiceDep,
@@ -54,3 +44,13 @@ def evaluate_user_query(
         raise HTTPException(status_code=403)
 
     return service.evaluate_user_query(q, user_id, thread_id)
+
+
+@router.get("/recommendations", response_model=list[ProductRecommendation])
+def get_recommendations(q: str, service: ServiceDep):
+    # TODO: Remove q, provide thread_id, access thread state and use cleaned query if exists
+    recommendations = service.get_recommendations(q)
+    if not recommendations:
+        raise HTTPException(status_code=400)
+
+    return recommendations

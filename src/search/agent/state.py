@@ -28,6 +28,6 @@ class QueryEvaluation(BaseModel):
     )
 
 
-class QueryAgentState(TypedDict):
+class SearchAgentState(TypedDict):
     messages: Annotated[list, add_messages]
     query_evaluation: QueryEvaluation

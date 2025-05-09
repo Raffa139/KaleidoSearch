@@ -10,7 +10,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.graph.state import CompiledStateGraph
-from src.recommendations.query_agent.agent import build_agent
+from src.search.agent.graph import build_agent
 from src.environment import datasource_url, gemini_api_key
 
 db_engine = create_engine(datasource_url())
@@ -29,7 +29,7 @@ chroma = Chroma(
 ).as_retriever(search_kwargs={"k": 4})
 
 
-def query_agent():
+def search_agent():
     with ConnectionPool(
             datasource_url(),
             max_size=20,
@@ -52,6 +52,6 @@ SessionDep = Annotated[Session, Depends(db_session)]
 
 LLMDep = Annotated[BaseChatModel, Depends(lambda: llm)]
 
-QueryAgentDep = Annotated[CompiledStateGraph, Depends(query_agent)]
+SearchAgentDep = Annotated[CompiledStateGraph, Depends(search_agent)]
 
 VectorStoreDep = Annotated[VectorStoreRetriever, Depends(lambda: chroma)]

@@ -6,7 +6,7 @@ from src.app.dependencies import db_engine
 from src.products.router import router as products_router
 from src.shops.router import router as shops_router
 from src.users.router import router as users_router
-from src.recommendations.router import router as recommendations_router
+from src.search.router import router as search_router
 
 
 def initialize_db():
@@ -23,7 +23,7 @@ def create_app():
     app.include_router(products_router)
     app.include_router(shops_router)
     app.include_router(users_router)
-    app.include_router(recommendations_router)
+    app.include_router(search_router)
 
     app.add_exception_handler(ValueError, handle_value_error)
 

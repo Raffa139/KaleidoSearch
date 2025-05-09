@@ -6,8 +6,8 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.graph.state import CompiledStateGraph
 from src.products.service import ProductService
 from src.users.service import UserService
-from src.recommendations.models import ProductRecommendation, RelevanceScoreList
-from src.recommendations.query_agent.state import QueryEvaluation, QueryAgentState
+from src.search.models import ProductRecommendation, RelevanceScoreList
+from src.search.agent.state import QueryEvaluation, SearchAgentState
 
 EVAL_QUERY_PROMPT = (
     """
@@ -106,19 +106,19 @@ document presented.
 )
 
 
-class RecommendationService:
+class SearchService:
     def __init__(
             self,
             product_service: ProductService,
             user_service: UserService,
             llm: BaseChatModel,
-            query_agent: CompiledStateGraph,
+            search_agent: CompiledStateGraph,
             vector_store: VectorStoreRetriever
     ):
         self._product_service = product_service
         self._user_service = user_service
         self._llm = llm
-        self._query_agent = query_agent
+        self._search_agent = search_agent
         self._vector_store = vector_store
 
     def evaluate_user_query(
@@ -131,12 +131,12 @@ class RecommendationService:
         thread_id = thread_id if thread_id else new_thread_id
 
         config = RunnableConfig(configurable={"thread_id": thread_id})
-        past_messages = self._query_agent.get_state(config).values.get("messages")
+        past_messages = self._search_agent.get_state(config).values.get("messages")
         initial_messages = [SystemMessage(EVAL_QUERY_PROMPT)] if not past_messages else []
 
         try:
-            return self._query_agent.invoke(
-                input=QueryAgentState(messages=[*initial_messages, HumanMessage(user_query)]),
+            return self._search_agent.invoke(
+                input=SearchAgentState(messages=[*initial_messages, HumanMessage(user_query)]),
                 config=config
             ).get("query_evaluation")
         except Exception:
