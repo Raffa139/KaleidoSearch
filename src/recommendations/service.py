@@ -5,6 +5,7 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.graph.state import CompiledStateGraph
 from src.products.service import ProductService
+from src.users.service import UserService
 from src.recommendations.models import ProductRecommendation, RelevanceScoreList
 from src.recommendations.query_agent.state import QueryEvaluation, QueryAgentState
 
@@ -109,24 +110,39 @@ class RecommendationService:
     def __init__(
             self,
             product_service: ProductService,
+            user_service: UserService,
             llm: BaseChatModel,
             query_agent: CompiledStateGraph,
             vector_store: VectorStoreRetriever
     ):
         self._product_service = product_service
+        self._user_service = user_service
         self._llm = llm
         self._query_agent = query_agent
         self._vector_store = vector_store
 
-    def evaluate_user_query(self, user_query: str, thread_id: str) -> QueryEvaluation:
+    def evaluate_user_query(
+            self,
+            user_query: str,
+            user_id: int,
+            thread_id: int | None
+    ) -> QueryEvaluation:
+        new_thread_id = self._user_service.create_thread(user_id).id if not thread_id else None
+        thread_id = thread_id if thread_id else new_thread_id
+
         config = RunnableConfig(configurable={"thread_id": thread_id})
         past_messages = self._query_agent.get_state(config).values.get("messages")
         initial_messages = [SystemMessage(EVAL_QUERY_PROMPT)] if not past_messages else []
 
-        return self._query_agent.invoke(
-            input=QueryAgentState(messages=[*initial_messages, HumanMessage(user_query)]),
-            config=config
-        ).get("query_evaluation")
+        try:
+            return self._query_agent.invoke(
+                input=QueryAgentState(messages=[*initial_messages, HumanMessage(user_query)]),
+                config=config
+            ).get("query_evaluation")
+        except Exception:
+            if new_thread_id:
+                self._user_service.delete_thread(new_thread_id)
+            raise
 
     def get_recommendations(self, query: str) -> list[ProductRecommendation] | None:
         documents = self._retrieve_relevant(query)

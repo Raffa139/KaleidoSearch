@@ -19,3 +19,8 @@ class UserOut(UserBase):
 
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
+
+
+class Thread(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
