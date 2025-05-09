@@ -16,6 +16,10 @@ def chat_model(llm: BaseChatModel, state: QueryAgentState):
 
 
 def structured_response(llm: BaseChatModel, state: QueryAgentState):
+    # TODO: Maybe can be called as tool to remove extra llm call
+    #       Custom tool condition that wires to END after tool called
+    #       Custom tool node that saves evaluation in state
+
     def invoke(s: QueryAgentState):
         last_message = s["messages"][-1].content
         response = llm.with_structured_output(QueryEvaluation).invoke(

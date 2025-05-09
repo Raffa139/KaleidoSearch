@@ -25,6 +25,7 @@ ServiceDep = Annotated[RecommendationService, Depends(recommendation_service)]
 
 @router.get("/", response_model=list[ProductRecommendation])
 def get_recommendations(q: str, service: ServiceDep):
+    # TODO: Remove q, provide thread_id, access thread state and use cleaned query if exists
     recommendations = service.get_recommendations(q)
     if not recommendations:
         raise HTTPException(status_code=400)
