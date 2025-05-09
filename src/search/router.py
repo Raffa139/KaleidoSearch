@@ -40,8 +40,13 @@ def evaluate_user_query(
         user_id: Annotated[int, Header()],
         thread_id: Annotated[int, Header()] = None
 ):
+    if not user_service.find_user_by_id(user_id):
+        raise HTTPException(status_code=401)
+
     if thread_id and not user_service.has_user_access_to_thread(user_id, thread_id):
         raise HTTPException(status_code=403)
+
+    # TODO: Return thread id
 
     return service.evaluate_user_query(q, user_id, thread_id)
 
@@ -53,6 +58,9 @@ def get_recommendations(
         service: ServiceDep,
         user_service: UserServiceDep
 ):
+    if not user_service.find_user_by_id(user_id):
+        raise HTTPException(status_code=401)
+
     if not user_service.has_user_access_to_thread(user_id, thread_id):
         raise HTTPException(status_code=403)
 

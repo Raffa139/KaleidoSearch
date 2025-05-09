@@ -15,11 +15,15 @@ from src.environment import datasource_url, gemini_api_key
 
 db_engine = create_engine(datasource_url())
 
+# TODO: Make LLM configurable
+
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     temperature=0,
     google_api_key=gemini_api_key()
 )
+
+# TODO: Make Chroma connection setting configurable
 
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
 chroma = Chroma(
