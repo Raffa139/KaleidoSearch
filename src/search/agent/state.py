@@ -3,7 +3,19 @@ from pydantic import BaseModel, Field
 from langgraph.graph.message import add_messages
 
 
-class QueryQuestion(BaseModel):
+class AnsweredQuestion(BaseModel):
+    id: int = Field(
+        description="Unique integer identifier, starting from 0 and incrementing sequentially"
+    )
+    answer: str = Field(
+        description="Answer from the user"
+    )
+
+
+class FollowUpQuestion(BaseModel):
+    id: int = Field(
+        description="Unique integer identifier, starting from 0 and incrementing sequentially"
+    )
     short: str = Field(
         description="Brief summary of a question, only 1-3 words long, capitalized and without '?'"
     )
@@ -16,8 +28,13 @@ class QueryEvaluation(BaseModel):
     valid: bool = Field(
         description="Query score: True if valid, or False if not valid"
     )
-    questions: List[QueryQuestion] = Field(
-        description="Questions to guide the user, improve the query, and add information to it"
+    answered_questions: List[AnsweredQuestion] = Field(
+        description="Questions that have already been answered by the user"
+    )
+    follow_up_questions: List[FollowUpQuestion] = Field(
+        description=(
+            "Follow Up Questions to guide the user, improve the query, and add information to it"
+        )
     )
     cleaned_query: str | None = Field(
         default=None,
