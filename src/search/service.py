@@ -6,8 +6,8 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.graph.state import CompiledStateGraph
 from src.products.service import ProductService
 from src.users.service import UserService
-from src.search.models import ProductRecommendation, RelevanceScoreList
-from src.search.agent.state import QueryEvaluation, SearchAgentState
+from src.search.models import ProductRecommendation, RelevanceScoreList, QueryEvaluationOut
+from src.search.agent.state import SearchAgentState
 
 EVAL_QUERY_PROMPT = (
     """
@@ -126,7 +126,7 @@ class SearchService:
             user_query: str,
             user_id: int,
             thread_id: int | None
-    ) -> QueryEvaluation:
+    ) -> QueryEvaluationOut:
         new_thread_id = self._user_service.create_thread(user_id).id if not thread_id else None
         thread_id = thread_id if thread_id else new_thread_id
 
@@ -135,10 +135,12 @@ class SearchService:
         initial_messages = [SystemMessage(EVAL_QUERY_PROMPT)] if not past_messages else []
 
         try:
-            return self._search_agent.invoke(
+            query_evaluation = self._search_agent.invoke(
                 input=SearchAgentState(messages=[*initial_messages, HumanMessage(user_query)]),
                 config=config
             ).get("query_evaluation")
+
+            return QueryEvaluationOut(**query_evaluation.model_dump(), thread_id=thread_id)
         except Exception:
             if new_thread_id:
                 self._user_service.delete_thread(new_thread_id)

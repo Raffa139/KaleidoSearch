@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends, Header
 from src.app.dependencies import SessionDep, LLMDep, SearchAgentDep, VectorStoreDep
 from src.search.service import SearchService, ProductRecommendation
-from src.search.agent.state import QueryEvaluation
+from src.search.models import QueryEvaluationOut
 from src.products.service import ProductService
 from src.shops.service import ShopService
 from src.users.service import UserService
@@ -32,7 +32,7 @@ def search_service(
 ServiceDep = Annotated[SearchService, Depends(search_service)]
 
 
-@router.get("/", response_model=QueryEvaluation)
+@router.get("/", response_model=QueryEvaluationOut)
 def evaluate_user_query(
         q: str,
         service: ServiceDep,
@@ -45,8 +45,6 @@ def evaluate_user_query(
 
     if thread_id and not user_service.has_user_access_to_thread(user_id, thread_id):
         raise HTTPException(status_code=403)
-
-    # TODO: Return thread id
 
     return service.evaluate_user_query(q, user_id, thread_id)
 
