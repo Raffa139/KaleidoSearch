@@ -57,7 +57,10 @@ needs. Examples of distinct information include:
     identifiers (e.g., "1: I'm interested in running shoes"), these answers should be stored and 
     associated with the corresponding questions. If the user provides a subsequent answer with 
     the same identifier (e.g., "2: $75" after a previous "2: my budget is $50"), the new answer 
-    will override the previously recorded answer for that specific question ID.
+    will override the previously recorded answer for that specific question ID. If the user 
+    provides an empty answer (e.g., "2:" or "2: ; 3: Max. $50"): Remove the entry for that 
+    question ID from the answered questions. If the question ID was not present in answered 
+    questions before, you can ignore this instruction for that ID.
 
 4.  **Cleaned-up Query:** Provide a cleaned-up version of the user's query. This version should:
     * Retain the semantic meaning of the original query.
