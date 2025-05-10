@@ -6,8 +6,9 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.graph.state import CompiledStateGraph
 from src.products.service import ProductService
 from src.users.service import UserService
-from src.search.models import ProductRecommendation, RelevanceScoreList, QueryEvaluationOut
-from src.search.agent.state import SearchAgentState
+from src.search.models import ProductRecommendation, RelevanceScoreList, QueryEvaluationOut, \
+    UserSearch
+from src.search.agent.state import SearchAgentState, QueryEvaluation
 
 EVAL_QUERY_PROMPT = (
     """
@@ -139,22 +140,28 @@ class SearchService:
 
     def evaluate_user_query(
             self,
-            user_query: str,
+            user_search: UserSearch,
             user_id: int,
             thread_id: int | None
     ) -> QueryEvaluationOut:
+        if not user_search.has_content():
+            raise ValueError("No query and no answers given, indicate at least one of the two")
+
         new_thread_id = self._user_service.create_thread(user_id).id if not thread_id else None
         thread_id = thread_id if thread_id else new_thread_id
-
         config = self.__get_agent_config(thread_id)
-        past_messages = self._search_agent.get_state(config).values.get("messages")
-        initial_messages = [SystemMessage(EVAL_QUERY_PROMPT)] if not past_messages else []
+
+        if not self.__user_answers_valid(user_search, config):
+            if new_thread_id:
+                self._user_service.delete_thread(new_thread_id)
+            raise ValueError("Answer IDs missmatch question IDs")
 
         try:
-            query_evaluation = self._search_agent.invoke(
-                input=SearchAgentState(messages=[*initial_messages, HumanMessage(user_query)]),
-                config=config
-            ).get("query_evaluation")
+            if user_query := user_search.query:
+                query_evaluation = self._invoke_search_agent(user_query, config)
+
+            if formatted_answers := user_search.format_answers():
+                query_evaluation = self._invoke_search_agent(formatted_answers, config)
 
             return QueryEvaluationOut(**query_evaluation.model_dump(), thread_id=thread_id)
         except Exception:
@@ -170,11 +177,19 @@ class SearchService:
         if not query:
             return None
 
-        relevant_documents = self._retrieve_relevant(query)
-        if not relevant_documents:
-            return []
+        if relevant_documents := self._retrieve_relevant(query):
+            return self._map_documents_to_products(relevant_documents)
 
-        return self._map_documents_to_products(relevant_documents)
+        return []
+
+    def _invoke_search_agent(self, query: str, config: RunnableConfig) -> QueryEvaluation:
+        past_messages = self._search_agent.get_state(config).values.get("messages")
+        initial_messages = [SystemMessage(EVAL_QUERY_PROMPT)] if not past_messages else []
+
+        return self._search_agent.invoke(
+            input=SearchAgentState(messages=[*initial_messages, HumanMessage(query)]),
+            config=config
+        ).get("query_evaluation")
 
     def _retrieve_relevant(self, query: str) -> list[Document]:
         documents = self._retrieve(query)
@@ -214,6 +229,17 @@ class SearchService:
             ))
 
         return recommendations
+
+    def __user_answers_valid(self, user_search: UserSearch, config: RunnableConfig) -> bool:
+        if not user_search.answers:
+            return True
+
+        query_evaluation = self._search_agent.get_state(config).values.get("query_evaluation")
+        follow_up_questions = query_evaluation.follow_up_questions if query_evaluation else []
+        answered_questions = query_evaluation.answered_questions if query_evaluation else []
+        all_question_ids = list(map(lambda q: q.id, follow_up_questions + answered_questions))
+        answer_ids = list(map(lambda a: a.id, user_search.answers))
+        return all([answer_id in all_question_ids for answer_id in answer_ids])
 
     def __get_agent_config(self, thread_id: int) -> RunnableConfig:
         return RunnableConfig(configurable={"thread_id": thread_id})

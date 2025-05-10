@@ -5,6 +5,8 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from src.search.agent.state import SearchAgentState, QueryEvaluation
 
+# TODO: Pydantic state -> https://langchain-ai.github.io/langgraph/how-tos/state-model/#serialization-behavior
+# TODO: Maybe wrap as class, make methods to directly access pydantic state
 
 def chat_model(llm: BaseChatModel, state: SearchAgentState):
     def invoke(s: SearchAgentState):

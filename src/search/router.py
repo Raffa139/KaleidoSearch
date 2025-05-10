@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends, Header
 from src.app.dependencies import SessionDep, LLMDep, SearchAgentDep, VectorStoreDep
 from src.search.service import SearchService, ProductRecommendation
-from src.search.models import QueryEvaluationOut
+from src.search.models import QueryEvaluationOut, UserSearch
 from src.products.service import ProductService
 from src.shops.service import ShopService
 from src.users.service import UserService
@@ -32,9 +32,9 @@ def search_service(
 ServiceDep = Annotated[SearchService, Depends(search_service)]
 
 
-@router.get("/", response_model=QueryEvaluationOut)
+@router.post("/", response_model=QueryEvaluationOut)
 def evaluate_user_query(
-        q: str,
+        user_search: UserSearch,
         service: ServiceDep,
         user_service: UserServiceDep,
         user_id: Annotated[int, Header()],
@@ -46,7 +46,7 @@ def evaluate_user_query(
     if thread_id and not user_service.has_user_access_to_thread(user_id, thread_id):
         raise HTTPException(status_code=403)
 
-    return service.evaluate_user_query(q, user_id, thread_id)
+    return service.evaluate_user_query(user_search, user_id, thread_id)
 
 
 @router.get("/recommendations", response_model=list[ProductRecommendation])
@@ -64,6 +64,6 @@ def get_recommendations(
 
     recommendations = service.get_recommendations(thread_id)
     if recommendations is None:
-        raise HTTPException(status_code=400, detail="User query needs refinement")
+        raise HTTPException(status_code=400, detail="User search needs refinement")
 
     return recommendations

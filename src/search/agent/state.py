@@ -11,6 +11,12 @@ class AnsweredQuestion(BaseModel):
         description="Answer from the user"
     )
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return hash(id)
+
 
 class FollowUpQuestion(BaseModel):
     id: int = Field(

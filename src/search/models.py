@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel, Field
-from src.search.agent.state import QueryEvaluation
+from src.search.agent.state import QueryEvaluation, AnsweredQuestion
 from src.products.models import ProductBase
 
 
@@ -15,6 +15,23 @@ class RelevanceScore(BaseModel):
 
 class RelevanceScoreList(BaseModel):
     list: List[RelevanceScore] = Field(description="Relevance scores of documents")
+
+
+class UserSearch(BaseModel):
+    query: str | None = None
+    answers: List[AnsweredQuestion] | None = None
+
+    def has_content(self) -> bool:
+        return bool(self.query) or bool(self.answers)
+
+    def format_answers(self) -> str | None:
+        if not self.answers:
+            return None
+
+        formatted_answers = [
+            f"{a.id}: {a.answer.strip().replace(';', ',')}" for a in set(self.answers)
+        ]
+        return "; ".join(formatted_answers)
 
 
 class QueryEvaluationOut(QueryEvaluation):
