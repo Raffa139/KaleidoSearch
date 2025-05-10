@@ -13,6 +13,8 @@ from langgraph.graph.state import CompiledStateGraph
 from src.search.agent.graph import build_agent
 from src.environment import datasource_url, gemini_api_key
 
+# TODO: Maybe create all dependencies here and none inside routers?
+
 db_engine = create_engine(datasource_url())
 
 # TODO: Make LLM configurable
@@ -23,7 +25,7 @@ llm = ChatGoogleGenerativeAI(
     google_api_key=gemini_api_key()
 )
 
-# TODO: Make Chroma connection setting configurable
+# TODO: Make Chroma connection settings configurable
 
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
 chroma = Chroma(
