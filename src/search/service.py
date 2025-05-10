@@ -178,7 +178,7 @@ class SearchService:
         query = query_evaluation.cleaned_query if query_evaluation else None
 
         if not query:
-            return None
+            raise ValueError("User search needs refinement")
 
         if relevant_documents := self._retrieve_relevant(query):
             return self._map_documents_to_products(relevant_documents)
