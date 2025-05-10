@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import List
 from pydantic import BaseModel, Field
 from src.search.agent.state import QueryEvaluation, AnsweredQuestion
@@ -17,9 +18,29 @@ class RelevanceScoreList(BaseModel):
     list: List[RelevanceScore] = Field(description="Relevance scores of documents")
 
 
-class UserSearch(BaseModel):
+class BaseUserSearch(ABC, BaseModel):
+    query: str
+
+    def get_answers(self) -> List[AnsweredQuestion] | None:
+        return None
+
+    def has_content(self) -> bool:
+        return bool(self.query)
+
+    def format_answers(self) -> str | None:
+        return None
+
+
+class NewUserSearch(BaseUserSearch):
+    pass
+
+
+class UserSearch(BaseUserSearch):
     query: str | None = None
     answers: List[AnsweredQuestion] | None = None
+
+    def get_answers(self) -> List[AnsweredQuestion] | None:
+        return self.answers
 
     def has_content(self) -> bool:
         return bool(self.query) or bool(self.answers)

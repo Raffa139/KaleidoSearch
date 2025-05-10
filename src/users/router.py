@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
 from src.app.dependencies import SessionDep, LLMDep, SearchAgentDep, VectorStoreDep
 from src.search.service import SearchService, ProductRecommendation
-from src.search.models import QueryEvaluationOut, UserSearch
+from src.search.models import QueryEvaluationOut, NewUserSearch, UserSearch, BaseUserSearch
 from src.products.service import ProductService
 from src.shops.service import ShopService
 from src.users.service import UserService
@@ -54,7 +54,7 @@ def get_user_by_id(uid: int, user_service: UserServiceDep):
 @router.post("/{uid}/threads", response_model=QueryEvaluationOut)
 def start_new_tread(
         uid: int,
-        user_search: UserSearch,
+        user_search: NewUserSearch,
         search_service: SearchServiceDep,
         user_service: UserServiceDep
 ):
@@ -91,7 +91,7 @@ def get_recommendations_from_thread(
 def handle_thread_posts(
         uid: int,
         tid: int | None,
-        user_search: UserSearch,
+        user_search: BaseUserSearch,
         search_service: SearchServiceDep,
         user_service: UserServiceDep
 ) -> QueryEvaluationOut:
