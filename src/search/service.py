@@ -147,26 +147,11 @@ class SearchService:
             user_id: int,
             thread_id: int | None
     ) -> QueryEvaluationOut:
-        if not user_search.has_content():
-            raise ValueError("No query and no answers given, indicate at least one of the two")
-
         new_thread_id = self._user_service.create_thread(user_id).id if not thread_id else None
-        thread_id = thread_id if thread_id else new_thread_id
-        config = self.__get_agent_config(thread_id)
-
-        if not self.__user_answers_valid(user_search, config):
-            if new_thread_id:
-                self._user_service.delete_thread(new_thread_id)
-            raise ValueError("Answer IDs missmatch question IDs")
+        config = self.__get_agent_config(thread_id if thread_id else new_thread_id)
 
         try:
-            if user_query := user_search.query:
-                query_evaluation = self._invoke_search_agent(user_query, config)
-
-            if formatted_answers := user_search.format_answers():
-                query_evaluation = self._invoke_search_agent(formatted_answers, config)
-
-            return QueryEvaluationOut(**query_evaluation.model_dump(), thread_id=thread_id)
+            return self._evaluate_user_query(user_search, config)
         except Exception:
             if new_thread_id:
                 self._user_service.delete_thread(new_thread_id)
@@ -184,6 +169,26 @@ class SearchService:
             return self._map_documents_to_products(relevant_documents)
 
         return []
+
+    def _evaluate_user_query(
+            self,
+            user_search: UserSearch,
+            config: RunnableConfig
+    ) -> QueryEvaluationOut:
+        if not user_search.has_content():
+            raise ValueError("No query and no answers given, indicate at least one of the two")
+
+        if not self.__user_answers_valid(user_search, config):
+            raise ValueError("Answer IDs missmatch question IDs")
+
+        if user_query := user_search.query:
+            query_evaluation = self._invoke_search_agent(user_query, config)
+
+        if formatted_answers := user_search.format_answers():
+            query_evaluation = self._invoke_search_agent(formatted_answers, config)
+
+        thread_id = config.get("configurable").get("thread_id")
+        return QueryEvaluationOut(**query_evaluation.model_dump(), thread_id=thread_id)
 
     def _invoke_search_agent(self, query: str, config: RunnableConfig) -> QueryEvaluation:
         past_messages = self._search_agent.get_state(config).values.get("messages")
