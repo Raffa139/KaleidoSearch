@@ -83,23 +83,32 @@ class Stopwatch:
 
     def print_segments(self):
         print("Stopwatch Segments")
+        print(f"┌{'-' * 17}")
         for i, segment in enumerate(self._segments):
-            if i == 0:
-                print("┌", end="")
-            elif i == len(self._segments) - 1:
-                print("└", end="")
+            if segment.name == "pause":
+                print("│", end="")
             else:
-                if segment.name == "pause":
-                    print("│", end="")
-                else:
-                    print("├", end="")
+                print("├", end="")
             print(f" {segment}")
+        print(f"└{'-' * 17}")
 
     def _create_segment(self, name: SegmentName, duration: float):
         self._segments.append(Segment(name, duration, units=self._units))
 
+    def _change_units(self, units: TimeUnits):
+        if self._segments:
+            raise Exception("Units can only be changed until segments are recorded")
+        self._units = units
+
     def __str__(self):
         return f"{self.lap()}{self._units}"
+
+
+global_stopwatch = Stopwatch()
+
+
+def global_stopwatch_config(units: TimeUnits):
+    global_stopwatch._change_units(units)
 
 
 if __name__ == '__main__':

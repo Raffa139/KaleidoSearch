@@ -4,6 +4,7 @@ from src.products.models import ProductBase, ProductIn
 from src.products.service import ProductService
 from src.shops.models import ShopIn
 from src.shops.service import ShopService
+from src.data_import.stopwatch import global_stopwatch as watch
 
 
 class ProductImport(ProductBase):
@@ -24,6 +25,8 @@ class ImportService:
 
     def add_products(self, products: list[ProductImport], source: str):
         documents = []
+
+        print("Write products to DB")
 
         for product in products:
             shop = self._shop_service.find_by_name(product.shop)
@@ -47,4 +50,10 @@ class ImportService:
             content = f"{product.title} - {product.description}"
             documents.append(Document(page_content=content, metadata=metadata))
 
-        return self._vector_store.add_documents(documents)
+        print(f"Products successfully written to DB, took {watch}")
+
+        print("Write products to Vector Store")
+        documents = self._vector_store.add_documents(documents)
+        print(f"Products successfully written to Vector Store, took {watch}")
+
+        return documents
