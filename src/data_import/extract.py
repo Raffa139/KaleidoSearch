@@ -27,10 +27,11 @@ class AmazonProduct(BaseModel):
         return self.store if self.store else "Amazon"
 
     def get_description(self) -> str:
-        # TODO: Combine descriptions + features into distinct list
-        description = f"{''.join(self.description)}" if self.description else ""
-        features = f"{''.join(self.features)}" if self.features else ""
-        return " - ".join(filter(lambda s: s, [description, features]))
+        description = [line.lower().strip() for line in self.description if line.strip()]
+        features = [line.lower().strip() for line in self.features if line.strip()]
+        separator = ["-"] if description and features else []
+        distinct_combined = self._distinct_ordered_list(description + separator + features)
+        return " ".join(distinct_combined)
 
     def get_product_url(self) -> HttpUrl:
         return HttpUrl(url=f"https://www.amazon.com/dp/{self.parent_asin}")
@@ -44,6 +45,11 @@ class AmazonProduct(BaseModel):
         if thumbnail:
             return HttpUrl(url=thumbnail)
         return None
+
+    def _distinct_ordered_list(self, collection: list) -> list:
+        seen = set()
+        seen_add = seen.add
+        return [entry for entry in collection if not entry in seen or seen_add(entry)]
 
 
 def extract_amazon_data(data_file: str) -> list[ProductImport]:

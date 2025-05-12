@@ -47,7 +47,7 @@ class ImportService:
                 "source": source
             }
 
-            content = f"{product.title} - {product.description}"
+            content = f"{product.title} - {product.price}$ - {product.description}"
             documents.append(Document(page_content=content, metadata=metadata))
 
         print(f"Products successfully written to DB, took {watch}")
