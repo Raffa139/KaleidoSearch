@@ -34,7 +34,7 @@ class Stopwatch:
         self._pause_time = 0
         self._resume_time = 0
         self._paused = False
-        self._segments = []
+        self._segments: list[Segment] = []
 
     def pause(self):
         if not self._paused:
@@ -51,7 +51,13 @@ class Stopwatch:
         if self._paused:
             raise Exception("Cannot take lap while paused")
 
-        pause_duration = self._resume_time - self._pause_time
+        pause_duration = 0
+        for s in self._segments[::-1]:
+            if s.name == "pause":
+                pause_duration += s.duration
+            else:
+                break
+
         now = time.time()
         lap_duration = now - self._last_lap - pause_duration
 
@@ -127,9 +133,10 @@ if __name__ == '__main__':
     assert round(watch.lap() / 1000, 1) == 1.5
 
     watch.isolate(time.sleep, 0.5)
+    watch.isolate(time.sleep, 0.5)
     time.sleep(0.5)
     assert round(watch.lap() / 1000, 1) == 0.5
 
-    assert 7.4 <= round(watch.stop() / 1000, 1) <= 7.6
+    assert 7.9 <= round(watch.stop() / 1000, 1) <= 8.1
 
     watch.print_segments()
