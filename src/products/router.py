@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
-from src.app.session import SessionDep
+from src.app.dependencies import SessionDep
 from src.products.models import ProductOut, ProductIn
 from src.products.service import ProductService
 from src.shops.service import ShopService

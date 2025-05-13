@@ -2,14 +2,14 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from sqlmodel import SQLModel
 
-from .session import engine
+from src.app.dependencies import db_engine
 from src.products.router import router as products_router
 from src.shops.router import router as shops_router
 from src.users.router import router as users_router
 
 
 def initialize_db():
-    SQLModel.metadata.create_all(engine)
+    SQLModel.metadata.create_all(db_engine)
 
 
 def handle_value_error(_, error: Exception):

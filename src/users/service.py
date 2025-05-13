@@ -1,24 +1,46 @@
 from sqlmodel import Session, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
-from src.users.models import User, UserIn
+from src.users.models import User, UserIn, Thread
 
 
 class UserService:
     def __init__(self, session: Session):
         self._session = session
 
-    def find_all(self) -> list[User]:
+    def find_all_users(self) -> list[User]:
         return self._query(select(User)).all()
 
-    def find_by_id(self, id: int) -> User | None:
+    def find_user_by_id(self, id: int) -> User | None:
         return self._session.get(User, id)
 
-    def create(self, user_in: UserIn) -> User:
+    def find_thread_by_id(self, id: int) -> Thread | None:
+        return self._session.get(Thread, id)
+
+    def create_user(self, user_in: UserIn) -> User:
         user = User.model_validate(user_in)
         self._session.add(user)
         self._session.commit()
         self._session.refresh(user)
         return user
+
+    def create_thread(self, user_id: int) -> Thread:
+        thread = Thread(user_id=user_id)
+        self._session.add(thread)
+        self._session.commit()
+        self._session.refresh(thread)
+        return thread
+
+    def delete_thread(self, thread_id: int):
+        thread = self.find_thread_by_id(thread_id)
+        if not thread:
+            raise ValueError(f"Thread {thread_id} not found")
+
+        self._session.delete(thread)
+        self._session.commit()
+
+    def has_user_access_to_thread(self, user_id: int, thread_id: int) -> bool:
+        thread = self.find_thread_by_id(thread_id)
+        return thread and thread.user_id == user_id
 
     def _query(self, query: Select | SelectOfScalar):
         return self._session.exec(query)
