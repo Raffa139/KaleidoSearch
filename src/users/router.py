@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
-from src.app.dependencies import SessionDep, LLMDep, SearchAgentDep, VectorStoreDep
+from src.app.dependencies import SessionDep, LLMDep, SearchAgentDep, VectorStoreRetrieverDep
 from src.search.service import SearchService, ProductRecommendation
 from src.search.models import QueryEvaluationOut, NewUserSearch, UserSearch, BaseUserSearch
 from src.products.service import ProductService
@@ -22,7 +22,7 @@ def create_search_service(
         session: SessionDep,
         llm: LLMDep,
         search_agent: SearchAgentDep,
-        vector_store: VectorStoreDep,
+        vector_store: VectorStoreRetrieverDep,
         user_service: UserServiceDep
 ):
     shop_service = ShopService(session)

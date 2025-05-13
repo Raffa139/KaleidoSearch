@@ -1,7 +1,4 @@
 import os
-import chromadb
-from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
 from src.definitions import DATA_DIR
 from src.environment import product_catalogues
 from src.data_import.extract import extract_amazon_data
@@ -9,16 +6,9 @@ from src.data_import.service import ImportService
 from src.data_import.stopwatch import global_stopwatch_config, global_stopwatch as watch
 from src.products.service import ProductService
 from src.shops.service import ShopService
-from src.app.session import db_session
+from src.app.dependencies import db_session, chroma
 
 global_stopwatch_config(units="s")
-
-chroma = Chroma(
-    client=chromadb.HttpClient(host="localhost", port=5000),
-    collection_name="kaleido_search_products",
-    embedding_function=HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    # By default, input text longer than 256 word pieces is truncated.
-)
 
 
 def get_data_files() -> list[str]:
@@ -26,13 +16,12 @@ def get_data_files() -> list[str]:
 
 
 def main():
-    # TODO: Use chroma from global dependencies?
     # TODO: Embedding function is the bottle neck - takes ~98% of time
+    # TODO: By default embeddings input text longer than 256 word pieces is truncated.
 
     with next(db_session()) as session:
         shop_service = ShopService(session)
         product_service = ProductService(session, shop_service)
-
         import_service = ImportService(product_service, shop_service, chroma)
 
         data_files = get_data_files()

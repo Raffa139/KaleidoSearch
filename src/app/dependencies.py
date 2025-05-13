@@ -27,12 +27,12 @@ llm = ChatGoogleGenerativeAI(
 
 # TODO: Make Chroma connection settings configurable
 
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 chroma = Chroma(
     client=chromadb.HttpClient(host="localhost", port=5000),
     collection_name="kaleido_search_products",
     embedding_function=embeddings
-).as_retriever(search_kwargs={"k": 4})
+)
 
 
 def search_agent():
@@ -60,4 +60,6 @@ LLMDep = Annotated[BaseChatModel, Depends(lambda: llm)]
 
 SearchAgentDep = Annotated[CompiledStateGraph, Depends(search_agent)]
 
-VectorStoreDep = Annotated[VectorStoreRetriever, Depends(lambda: chroma)]
+VectorStoreRetrieverDep = Annotated[
+    VectorStoreRetriever, Depends(lambda: chroma.as_retriever(search_kwargs={"k": 4}))
+]
