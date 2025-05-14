@@ -16,9 +16,6 @@ def get_data_files() -> list[str]:
 
 
 def main():
-    # TODO: Embedding function is the bottle neck - takes ~98% of time
-    # TODO: By default embeddings input text longer than 256 word pieces is truncated.
-
     with next(db_session()) as session:
         shop_service = ShopService(session)
         product_service = ProductService(session, shop_service)
@@ -30,9 +27,7 @@ def main():
 
         for data_file in data_files:
             source = os.path.basename(data_file)
-
-            print()
-            print(f"Importing {source}")
+            print(f"\nImporting {source}")
 
             documents = chroma.get(where={"source": source}, include=["metadatas"])
             if len(documents["ids"]) > 0:

@@ -6,7 +6,7 @@ from psycopg_pool import ConnectionPool
 from langchain_core.language_models import BaseChatModel
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.graph.state import CompiledStateGraph
@@ -27,7 +27,7 @@ llm = ChatGoogleGenerativeAI(
 
 # TODO: Make Chroma connection settings configurable
 
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 chroma = Chroma(
     client=chromadb.HttpClient(host="localhost", port=5000),
     collection_name="kaleido_search_products",

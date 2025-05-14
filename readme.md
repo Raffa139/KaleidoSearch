@@ -61,9 +61,10 @@ search endeavours.
    ```
 3. Set up your environment:
    ```.env
+   OPENAI_API_KEY="<Your-API-Key>"
+   GEMINI_API_KEY="<Your-API-Key>"
    DATASOURCE_URL="postgresql://kaleidosearch:secret@localhost:5432/kaleidosearch"
    ```
-4. Configure your LLM API key securely.
 
 ### Running the Application
 
