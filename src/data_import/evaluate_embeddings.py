@@ -3,8 +3,10 @@ import chromadb
 from langchain_core.embeddings import Embeddings
 from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from src.definitions import DATA_DIR
+from src.environment import openai_api_key
 from src.data_import.stopwatch import Stopwatch
 
 """
@@ -14,6 +16,7 @@ Evaluation of embedding models
   * intfloat/multilingual-e5-small
   * intfloat/multilingual-e5-large-instruct (Not working)
   * Snowflake/snowflake-arctic-embed-m-v2.0 (Not working)
+  * openai/text-embedding-3-small
 """
 
 TEST_DATA_FILE = "f_105_metas.csv"
@@ -22,7 +25,7 @@ TEST_QUERY = "neutralize itching from stings and bites"
 
 def test_data() -> list[str]:
     with open(os.path.join(DATA_DIR, TEST_DATA_FILE), encoding="utf-8") as file:
-        data = [f"passage: {line}" for line in file]
+        data = [line for line in file]
     return data
 
 
@@ -56,6 +59,11 @@ def multilingual_e5_small() -> tuple[str, Embeddings]:
     )
 
 
+def text_embedding_3_small() -> tuple[str, Embeddings]:
+    model_name = "text-embedding-3-small"
+    return model_name, OpenAIEmbeddings(model=model_name)
+
+
 # def multilingual_e5_large_instruct() -> tuple[str, Embeddings]:
 #    model_name = "multilingual-e5-large-instruct"
 #    return model_name, HuggingFaceInstructEmbeddings(
@@ -83,7 +91,7 @@ def eval_model(model: str, embeddings: Embeddings):
     chroma.add_documents(test_documents())
     print(f"Embedded documents in: {watch}")
 
-    results = chroma.similarity_search(f"query: {TEST_QUERY}")
+    results = chroma.similarity_search(TEST_QUERY)
     results_file = f"{model}.csv"
 
     with open(os.path.join(DATA_DIR, results_file), mode="w", encoding="utf-8") as file:
@@ -93,7 +101,7 @@ def eval_model(model: str, embeddings: Embeddings):
 
 
 def main():
-    model_name, embeddings = multilingual_e5_small()
+    model_name, embeddings = text_embedding_3_small()
     eval_model(model_name, embeddings)
 
 
