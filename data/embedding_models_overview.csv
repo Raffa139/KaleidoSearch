@@ -1,8 +1,0 @@
-﻿Model;Size;Dimensions;Max. Tokens;Reranking;Retrieval;Notes
-sentence-transformers/all-MiniLM-L6-v2;85MB;384;256;47,14;42,92;English only benchmarks
-sentence-transformers/all-mpnet-base-v2;420MB;768;384;48,41;44,54;English only benchmarks
-intfloat/e5-large-v2;1,3GB;1024;512;48,76;40,06;Multilingual benchmarks, not tested
-intfloat/multilingual-e5-small;450MB;384;512;60,39;49,33;Multilingual benchmarks
-intfloat/multilingual-e5-large-instruct;1GB;1024;512;62,61;57,12;Multilingual benchmarks, not working
-intfloat/multilingual-e5-large;2,1GB;1024;512;62,78;54,08;Multilingual benchmarks, not tested
-Snowflake/snowflake-arctic-embed-m-v2.0;1,1GB;768;8192;61,67;54,83;Multilingual benchmarks, not working
