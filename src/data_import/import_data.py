@@ -6,7 +6,7 @@ from src.data_import.service import ImportService
 from src.data_import.stopwatch import global_stopwatch_config, global_stopwatch as watch
 from src.products.service import ProductService
 from src.shops.service import ShopService
-from src.app.dependencies import db_session, chroma
+from src.app.dependencies import db_session, llm, chroma
 
 global_stopwatch_config(units="s")
 
@@ -17,12 +17,12 @@ def get_data_files() -> list[str]:
 
 def main():
     # TODO: Embedding function is the bottle neck - takes ~98% of time
-    # TODO: By default embeddings input text longer than 256 word pieces is truncated.
+    # TODO: By default embeddings input text longer than 512 word pieces is truncated.
 
     with next(db_session()) as session:
         shop_service = ShopService(session)
         product_service = ProductService(session, shop_service)
-        import_service = ImportService(product_service, shop_service, chroma)
+        import_service = ImportService(product_service, shop_service, llm, chroma)
 
         data_files = get_data_files()
 
@@ -42,8 +42,8 @@ def main():
             try:
                 extracted_products = extract_amazon_data(data_file)
                 print(f"Extracted {len(extracted_products)} from {source}, took {watch}")
-                import_service.add_products(extracted_products, source=source)
-                print(f"Imported {source} successfully")
+                too_big_products = import_service.add_products(extracted_products, source=source)
+                print(f"Imported {source} successfully, found {len(too_big_products)} too big products")
             except Exception as e:
                 print(f"Import of {source} failed after {watch}, details: {e}")
 
