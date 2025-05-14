@@ -37,12 +37,20 @@ def main():
             try:
                 extracted_products = extract_amazon_data(data_file)
                 print(f"Extracted {len(extracted_products)} from {source}, took {watch}")
+
+                answer = watch.isolate(
+                    input,
+                    f"Continue importing {len(extracted_products)} products? (Y/N): "
+                )
+                if not answer.lower() == "y":
+                    continue
+
                 import_service.add_products(extracted_products, source=source)
                 print(f"Imported {source} successfully")
             except Exception as e:
                 print(f"Import of {source} failed after {watch}, details: {e}")
 
-    print(f"Import took {watch.stop()}s\n\n")
+    print(f"\nImport took {watch.stop()}s\n\n")
     watch.print_segments()
 
 

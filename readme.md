@@ -96,6 +96,11 @@ Choose a category of your likings (or all) and download the product metadata via
    cd src/data_import
    python import_data.py
    ```
+5. Each catalog needs confirmation to proceed with the expensive persisting and embedding of the
+   data, after products have been extracted
+   ```bash
+   Continue importing 39608 products? (Y/N): y
+   ```
 
 ## Future Enhancements
 
