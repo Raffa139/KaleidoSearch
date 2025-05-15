@@ -20,6 +20,16 @@ class BatchedProduct(BaseModel):
     document: Document
 
 
+class ImportResult(BaseModel):
+    failed_batches: list[tuple[list[BatchedProduct], Exception]] = []
+
+    def add_failed(self, batched_products: list[BatchedProduct], exception: Exception):
+        self.failed_batches.append((batched_products, exception))
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
 class ImportService:
     def __init__(
             self,
@@ -31,31 +41,37 @@ class ImportService:
         self._shop_service = shop_service
         self._vector_store = vector_store
 
-    def import_products(self, products: list[ProductImport], *, source: str):
+    def import_products(self, products: list[ProductImport], *, source: str) -> ImportResult:
+        watch = Stopwatch(units="s")
+        result = ImportResult()
         batches = self._create_batches(products, source=source)
         total_tokens = self._count_total_tokens(
             [bp.document.page_content for batch in batches for bp in batch]
         )
 
-        print(f"Total tokens: {total_tokens}")
-        print(f"Total batches: {len(batches)}")
-        print(f"Estimated time {len(batches) * 60}s")
-        watch = Stopwatch(units="s")
+        print(
+            f"Total tokens: {total_tokens}, Total batches: {len(batches)}, Estimated time "
+            f"{len(batches) * 60}s")
 
         for i, batch in enumerate(batches):
-            print(f"Starting {i + 1}. batch ({len(batch)}) ... ", end="")
-            self._import_product_batch(batch)
+            try:
+                print(f"Processing {i + 1}. batch (len: {len(batch)})")
+                self._import_product_batch(batch)
+            except Exception as e:
+                result.add_failed(batch, e)
 
             duration = watch.lap()
             timeout = max(0, 60 - duration)
             unprocessed_batches = len(batches) - (i + 1)
             remaining = unprocessed_batches * 60 + timeout
+            print(f"Batch processed, took {duration}s")
 
-            print(f"Processed successfully, took {duration}s")
-            print(f"Next batch in {timeout}s, estimated {remaining}s remaining")
-            watch.isolate(time.sleep, timeout)
+            if unprocessed_batches:
+                print(f"Next batch in {timeout}s, estimated {remaining}s remaining")
+                watch.isolate(time.sleep, timeout)
 
-        print(f"Products successfully imported, took {watch.stop()}s")
+        print(f"All batches processed, took {watch.stop()}s")
+        return result
 
     def _import_product_batch(self, batch: list[BatchedProduct]):
         create_shops_batch = self._shop_service.create_batch()
@@ -100,9 +116,11 @@ class ImportService:
         try:
             documents = [bp.document for bp in batch]
             self._vector_store.add_documents(documents)
-        except Exception:
+        except Exception as e:
+            print(f"Failed to store embeddings. Performing rollback... Details: {e}")
             self._product_service.delete(products)
             self._shop_service.delete(shops)
+            raise
 
     def _create_batches(
             self,
