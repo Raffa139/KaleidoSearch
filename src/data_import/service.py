@@ -1,4 +1,5 @@
 import time
+import logging
 import tiktoken
 from pydantic import BaseModel
 from langchain_core.documents import Document
@@ -8,6 +9,8 @@ from src.products.service import ProductService
 from src.shops.models import ShopIn
 from src.shops.service import ShopService
 from src.data_import.stopwatch import Stopwatch
+
+log = logging.getLogger(__name__)
 
 
 class ProductImport(ProductBase):
@@ -49,13 +52,16 @@ class ImportService:
             [bp.document.page_content for batch in batches for bp in batch]
         )
 
-        print(
-            f"Total tokens: {total_tokens}, Total batches: {len(batches)}, Estimated time "
-            f"{len(batches) * 60}s")
+        log.info(
+            "Total tokens: %s, Total batches: %s, Estimated time %ss",
+            total_tokens,
+            len(batches),
+            len(batches) * 60
+        )
 
         for i, batch in enumerate(batches):
             try:
-                print(f"Processing {i + 1}. batch (len: {len(batch)})")
+                log.info("Processing %s. batch (len: %s)", i + 1, len(batch))
                 self._import_product_batch(batch)
             except Exception as e:
                 result.add_failed(batch, e)
@@ -64,13 +70,13 @@ class ImportService:
             timeout = max(0, 60 - duration)
             unprocessed_batches = len(batches) - (i + 1)
             remaining = unprocessed_batches * 60 + timeout
-            print(f"Batch processed, took {duration}s")
+            log.info("Batch processed, took %ss", duration)
 
             if unprocessed_batches:
-                print(f"Next batch in {timeout}s, estimated {remaining}s remaining")
+                log.info("Next batch in %ss, estimated %ss remaining", timeout, remaining)
                 watch.isolate(time.sleep, timeout)
 
-        print(f"All batches processed, took {watch.stop()}s")
+        log.info("All batches processed, took %ss", watch.stop())
         return result
 
     def _import_product_batch(self, batch: list[BatchedProduct]):
@@ -94,7 +100,7 @@ class ImportService:
             shop = self._shop_service.find_by_name(product.shop)
 
             if not shop:
-                print("NO SHOP", product)
+                log.warning("Shop '%s' not found, skipping", product.shop)
                 continue
 
             create_products_batch.add(ProductIn(
@@ -108,7 +114,7 @@ class ImportService:
             batched_product = next((bp for bp in batch if bp.product.title == product.title), None)
 
             if not batched_product:
-                print("NO PRODUCT", product)
+                log.warning("Product '%s' not found, skipping", product.title)
                 continue
 
             batched_product.document.metadata["ref_id"] = product.id
@@ -117,7 +123,7 @@ class ImportService:
             documents = [bp.document for bp in batch]
             self._vector_store.add_documents(documents)
         except Exception as e:
-            print(f"Failed to store embeddings. Performing rollback... Details: {e}")
+            log.error("Failed to store embeddings. Performing rollback... Details: %s", str(e))
             self._product_service.delete(products)
             self._shop_service.delete(shops)
             raise

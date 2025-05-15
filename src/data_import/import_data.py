@@ -1,4 +1,5 @@
 import os
+import logging
 from src.definitions import DATA_DIR
 from src.environment import product_catalogues
 from src.data_import.extract import extract_amazon_data
@@ -8,7 +9,8 @@ from src.products.service import ProductService
 from src.shops.service import ShopService
 from src.app.dependencies import db_session, chroma
 
-
+logging.basicConfig(format="%(asctime)s [%(name)s] %(levelname)s: %(message)s", level=logging.INFO)
+log = logging.getLogger(__name__)
 
 
 def get_data_files() -> list[str]:
@@ -25,20 +27,25 @@ def main():
 
         data_files = get_data_files()
 
-        print(f"Starting import of {len(data_files)} data file(s)...")
+        log.info("Starting import of %s data file(s)...", len(data_files))
 
         for data_file in data_files:
             source = os.path.basename(data_file)
-            print(f"\nImporting {source}")
+            log.info("Importing %s", source)
 
             documents = chroma.get(where={"source": source}, include=["metadatas"])
             if len(documents["ids"]) > 0:
-                print(f"Skipping already imported {source}")
+                log.info("Skipping already imported %s", source)
                 continue
 
             try:
                 extracted_products = extract_amazon_data(data_file)
-                print(f"Extracted {len(extracted_products)} from {source}, took {watch}")
+                log.info(
+                    "Extracted %s from %s, took %s",
+                    len(extracted_products),
+                    source,
+                    str(watch)
+                )
 
                 answer = watch.isolate(
                     input,
@@ -49,11 +56,16 @@ def main():
 
                 result = import_service.import_products(extracted_products, source=source)
                 for failed_batch, exception in result.failed_batches:
-                    print(f"Failed to import batch (len: {len(failed_batch)}). Details {exception}")
+                    log.warning(
+                        "Failed to import batch (len: %s). Details %s",
+                        len(failed_batch),
+                        str(exception)
+                    )
+                watch.lap()
             except Exception as e:
-                print(f"Import of {source} failed after {watch}, details: {e}")
+                log.error("Import of %s failed after %s, details: %s", source, str(watch), str(e))
 
-    print(f"\nImport took {watch.stop()}s\n\n")
+    log.info("Import took %ss", watch.stop())
 
 
 if __name__ == '__main__':
