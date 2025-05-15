@@ -4,6 +4,7 @@ import tiktoken
 from pydantic import BaseModel
 from langchain_core.documents import Document
 from langchain_core.vectorstores import VectorStore
+from src.environment import max_tokens_minute
 from src.products.models import ProductBase, ProductIn
 from src.products.service import ProductService
 from src.shops.models import ShopIn
@@ -11,6 +12,8 @@ from src.shops.service import ShopService
 from src.data_import.stopwatch import Stopwatch
 
 log = logging.getLogger(__name__)
+
+SECONDS_IN_MINUTE = 60
 
 
 class ProductImport(ProductBase):
@@ -56,7 +59,7 @@ class ImportService:
             "Total tokens: %s, Total batches: %s, Estimated time %ss",
             total_tokens,
             len(batches),
-            len(batches) * 60
+            len(batches) * SECONDS_IN_MINUTE
         )
 
         for i, batch in enumerate(batches):
@@ -67,9 +70,9 @@ class ImportService:
                 result.add_failed(batch, e)
 
             duration = watch.lap()
-            timeout = max(0, 60 - duration)
+            timeout = max(0, SECONDS_IN_MINUTE - duration)
             unprocessed_batches = len(batches) - (i + 1)
-            remaining = unprocessed_batches * 60 + timeout
+            remaining = unprocessed_batches * SECONDS_IN_MINUTE + timeout
             log.info("Batch processed, took %ss", duration)
 
             if unprocessed_batches:
@@ -133,7 +136,7 @@ class ImportService:
             products: list[ProductImport],
             *,
             source: str,
-            batch_token_limit: int = 100000
+            batch_token_limit: int = max_tokens_minute()
     ) -> list[list[BatchedProduct]]:
         batches: list[list[BatchedProduct]] = []
 

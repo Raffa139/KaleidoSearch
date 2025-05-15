@@ -85,9 +85,10 @@ To populate the product catalog you can download amazon product metadata from th
 Choose a category of your likings (or all) and download the product metadata via the 'meta' link.
 
 1. Put the downloaded product metadata files into the `/data` directory
-2. Provide the file names in .env
+2. Provide the file names and max. token limit/minute in .env
    ```.env
-   PRODUCT_CATALOGUES="<Filenames-Separated-By-Comma>"
+   IMPORT_PRODUCT_CATALOGUES="<Filenames-Separated-By-Comma>"
+   IMPORT_MAX_TOKENS_PER_MINUTE=100_000
    ```
 3. Make sure the main application ran at least once to create the database schema and docker
    containers for DB & Vector Store are up and running

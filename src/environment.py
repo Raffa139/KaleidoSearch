@@ -17,4 +17,8 @@ def openai_api_key() -> str:
 
 
 def product_catalogues() -> list[str]:
-    return [s.strip() for s in os.getenv("PRODUCT_CATALOGUES", "").split(",") if s.strip()]
+    return [s.strip() for s in os.getenv("IMPORT_PRODUCT_CATALOGUES", "").split(",") if s.strip()]
+
+
+def max_tokens_minute() -> int:
+    return int(os.getenv("IMPORT_MAX_TOKENS_PER_MINUTE"))
