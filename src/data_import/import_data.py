@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 from src.definitions import DATA_DIR
 from src.environment import product_catalogues
@@ -15,6 +16,10 @@ log = logging.getLogger(__name__)
 
 def get_data_files() -> list[str]:
     return [os.path.join(DATA_DIR, catalog) for catalog in product_catalogues()]
+
+
+def always_accept() -> bool:
+    return len(sys.argv) == 2 and sys.argv[1] == "--y"
 
 
 def main():
@@ -47,12 +52,13 @@ def main():
                     str(watch)
                 )
 
-                answer = watch.isolate(
-                    input,
-                    f"Continue importing {len(extracted_products)} products? (Y/N): "
-                )
-                if not answer.lower() == "y":
-                    continue
+                if not always_accept():
+                    answer = watch.isolate(
+                        input,
+                        f"Continue importing {len(extracted_products)} products? (Y/N): "
+                    )
+                    if not answer.lower() == "y":
+                        continue
 
                 result = import_service.import_products(extracted_products, source=source)
                 for failed_batch, exception in result.failed_batches:

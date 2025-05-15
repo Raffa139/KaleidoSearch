@@ -102,6 +102,9 @@ Choose a category of your likings (or all) and download the product metadata via
    ```bash
    Continue importing 39608 products? (Y/N): y
    ```
+   ```bash
+   python import_data.py --y # Skip confirmation mechanism & always proceed with the import
+   ```
 
 ## Future Enhancements
 
