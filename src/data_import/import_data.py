@@ -45,7 +45,7 @@ def main():
                 if not answer.lower() == "y":
                     continue
 
-                import_service.add_products(extracted_products, source=source)
+                import_service.import_products(extracted_products, source=source)
                 print(f"Imported {source} successfully")
             except Exception as e:
                 print(f"Import of {source} failed after {watch}, details: {e}")
