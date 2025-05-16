@@ -24,16 +24,20 @@ class GraphWrapper(Generic[T]):
         self._prompt = prompt
         self._state_schema = state_schema
 
-    def invoke(self, input: T | str, config: RunnableConfig = DEFAULT_CONFIG, **kwargs) -> T:
+    def invoke(self, input: T | str = None, config: RunnableConfig = DEFAULT_CONFIG, **kwargs) -> T:
         past_messages = self.get_dict_state(config).get("messages")
         system_message = [SystemMessage(self._prompt)] if not past_messages and self._prompt else []
 
-        if isinstance(input, str):
+        if not input:
+            state = self._state_schema(**kwargs)
+            input_messages = kwargs.get("messages", [])
+            graph_input = {**state.model_dump(), "messages": [*system_message, *input_messages]}
+        elif isinstance(input, str):
             graph_input = {"messages": [*system_message, HumanMessage(input)]}
         else:
             graph_input = {**input.model_dump(), "messages": [*system_message, *input.messages]}
 
-        result = self._graph.invoke(graph_input, config, **kwargs)
+        result = self._graph.invoke(graph_input, config)
         return self._state_schema(**result)
 
     def get_state(self, config: RunnableConfig = DEFAULT_CONFIG) -> T | None:
@@ -88,13 +92,18 @@ if __name__ == '__main__':
         InMemorySaver()
     )
 
-    print(test_graph.get_state({"configurable": {"thread_id": "1"}}))
+    print(test_graph.get_state())
+
+    test_graph.invoke(messages=[HumanMessage("Test 0")], my_str="String 3", my_int=3)
+    print(test_graph.get_state())
 
     test_graph.invoke(
-        CustomAgentState(messages=[HumanMessage("Test")], my_str="String", my_int=1),
-        config={"configurable": {"thread_id": "1"}}
+        CustomAgentState(messages=[HumanMessage("Test")], my_str="String", my_int=1)
     )
-    print(test_graph.get_state({"configurable": {"thread_id": "1"}}))
+    print(test_graph.get_state())
 
-    test_graph.invoke("Test 2", config={"configurable": {"thread_id": "1"}})
-    print(test_graph.get_state({"configurable": {"thread_id": "1"}}))
+    test_graph.invoke("Test 2")
+    print(test_graph.get_state())
+
+    test_graph.invoke(my_str="String 3", my_int=3)
+    print(test_graph.get_state())
