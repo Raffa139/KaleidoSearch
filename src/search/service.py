@@ -45,8 +45,8 @@ class SearchService:
         if not query:
             raise ValueError("User search needs refinement")
 
-        if relevant_documents := self._retrieve_agent.invoke(query=query).relevant_documents:
-            return self._map_documents_to_products(relevant_documents)
+        if documents := self._retrieve_agent.invoke(query=query).summarized_documents:
+            return self._map_documents_to_products(documents)
 
         return []
 
