@@ -1,13 +1,10 @@
 from langchain_core.documents import Document
 from langchain_core.runnables import RunnableConfig
-from langchain_core.messages import HumanMessage
 from src.products.service import ProductService
 from src.users.service import UserService
 from src.search.models import ProductRecommendation, QueryEvaluationOut, BaseUserSearch
-from src.search.agents.search_agent import SearchAgentGraph, SearchAgentState, QueryEvaluation
+from src.search.agents.search_agent import SearchAgentGraph
 from src.search.agents.retrieve_agent import RetrieveAgentGraph, RetrieveAgentState
-
-
 
 
 class SearchService:
@@ -67,18 +64,13 @@ class SearchService:
             raise ValueError("Answer IDs missmatch question IDs")
 
         if user_query := user_search.query:
-            query_evaluation = self._invoke_search_agent(user_query, config)
+            query_evaluation = self._search_agent.invoke(user_query, config).query_evaluation
 
         if formatted_answers := user_search.format_answers():
-            query_evaluation = self._invoke_search_agent(formatted_answers, config)
+            query_evaluation = self._search_agent.invoke(formatted_answers, config).query_evaluation
 
         thread_id = config.get("configurable").get("thread_id")
         return QueryEvaluationOut(**query_evaluation.model_dump(), thread_id=thread_id)
-
-    def _invoke_search_agent(self, query: str, config: RunnableConfig) -> QueryEvaluation:
-        return self._search_agent.invoke(
-            SearchAgentState(messages=[HumanMessage(query)]), config
-        ).query_evaluation
 
     def _map_documents_to_products(self, documents: list[Document]) -> list[ProductRecommendation]:
         ref_ids = [doc.metadata.get("ref_id") for doc in documents]

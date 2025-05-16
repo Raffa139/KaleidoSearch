@@ -24,10 +24,15 @@ class GraphWrapper(Generic[T]):
         self._prompt = prompt
         self._state_schema = state_schema
 
-    def invoke(self, input: T, config: RunnableConfig = DEFAULT_CONFIG, **kwargs) -> T:
+    def invoke(self, input: T | str, config: RunnableConfig = DEFAULT_CONFIG, **kwargs) -> T:
         past_messages = self.get_dict_state(config).get("messages")
         system_message = [SystemMessage(self._prompt)] if not past_messages and self._prompt else []
-        graph_input = {**input.model_dump(), "messages": [*system_message, *input.messages]}
+
+        if isinstance(input, str):
+            graph_input = {"messages": [*system_message, HumanMessage(input)]}
+        else:
+            graph_input = {**input.model_dump(), "messages": [*system_message, *input.messages]}
+
         result = self._graph.invoke(graph_input, config, **kwargs)
         return self._state_schema(**result)
 
@@ -86,13 +91,10 @@ if __name__ == '__main__':
     print(test_graph.get_state({"configurable": {"thread_id": "1"}}))
 
     test_graph.invoke(
-        CustomAgentState(my_str="String", my_int=1),
+        CustomAgentState(messages=[HumanMessage("Test")], my_str="String", my_int=1),
         config={"configurable": {"thread_id": "1"}}
     )
     print(test_graph.get_state({"configurable": {"thread_id": "1"}}))
 
-    test_graph.invoke(
-        CustomAgentState(messages=[HumanMessage("Test 2")], my_str="String 2", my_int=2),
-        config={"configurable": {"thread_id": "1"}}
-    )
+    test_graph.invoke("Test 2", config={"configurable": {"thread_id": "1"}})
     print(test_graph.get_state({"configurable": {"thread_id": "1"}}))
