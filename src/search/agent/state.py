@@ -1,7 +1,6 @@
-from typing import Annotated, List
+from typing import List
 from pydantic import BaseModel, Field
-from langchain_core.messages import AnyMessage
-from langgraph.graph.message import add_messages
+from src.search.agent.base_graph import MessageState
 
 
 class AnsweredQuestion(BaseModel):
@@ -50,10 +49,6 @@ class QueryEvaluation(BaseModel):
             "retaining semantic meaning, used for distance-based similarity search"
         )
     )
-
-
-class MessageState(BaseModel):
-    messages: Annotated[List[AnyMessage], add_messages] = []
 
 
 class SearchAgentState(MessageState):

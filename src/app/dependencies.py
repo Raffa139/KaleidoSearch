@@ -9,8 +9,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langgraph.checkpoint.postgres import PostgresSaver
-from langgraph.graph.state import CompiledStateGraph
-from src.search.agent.graph import build_agent
+from src.search.agent.graph import SearchAgentGraph, build_agent
 from src.environment import datasource_url, gemini_api_key
 
 # TODO: Maybe create all dependencies here and none inside routers?
@@ -58,7 +57,7 @@ SessionDep = Annotated[Session, Depends(db_session)]
 
 LLMDep = Annotated[BaseChatModel, Depends(lambda: llm)]
 
-SearchAgentDep = Annotated[CompiledStateGraph, Depends(search_agent)]
+SearchAgentDep = Annotated[SearchAgentGraph, Depends(search_agent)]
 
 VectorStoreRetrieverDep = Annotated[
     VectorStoreRetriever, Depends(lambda: chroma.as_retriever(search_kwargs={"k": 4}))
