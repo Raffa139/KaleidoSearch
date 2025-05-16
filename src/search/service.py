@@ -4,7 +4,7 @@ from src.products.service import ProductService
 from src.users.service import UserService
 from src.search.models import ProductRecommendation, QueryEvaluationOut, BaseUserSearch
 from src.search.agents.search_agent import SearchAgentGraph
-from src.search.agents.retrieve_agent import RetrieveAgentGraph, RetrieveAgentState
+from src.search.agents.retrieve_agent import RetrieveAgentGraph
 
 
 class SearchService:
@@ -45,8 +45,8 @@ class SearchService:
         if not query:
             raise ValueError("User search needs refinement")
 
-        if relevant_documents := self._retrieve_agent.invoke(query=query).relevant_documents:
-            return self._map_documents_to_products(relevant_documents)
+        if documents := self._retrieve_agent.invoke(query=query).summarized_documents:
+            return self._map_documents_to_products(documents)
 
         return []
 
