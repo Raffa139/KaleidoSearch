@@ -3,8 +3,8 @@ from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.base import BaseCheckpointSaver
-from src.search.agent.base_graph import GraphWrapper
-from src.search.agent.state import SearchAgentState, QueryEvaluation
+from src.search.agents.graph_wrapper import GraphWrapper
+from src.search.agents.search_agent_state import SearchAgentState, QueryEvaluation
 
 SYS_PROMPT = (
     """

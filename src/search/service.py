@@ -7,8 +7,7 @@ from src.products.service import ProductService
 from src.users.service import UserService
 from src.search.models import ProductRecommendation, RelevanceScoreList, QueryEvaluationOut, \
     BaseUserSearch
-from src.search.agent.state import SearchAgentState, QueryEvaluation
-from src.search.agent.graph import SearchAgentGraph
+from src.search.agents.search_agent import SearchAgentGraph, SearchAgentState, QueryEvaluation
 
 RANK_DOCS_PROMPT = (
     """

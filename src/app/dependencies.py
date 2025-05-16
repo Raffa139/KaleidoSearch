@@ -9,7 +9,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langgraph.checkpoint.postgres import PostgresSaver
-from src.search.agent.graph import SearchAgentGraph, build_agent
+from src.search.agents.search_agent import SearchAgentGraph, build_agent
 from src.environment import datasource_url, gemini_api_key
 
 # TODO: Maybe create all dependencies here and none inside routers?

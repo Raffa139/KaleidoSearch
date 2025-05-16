@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import List
 from pydantic import BaseModel, Field
-from src.search.agent.state import QueryEvaluation, AnsweredQuestion
+from src.search.agents.search_agent_state import QueryEvaluation, AnsweredQuestion
 from src.products.models import ProductBase
 
 

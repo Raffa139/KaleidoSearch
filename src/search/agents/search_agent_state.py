@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel, Field
-from src.search.agent.base_graph import MessageState
+from src.search.agents.graph_wrapper import MessageState
 
 
 class AnsweredQuestion(BaseModel):
