@@ -207,7 +207,7 @@ class SearchService:
         initial_messages = [SystemMessage(EVAL_QUERY_PROMPT)] if not past_messages else []
 
         return self._search_agent.invoke(
-            input=SearchAgentState(messages=[*initial_messages, HumanMessage(query)]),
+            input=SearchAgentState(messages=[*initial_messages, HumanMessage(query)]).model_dump(),
             config=config
         ).get("query_evaluation")
 

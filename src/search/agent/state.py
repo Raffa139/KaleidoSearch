@@ -1,5 +1,6 @@
-from typing import TypedDict, Annotated, List
+from typing import Annotated, List
 from pydantic import BaseModel, Field
+from langchain_core.messages import AnyMessage
 from langgraph.graph.message import add_messages
 
 
@@ -51,6 +52,9 @@ class QueryEvaluation(BaseModel):
     )
 
 
-class SearchAgentState(TypedDict):
-    messages: Annotated[list, add_messages]
-    query_evaluation: QueryEvaluation
+class MessageState(BaseModel):
+    messages: Annotated[List[AnyMessage], add_messages] = []
+
+
+class SearchAgentState(MessageState):
+    query_evaluation: QueryEvaluation | None = None
