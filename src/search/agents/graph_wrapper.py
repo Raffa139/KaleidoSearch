@@ -17,41 +17,43 @@ T = TypeVar("T", bound=MessageState)
 
 
 class GraphWrapper(Generic[T]):
-    def __init__(self, grap: CompiledStateGraph, prompt: str, state_schema: type[T]):
+    DEFAULT_CONFIG = {"configurable": {"thread_id": "default"}}
+
+    def __init__(self, grap: CompiledStateGraph, state_schema: type[T], prompt: str = None):
         self._graph = grap
         self._prompt = prompt
         self._state_schema = state_schema
 
-    def invoke(self, input: T, config: RunnableConfig, **kwargs) -> T:
+    def invoke(self, input: T, config: RunnableConfig = DEFAULT_CONFIG, **kwargs) -> T:
         past_messages = self.get_dict_state(config).get("messages")
-        system_messages = [SystemMessage(self._prompt)] if not past_messages else []
-        graph_input = {**input.model_dump(), "messages": [*system_messages, *input.messages]}
+        system_message = [SystemMessage(self._prompt)] if not past_messages and self._prompt else []
+        graph_input = {**input.model_dump(), "messages": [*system_message, *input.messages]}
         result = self._graph.invoke(graph_input, config, **kwargs)
         return self._state_schema(**result)
 
-    def get_state(self, config: RunnableConfig) -> T | None:
+    def get_state(self, config: RunnableConfig = DEFAULT_CONFIG) -> T | None:
         try:
             state_values = self.get_dict_state(config)
             return self._state_schema(**state_values)
         except ValidationError:
             return None
 
-    def get_dict_state(self, config: RunnableConfig):
+    def get_dict_state(self, config: RunnableConfig = DEFAULT_CONFIG):
         return self._graph.get_state(config).values
 
     @classmethod
     def from_builder(
             cls,
             state_schema: type[T],
-            prompt: str,
             builder: Callable[..., CompiledStateGraph],
+            prompt: str = None,
             *builder_args,
             **builder_kwargs
     ) -> "GraphWrapper":
         return GraphWrapper[T](
             builder(*builder_args, **builder_kwargs),
-            prompt,
-            state_schema
+            state_schema,
+            prompt
         )
 
 
@@ -76,8 +78,8 @@ def build_test_agent(memory: BaseCheckpointSaver) -> CompiledStateGraph:
 if __name__ == '__main__':
     test_graph = GraphWrapper.from_builder(
         CustomAgentState,
-        "Be kind.",
         build_test_agent,
+        "Be kind.",
         InMemorySaver()
     )
 

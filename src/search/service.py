@@ -1,42 +1,13 @@
-from langchain_core.language_models import BaseChatModel
-from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_core.documents import Document
 from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import HumanMessage
 from src.products.service import ProductService
 from src.users.service import UserService
-from src.search.models import ProductRecommendation, RelevanceScoreList, QueryEvaluationOut, \
-    BaseUserSearch
+from src.search.models import ProductRecommendation, QueryEvaluationOut, BaseUserSearch
 from src.search.agents.search_agent import SearchAgentGraph, SearchAgentState, QueryEvaluation
+from src.search.agents.retrieve_agent import RetrieveAgentGraph, RetrieveAgentState
 
-RANK_DOCS_PROMPT = (
-    """
-You are an expert grader tasked with evaluating the relevance of retrieved documents to a given 
-user query. Your goal is to determine, for each document individually, whether it shares 
-significant semantic meaning or keywords with the query.
 
-Each document is presented in the following format:
-
-Document ID: [document_id]
-Content: [document_content]
-
-Here are the retrieved documents:
-
-{documents}
-
-Here is the user query:
-
-{query}
-
-For each document listed above, carefully analyze its content and compare it to the user query. 
-Consider both the presence of specific keywords and the overall semantic similarity.
-
-Provide your evaluation for each document, where 'True' indicates that the document is highly 
-relevant to the user query (sharing significant semantic meaning or keywords), and 'False' 
-indicates that the document is not relevant. Ensure you provide a True/False evaluation for every 
-document presented.
-    """
-)
 
 
 class SearchService:
@@ -44,15 +15,13 @@ class SearchService:
             self,
             product_service: ProductService,
             user_service: UserService,
-            llm: BaseChatModel,
             search_agent: SearchAgentGraph,
-            vector_store: VectorStoreRetriever
+            retrieve_agent: RetrieveAgentGraph
     ):
         self._product_service = product_service
         self._user_service = user_service
-        self._llm = llm
         self._search_agent = search_agent
-        self._vector_store = vector_store
+        self._retrieve_agent = retrieve_agent
 
     def evaluate_user_query(
             self,
@@ -79,7 +48,9 @@ class SearchService:
         if not query:
             raise ValueError("User search needs refinement")
 
-        if relevant_documents := self._retrieve_relevant(query):
+        if relevant_documents := self._retrieve_agent.invoke(
+                RetrieveAgentState(query=query)
+        ).relevant_documents:
             return self._map_documents_to_products(relevant_documents)
 
         return []
@@ -108,30 +79,6 @@ class SearchService:
         return self._search_agent.invoke(
             SearchAgentState(messages=[HumanMessage(query)]), config
         ).query_evaluation
-
-    def _retrieve_relevant(self, query: str) -> list[Document]:
-        documents = self._retrieve(query)
-        return self._filter_relevant_documents(query, documents)
-
-    def _retrieve(self, query: str) -> list[Document]:
-        return self._vector_store.invoke(query)
-
-    def _filter_relevant_documents(self, query: str, documents: list[Document]) -> list[Document]:
-        prompt = RANK_DOCS_PROMPT.format(
-            query=query,
-            documents="\n\n".join(map(
-                lambda d: f"Document ID: {d.metadata.get('ref_id')}\nContent: {d.page_content}",
-                documents
-            ))
-        )
-
-        rankings = self._llm.with_structured_output(RelevanceScoreList).invoke(prompt)
-        relevant_ids = [ranking.id for ranking in rankings.list if ranking.relevant]
-
-        if not relevant_ids:
-            return []
-
-        return [d for d in documents if d.metadata.get("ref_id") in relevant_ids]
 
     def _map_documents_to_products(self, documents: list[Document]) -> list[ProductRecommendation]:
         ref_ids = [doc.metadata.get("ref_id") for doc in documents]

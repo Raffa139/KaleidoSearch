@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
-from src.app.dependencies import SessionDep, LLMDep, SearchAgentDep, VectorStoreRetrieverDep
+from src.app.dependencies import SessionDep, SearchAgentDep, RetrieveAgentDep
 from src.search.service import SearchService, ProductRecommendation
 from src.search.models import QueryEvaluationOut, NewUserSearch, UserSearch, BaseUserSearch
 from src.products.service import ProductService
@@ -20,14 +20,13 @@ UserServiceDep = Annotated[UserService, Depends(create_user_service)]
 
 def create_search_service(
         session: SessionDep,
-        llm: LLMDep,
         search_agent: SearchAgentDep,
-        vector_store: VectorStoreRetrieverDep,
+        retrieve_agent: RetrieveAgentDep,
         user_service: UserServiceDep
 ):
     shop_service = ShopService(session)
     product_service = ProductService(session, shop_service)
-    return SearchService(product_service, user_service, llm, search_agent, vector_store)
+    return SearchService(product_service, user_service, search_agent, retrieve_agent)
 
 
 SearchServiceDep = Annotated[SearchService, Depends(create_search_service)]

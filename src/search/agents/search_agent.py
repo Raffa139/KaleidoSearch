@@ -145,8 +145,8 @@ SearchAgentGraph = GraphWrapper[SearchAgentState]
 def build_agent(llm: BaseChatModel, memory: BaseCheckpointSaver) -> SearchAgentGraph:
     return GraphWrapper.from_builder(
         SearchAgentState,
-        SYS_PROMPT,
         build_graph,
+        SYS_PROMPT,
         llm,
         memory
     )
