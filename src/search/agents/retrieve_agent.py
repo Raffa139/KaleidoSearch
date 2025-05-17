@@ -1,6 +1,6 @@
 from langchain_core.documents import Document
 from langchain_core.language_models import BaseChatModel
-from langchain_core.vectorstores import VectorStoreRetriever
+from langchain_core.retrievers import BaseRetriever
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.memory import InMemorySaver
@@ -63,16 +63,12 @@ Here are the documents/products:
 )
 
 
-def retrieve(vector_store: VectorStoreRetriever, s: RetrieveAgentState):
+def retrieve(retriever: BaseRetriever, s: RetrieveAgentState):
     def invoke(state: RetrieveAgentState):
-        documents = vector_store.invoke(state.query)
+        documents = retriever.invoke(state.query)
         return {"retrieved_documents": documents}
 
     return invoke(s)
-
-
-def rerank(state: RetrieveAgentState):
-    pass
 
 
 def filter_relevant(llm: BaseChatModel, s: RetrieveAgentState):
@@ -105,7 +101,7 @@ def summarize(llm: BaseChatModel, s: RetrieveAgentState):
             ))
         )
 
-        # TODO: Increase temperatur for this
+        # TODO: Increase temperatur for this -> https://python.langchain.com/docs/how_to/configure/
         summaries = llm.with_structured_output(SummarizedContentList).invoke(prompt)
 
         return {"summarized_documents": [
@@ -115,15 +111,21 @@ def summarize(llm: BaseChatModel, s: RetrieveAgentState):
     return invoke(s)
 
 
-def build_graph(llm: BaseChatModel, vector_store: VectorStoreRetriever) -> CompiledStateGraph:
+def summarize_condition(state: RetrieveAgentState):
+    if state.relevant_documents:
+        return "summarize"
+    return END
+
+
+def build_graph(llm: BaseChatModel, retriever: BaseRetriever) -> CompiledStateGraph:
     graph_builder = StateGraph(RetrieveAgentState)
 
-    graph_builder.add_node("retrieve", lambda state: retrieve(vector_store, state))
+    graph_builder.add_node("retrieve", lambda state: retrieve(retriever, state))
     graph_builder.add_node("filter", lambda state: filter_relevant(llm, state))
     graph_builder.add_node("summarize", lambda state: summarize(llm, state))
     graph_builder.add_edge(START, "retrieve")
     graph_builder.add_edge("retrieve", "filter")
-    graph_builder.add_edge("filter", "summarize")
+    graph_builder.add_conditional_edges("filter", summarize_condition)
     graph_builder.add_edge("summarize", END)
 
     return graph_builder.compile(checkpointer=InMemorySaver())
@@ -132,11 +134,11 @@ def build_graph(llm: BaseChatModel, vector_store: VectorStoreRetriever) -> Compi
 RetrieveAgentGraph = GraphWrapper[RetrieveAgentState]
 
 
-def build_agent(llm: BaseChatModel, vector_store: VectorStoreRetriever) -> RetrieveAgentGraph:
+def build_agent(llm: BaseChatModel, retriever: BaseRetriever) -> RetrieveAgentGraph:
     return GraphWrapper.from_builder(
         RetrieveAgentState,
         build_graph,
         None,
         llm,
-        vector_store
+        retriever
     )
