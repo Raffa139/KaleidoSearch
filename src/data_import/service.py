@@ -67,6 +67,7 @@ class ImportService:
                 log.info("Processing %s. batch (len: %s)", i + 1, len(batch))
                 self._import_product_batch(batch)
             except Exception as e:
+                log.error("Exception caught: %s", str(e))
                 result.add_failed(batch, e)
 
             duration = watch.lap()
