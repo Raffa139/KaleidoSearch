@@ -85,7 +85,7 @@ To populate the product catalog you can download amazon product metadata from th
 Choose a category of your likings (or all) and download the product metadata via the 'meta' link.
 
 1. Put the downloaded product metadata files into the `/data` directory
-2. Provide the file names and max. token limit/minute in .env
+2. Provide the file names and max. token limit/minute in `.env`
    ```.env
    IMPORT_PRODUCT_CATALOGUES="<Filenames-Separated-By-Comma>"
    IMPORT_MAX_TOKENS_PER_MINUTE=100_000
@@ -105,6 +105,25 @@ Choose a category of your likings (or all) and download the product metadata via
    ```bash
    python import_data.py --y # Skip confirmation mechanism & always proceed with the import
    ```
+
+## Evaluate RAG
+
+To evaluate RAG capabilities and compare actual with expected output, the file `evaluate_rag.py`
+inside `/src/data_import` can be executed.
+
+```bash
+cd src/data_import
+python evaluate_rag.py
+```
+
+It generates test queries based on the documents stored
+inside chroma (import products before), by default it will use product descriptions from the first
+catalog specified in `.env`. Each artificial query goes through the whole retrieve pipeline and the
+actual vs. expected results will be shown in the console.
+
+Generated test data is stored inside `/data` following naming schema `testset_{catalog_name}.jsonl`.
+
+This evaluation can be used to compare f. ex. the performance of a reranker or query expansion.
 
 ## Future Enhancements
 
