@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from sqlmodel import Session, create_engine
 from psycopg_pool import ConnectionPool
-from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers import ContextualCompressionRetriever, MultiQueryRetriever
 from langchain.retrievers.document_compressors import CrossEncoderReranker
 from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -43,6 +43,8 @@ rerank_retriever = ContextualCompressionRetriever(
     base_compressor=reranker,
     base_retriever=chroma.as_retriever(search_kwargs={"k": 20})
 )
+multi_query_retriever = MultiQueryRetriever.from_llm(retriever=chroma_retriever, llm=llm)
+multi_query_reranker = MultiQueryRetriever.from_llm(retriever=rerank_retriever, llm=llm)
 
 
 def search_graph():
@@ -60,7 +62,7 @@ def search_graph():
 
 
 def retrieve_graph():
-    return build_retrieve_graph(llm, chroma_retriever, rerank_retriever)
+    return build_retrieve_graph(llm, multi_query_retriever, multi_query_reranker)
 
 
 def db_session():
