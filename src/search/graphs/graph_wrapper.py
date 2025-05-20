@@ -66,15 +66,15 @@ class GraphWrapper(Generic[T]):
         )
 
 
-class CustomAgentState(MessageState):
+class CustomGraphState(MessageState):
     my_str: str
     my_int: int
 
 
-def build_test_agent(memory: BaseCheckpointSaver) -> CompiledStateGraph:
-    graph_builder = StateGraph(CustomAgentState)
+def build_test_graph(memory: BaseCheckpointSaver) -> CompiledStateGraph:
+    graph_builder = StateGraph(CustomGraphState)
 
-    def add_message(state: CustomAgentState):
+    def add_message(state: CustomGraphState):
         return {"messages": [AIMessage("Hello there!")]}
 
     graph_builder.add_node("llm", add_message)
@@ -86,8 +86,8 @@ def build_test_agent(memory: BaseCheckpointSaver) -> CompiledStateGraph:
 
 if __name__ == '__main__':
     test_graph = GraphWrapper.from_builder(
-        CustomAgentState,
-        build_test_agent,
+        CustomGraphState,
+        build_test_graph,
         "Be kind.",
         InMemorySaver()
     )
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     print(test_graph.get_state())
 
     test_graph.invoke(
-        CustomAgentState(messages=[HumanMessage("Test")], my_str="String", my_int=1)
+        CustomGraphState(messages=[HumanMessage("Test")], my_str="String", my_int=1)
     )
     print(test_graph.get_state())
 

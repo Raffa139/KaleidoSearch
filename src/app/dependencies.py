@@ -10,8 +10,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langgraph.checkpoint.postgres import PostgresSaver
-from src.search.agents.search_agent import SearchAgentGraph, build_agent as build_search_agent
-from src.search.agents.retrieve_agent import RetrieveAgentGraph, build_agent as build_retrieve_agent
+from src.search.graphs.search_graph import SearchGraph, build as build_search_graph
+from src.search.graphs.retrieve_graph import RetrieveGraph, build as build_retrieve_graph
 from src.environment import datasource_url, gemini_api_key
 
 # TODO: Maybe create all dependencies here and none inside routers?
@@ -45,7 +45,7 @@ rerank_retriever = ContextualCompressionRetriever(
 )
 
 
-def search_agent():
+def search_graph():
     with ConnectionPool(
             datasource_url(),
             max_size=20,
@@ -56,11 +56,11 @@ def search_agent():
     ) as pool:
         memory = PostgresSaver(pool)
         memory.setup()
-        yield build_search_agent(llm, memory)
+        yield build_search_graph(llm, memory)
 
 
-def retrieve_agent():
-    return build_retrieve_agent(llm, chroma_retriever, rerank_retriever)
+def retrieve_graph():
+    return build_retrieve_graph(llm, chroma_retriever, rerank_retriever)
 
 
 def db_session():
@@ -70,6 +70,6 @@ def db_session():
 
 SessionDep = Annotated[Session, Depends(db_session)]
 
-SearchAgentDep = Annotated[SearchAgentGraph, Depends(search_agent)]
+SearchGraphDep = Annotated[SearchGraph, Depends(search_graph)]
 
-RetrieveAgentDep = Annotated[RetrieveAgentGraph, Depends(retrieve_agent)]
+RetrieveGraphDep = Annotated[RetrieveGraph, Depends(retrieve_graph)]

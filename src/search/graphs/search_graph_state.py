@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel, Field
-from src.search.agents.graph_wrapper import MessageState
+from src.search.graphs.graph_wrapper import MessageState
 
 
 class AnsweredQuestion(BaseModel):
@@ -51,5 +51,5 @@ class QueryEvaluation(BaseModel):
     )
 
 
-class SearchAgentState(MessageState):
+class SearchGraphState(MessageState):
     query_evaluation: QueryEvaluation | None = None

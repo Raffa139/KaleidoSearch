@@ -4,8 +4,8 @@ from langchain_core.retrievers import BaseRetriever
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.memory import InMemorySaver
-from src.search.agents.graph_wrapper import GraphWrapper
-from src.search.agents.retrieve_agent_state import RetrieveAgentState, RelevanceScoreList, \
+from src.search.graphs.graph_wrapper import GraphWrapper
+from src.search.graphs.retrieve_graph_state import RetrieveGraphState, RelevanceScoreList, \
     SummarizedContentList
 
 FILTER_DOCS_PROMPT = (
@@ -64,16 +64,16 @@ Here are the documents/products:
 )
 
 
-def retrieve(retriever: BaseRetriever, s: RetrieveAgentState):
-    def invoke(state: RetrieveAgentState):
+def retrieve(retriever: BaseRetriever, s: RetrieveGraphState):
+    def invoke(state: RetrieveGraphState):
         documents = retriever.invoke(state.query)
         return {"retrieved_documents": documents}
 
     return invoke(s)
 
 
-def filter_relevant(llm: BaseChatModel, s: RetrieveAgentState):
-    def invoke(state: RetrieveAgentState):
+def filter_relevant(llm: BaseChatModel, s: RetrieveGraphState):
+    def invoke(state: RetrieveGraphState):
         prompt = FILTER_DOCS_PROMPT.format(
             query=state.query,
             documents="\n\n".join(map(
@@ -92,8 +92,8 @@ def filter_relevant(llm: BaseChatModel, s: RetrieveAgentState):
     return invoke(s)
 
 
-def summarize(llm: BaseChatModel, s: RetrieveAgentState):
-    def invoke(state: RetrieveAgentState):
+def summarize(llm: BaseChatModel, s: RetrieveGraphState):
+    def invoke(state: RetrieveGraphState):
         prompt = SUMMARIZE_PROMPT.format(
             n_words=state.summary_length,
             documents="\n\n".join(map(
@@ -112,11 +112,11 @@ def summarize(llm: BaseChatModel, s: RetrieveAgentState):
     return invoke(s)
 
 
-def rerank_or_retrieve(state: RetrieveAgentState):
+def rerank_or_retrieve(state: RetrieveGraphState):
     return "rerank" if state.rerank_documents else "retrieve"
 
 
-def summarize_or_end(state: RetrieveAgentState):
+def summarize_or_end(state: RetrieveGraphState):
     return "summarize" if state.relevant_documents else END
 
 
@@ -125,7 +125,7 @@ def build_graph(
         retriever: BaseRetriever,
         reranker: BaseRetriever
 ) -> CompiledStateGraph:
-    graph_builder = StateGraph(RetrieveAgentState)
+    graph_builder = StateGraph(RetrieveGraphState)
 
     graph_builder.add_node("retrieve", lambda state: retrieve(retriever, state))
     graph_builder.add_node("rerank", lambda state: retrieve(reranker, state))
@@ -140,16 +140,16 @@ def build_graph(
     return graph_builder.compile(checkpointer=InMemorySaver())
 
 
-RetrieveAgentGraph = GraphWrapper[RetrieveAgentState]
+RetrieveGraph = GraphWrapper[RetrieveGraphState]
 
 
-def build_agent(
+def build(
         llm: BaseChatModel,
         retriever: BaseRetriever,
         reranker: BaseRetriever
-) -> RetrieveAgentGraph:
+) -> RetrieveGraph:
     return GraphWrapper.from_builder(
-        RetrieveAgentState,
+        RetrieveGraphState,
         build_graph,
         None,
         llm,

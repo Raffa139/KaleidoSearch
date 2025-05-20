@@ -1,7 +1,7 @@
 from typing import List
 from pydantic import BaseModel, Field
 from langchain_core.documents import Document
-from src.search.agents.graph_wrapper import MessageState
+from src.search.graphs.graph_wrapper import MessageState
 
 
 class RelevanceScore(BaseModel):
@@ -30,7 +30,7 @@ class SummarizedContentList(BaseModel):
     list: List[SummarizedContent] = Field(description="New and enhanced product descriptions")
 
 
-class RetrieveAgentState(MessageState):
+class RetrieveGraphState(MessageState):
     query: str
     summary_length: int = 100
     rerank_documents: bool = False

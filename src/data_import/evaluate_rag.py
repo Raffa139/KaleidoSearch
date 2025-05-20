@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from src.definitions import DATA_DIR
 from src.environment import product_catalogues
 from src.data_import.stopwatch import Stopwatch
-from src.app.dependencies import llm, chroma, retrieve_agent as build_retrieve_agent
+from src.app.dependencies import llm, chroma, retrieve_graph as build_retrieve_graph
 
 logging.basicConfig(format="%(asctime)s [%(name)s] %(levelname)s: %(message)s", level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -141,12 +141,12 @@ def run_testset(
         with open(os.path.join(DATA_DIR, f"testset_{data_file}"), encoding="utf-8") as file:
             testset = [DataFrame(**data) for data in json.load(file)]
 
-    retrieve_agent = build_retrieve_agent()
+    retrieve_graph = build_retrieve_graph()
     end_index = limit if limit else len(testset)
     watch = Stopwatch(units="s")
 
     for data_frame in testset[:end_index]:
-        result = retrieve_agent.invoke(query=data_frame.user_input)
+        result = retrieve_graph.invoke(query=data_frame.user_input)
 
         if documents := result.summarized_documents:
             data_frame.response = documents[0].page_content

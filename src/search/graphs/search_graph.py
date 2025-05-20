@@ -3,8 +3,8 @@ from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.base import BaseCheckpointSaver
-from src.search.agents.graph_wrapper import GraphWrapper
-from src.search.agents.search_agent_state import SearchAgentState, QueryEvaluation
+from src.search.graphs.graph_wrapper import GraphWrapper
+from src.search.graphs.search_graph_state import SearchGraphState, QueryEvaluation
 
 SYS_PROMPT = (
     """
@@ -105,19 +105,19 @@ Your response should be structured as follows:
 )
 
 
-def chat_model(llm: BaseChatModel, s: SearchAgentState):
-    def invoke(state: SearchAgentState):
+def chat_model(llm: BaseChatModel, s: SearchGraphState):
+    def invoke(state: SearchGraphState):
         return {"messages": [llm.invoke(state.messages)]}
 
     return invoke(s)
 
 
-def structured_response(llm: BaseChatModel, s: SearchAgentState):
+def structured_response(llm: BaseChatModel, s: SearchGraphState):
     # TODO: Maybe can be called as tool to remove extra llm call
     #       Custom tool condition that wires to END after tool called
     #       Custom tool node that saves evaluation in state
 
-    def invoke(state: SearchAgentState):
+    def invoke(state: SearchGraphState):
         last_message = state.messages[-1].content
         response = llm.with_structured_output(QueryEvaluation).invoke(
             [HumanMessage(content=last_message)]
@@ -128,7 +128,7 @@ def structured_response(llm: BaseChatModel, s: SearchAgentState):
 
 
 def build_graph(llm: BaseChatModel, memory: BaseCheckpointSaver) -> CompiledStateGraph:
-    graph_builder = StateGraph(SearchAgentState)
+    graph_builder = StateGraph(SearchGraphState)
 
     graph_builder.add_node("llm", lambda state: chat_model(llm, state))
     graph_builder.add_node("respond", lambda state: structured_response(llm, state))
@@ -139,12 +139,12 @@ def build_graph(llm: BaseChatModel, memory: BaseCheckpointSaver) -> CompiledStat
     return graph_builder.compile(checkpointer=memory)
 
 
-SearchAgentGraph = GraphWrapper[SearchAgentState]
+SearchGraph = GraphWrapper[SearchGraphState]
 
 
-def build_agent(llm: BaseChatModel, memory: BaseCheckpointSaver) -> SearchAgentGraph:
+def build(llm: BaseChatModel, memory: BaseCheckpointSaver) -> SearchGraph:
     return GraphWrapper.from_builder(
-        SearchAgentState,
+        SearchGraphState,
         build_graph,
         SYS_PROMPT,
         llm,
