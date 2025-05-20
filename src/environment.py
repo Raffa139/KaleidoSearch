@@ -28,6 +28,14 @@ def openai_api_key() -> str:
     return os.getenv("OPENAI_API_KEY")
 
 
+def llm_model() -> str:
+    return os.getenv("LLM_MODEL")
+
+
+def llm_provider() -> str:
+    return os.getenv("LLM_PROVIDER")
+
+
 def product_catalogues() -> list[str]:
     return [s.strip() for s in os.getenv("IMPORT_PRODUCT_CATALOGUES", "").split(",") if s.strip()]
 

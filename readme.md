@@ -62,12 +62,17 @@ search endeavours.
 3. Set up your environment:
    ```.env
    OPENAI_API_KEY="<Your-API-Key>"
-   GEMINI_API_KEY="<Your-API-Key>"
+   GOOGLE_API_KEY="<Your-API-Key>"
    DATASOURCE_URL="postgresql://kaleidosearch:secret@localhost:5432/kaleidosearch"
    CHROMA_HOST="localhost"
    CHROMA_PORT=5000
    CHROMA_COLLECTION="kaleido_search_products"
+   LLM_MODEL="gemini-2.0-flash"
+   LLM_PROVIDER="google_genai"
    ```
+   > **Note:**
+   > To use a LLM from OpenAI, it is sufficient to only put in the model name and omit provider
+   name. For other LLM models/provider refer to https://python.langchain.com/docs/integrations/chat/
 
 ### Running the Application
 
@@ -108,6 +113,9 @@ Choose a category of your likings (or all) and download the product metadata via
    ```bash
    python import_data.py --y # Skip confirmation mechanism & always proceed with the import
    ```
+   > **Note:**
+   > Embeddings are created using OpenAI's text-embedding-3-small, make sure to provide an OpenAI
+   API-Key or go into `/src/app/dependencies.py` and change the embedding model.
 
 ## Evaluate RAG
 

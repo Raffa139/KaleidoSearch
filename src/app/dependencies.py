@@ -3,29 +3,23 @@ from typing import Annotated
 from fastapi import Depends
 from sqlmodel import Session, create_engine
 from psycopg_pool import ConnectionPool
+from langchain.chat_models import init_chat_model
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import CrossEncoderReranker
 from langchain_community.cross_encoders import HuggingFaceCrossEncoder
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langgraph.checkpoint.postgres import PostgresSaver
 from src.search.graphs.search_graph import SearchGraph, build as build_search_graph
 from src.search.graphs.retrieve_graph import RetrieveGraph, build as build_retrieve_graph
-from src.environment import datasource_url, gemini_api_key, chroma_host, chroma_port, \
-    chroma_collection
+from src.environment import datasource_url, chroma_host, chroma_port, chroma_collection, \
+    llm_model, llm_provider
 
 # TODO: Maybe create all dependencies here and none inside routers?
 
 db_engine = create_engine(datasource_url())
 
-# TODO: Make LLM configurable
-
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
-    temperature=0,
-    google_api_key=gemini_api_key()
-)
+llm = init_chat_model(llm_model(), model_provider=llm_provider(), temperature=0)
 
 bi_encoder = OpenAIEmbeddings(model="text-embedding-3-small")
 cross_encoder = HuggingFaceCrossEncoder(model_name="cross-encoder/ms-marco-MiniLM-L6-v2")
