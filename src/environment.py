@@ -8,6 +8,18 @@ def datasource_url() -> str:
     return os.getenv("DATASOURCE_URL")
 
 
+def chroma_host() -> str:
+    return os.getenv("CHROMA_HOST")
+
+
+def chroma_port() -> int:
+    return int(os.getenv("CHROMA_PORT"))
+
+
+def chroma_collection() -> str:
+    return os.getenv("CHROMA_COLLECTION")
+
+
 def gemini_api_key() -> str:
     return os.getenv("GEMINI_API_KEY")
 

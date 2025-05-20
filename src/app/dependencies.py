@@ -12,7 +12,8 @@ from langchain_chroma import Chroma
 from langgraph.checkpoint.postgres import PostgresSaver
 from src.search.graphs.search_graph import SearchGraph, build as build_search_graph
 from src.search.graphs.retrieve_graph import RetrieveGraph, build as build_retrieve_graph
-from src.environment import datasource_url, gemini_api_key
+from src.environment import datasource_url, gemini_api_key, chroma_host, chroma_port, \
+    chroma_collection
 
 # TODO: Maybe create all dependencies here and none inside routers?
 
@@ -26,15 +27,13 @@ llm = ChatGoogleGenerativeAI(
     google_api_key=gemini_api_key()
 )
 
-# TODO: Make Chroma connection settings configurable
-
 bi_encoder = OpenAIEmbeddings(model="text-embedding-3-small")
 cross_encoder = HuggingFaceCrossEncoder(model_name="cross-encoder/ms-marco-MiniLM-L6-v2")
 reranker = CrossEncoderReranker(model=cross_encoder, top_n=4)
 
 chroma = Chroma(
-    client=chromadb.HttpClient(host="localhost", port=5000),
-    collection_name="kaleido_search_products",
+    client=chromadb.HttpClient(host=chroma_host(), port=chroma_port()),
+    collection_name=chroma_collection(),
     embedding_function=bi_encoder
 )
 

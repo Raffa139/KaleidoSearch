@@ -64,6 +64,9 @@ search endeavours.
    OPENAI_API_KEY="<Your-API-Key>"
    GEMINI_API_KEY="<Your-API-Key>"
    DATASOURCE_URL="postgresql://kaleidosearch:secret@localhost:5432/kaleidosearch"
+   CHROMA_HOST="localhost"
+   CHROMA_PORT=5000
+   CHROMA_COLLECTION="kaleido_search_products"
    ```
 
 ### Running the Application
