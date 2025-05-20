@@ -21,6 +21,9 @@ class Segment:
         self.duration = duration
         self._units = units
 
+    def json(self) -> dict:
+        return {self.name: self.duration}
+
     def __str__(self):
         return f"{self.name.upper().ljust(7, ' ')} {scale(self.duration, self._units)}{self._units}"
 
@@ -97,6 +100,15 @@ class Stopwatch:
                 print("├", end="")
             print(f" {segment}")
         print(f"└{'-' * 17}")
+
+    def json(self) -> dict:
+        return {
+            "stopwatch_stats": {
+                "units": self._units,
+                "runtime": self.stop(),
+                "segments": [segment.json() for segment in self._segments]
+            }
+        }
 
     def _create_segment(self, name: SegmentName, duration: float):
         self._segments.append(Segment(name, duration, units=self._units))

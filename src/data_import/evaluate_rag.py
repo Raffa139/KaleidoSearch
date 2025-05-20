@@ -7,6 +7,7 @@ from typing import Literal, Tuple, get_args
 from pydantic import BaseModel
 from src.definitions import DATA_DIR
 from src.environment import product_catalogues
+from src.data_import.stopwatch import Stopwatch
 from src.app.dependencies import llm, chroma, retrieve_agent as build_retrieve_agent
 
 logging.basicConfig(format="%(asctime)s [%(name)s] %(levelname)s: %(message)s", level=logging.INFO)
@@ -126,7 +127,13 @@ def generate_testset(data_file: str, *, size: int, write_to_disk: bool = False) 
         raise ValueError(f"No documents found for {data_file}")
 
 
-def run_testset(testset: list[DataFrame] = None, *, data_file: str = None, limit: int = None):
+def run_testset(
+        testset: list[DataFrame] = None,
+        *,
+        data_file: str = None,
+        limit: int = None,
+        record: bool = False
+):
     if not testset and not data_file:
         raise ValueError()
 
@@ -136,6 +143,7 @@ def run_testset(testset: list[DataFrame] = None, *, data_file: str = None, limit
 
     retrieve_agent = build_retrieve_agent()
     end_index = limit if limit else len(testset)
+    watch = Stopwatch(units="s")
 
     for data_frame in testset[:end_index]:
         result = retrieve_agent.invoke(query=data_frame.user_input)
@@ -146,13 +154,22 @@ def run_testset(testset: list[DataFrame] = None, *, data_file: str = None, limit
             data_frame.n_relevant_contexts = len(result.relevant_documents)
             print(f"{data_frame}\n\n")
 
+        watch.lap()
+
+    if record:
+        now = round(time.time())
+        with open(os.path.join(DATA_DIR, f"run_{now}_{data_file}"), "x", encoding="utf-8") as file:
+            dumps = [data_frame.model_dump() for data_frame in testset[:end_index]]
+            run = {"testset": dumps, **watch.json()}
+            json.dump(run, file)
+
 
 def main():
     data_file, *rest = product_catalogues()
     testset = generate_testset(data_file, size=7, write_to_disk=True)
     time.sleep(60)  # 60s timeout: 15 RPM Gemini API limit
-    run_testset(testset)
-    # run_testset(data_file=data_file, limit=7)
+    run_testset(testset, record=True)
+    # run_testset(data_file=data_file, limit=7, record=True)
 
 
 if __name__ == '__main__':
