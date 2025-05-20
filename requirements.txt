@@ -12,6 +12,7 @@ langchain-chroma==0.2.3
 langchain-huggingface==0.1.2
 langchain-openai==0.3.16
 langchain-google-genai==2.1.4
+langchain-community
 langgraph==0.4.1
 langgraph-checkpoint-postgres
 chromadb==0.6.3

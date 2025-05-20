@@ -76,7 +76,8 @@ def get_recommendations_from_thread(
         uid: int,
         tid: int,
         search_service: SearchServiceDep,
-        user_service: UserServiceDep
+        user_service: UserServiceDep,
+        rerank: bool = False
 ):
     if not user_service.find_user_by_id(uid):
         raise HTTPException(status_code=401)
@@ -84,7 +85,7 @@ def get_recommendations_from_thread(
     if not user_service.has_user_access_to_thread(uid, tid):
         raise HTTPException(status_code=403)
 
-    return search_service.get_recommendations(tid)
+    return search_service.get_recommendations(tid, rerank=rerank)
 
 
 def handle_thread_posts(

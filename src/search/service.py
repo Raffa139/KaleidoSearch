@@ -36,7 +36,12 @@ class SearchService:
                 self._user_service.delete_thread(new_thread_id)
             raise
 
-    def get_recommendations(self, thread_id: int) -> list[ProductRecommendation] | None:
+    def get_recommendations(
+            self,
+            thread_id: int,
+            *,
+            rerank: bool = False
+    ) -> list[ProductRecommendation] | None:
         config = self.__get_agent_config(thread_id)
         state = self._search_agent.get_state(config)
         query_evaluation = state.query_evaluation if state else None
@@ -45,7 +50,10 @@ class SearchService:
         if not query:
             raise ValueError("User search needs refinement")
 
-        if documents := self._retrieve_agent.invoke(query=query).summarized_documents:
+        if documents := self._retrieve_agent.invoke(
+                query=query,
+                rerank_documents=rerank
+        ).summarized_documents:
             return self._map_documents_to_products(documents)
 
         return []

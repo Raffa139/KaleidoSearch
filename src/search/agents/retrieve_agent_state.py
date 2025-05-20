@@ -33,7 +33,7 @@ class SummarizedContentList(BaseModel):
 class RetrieveAgentState(MessageState):
     query: str
     summary_length: int = 100
+    rerank_documents: bool = False
     retrieved_documents: List[Document] = []
-    reranked_documents: List[Document] = []
     relevant_documents: List[Document] = []
     summarized_documents: List[Document] = []

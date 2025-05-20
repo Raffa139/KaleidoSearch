@@ -54,7 +54,8 @@ product summaries/descriptions which are less than {n_words} words long. The pur
 descriptions is marketing the products to users looking to buy.
 
 Do not use any kind of text formatting besides line breaks. Do not echo my prompt. Do not remind 
-me what I asked you for. Do not apologize. Do not self-reference.
+me what I asked you for. Do not apologize. Do not self-reference. Do not include Document IDs in 
+your output.
 
 Here are the documents/products:
 
@@ -111,21 +112,29 @@ def summarize(llm: BaseChatModel, s: RetrieveAgentState):
     return invoke(s)
 
 
-def summarize_condition(state: RetrieveAgentState):
-    if state.relevant_documents:
-        return "summarize"
-    return END
+def rerank_or_retrieve(state: RetrieveAgentState):
+    return "rerank" if state.rerank_documents else "retrieve"
 
 
-def build_graph(llm: BaseChatModel, retriever: BaseRetriever) -> CompiledStateGraph:
+def summarize_or_end(state: RetrieveAgentState):
+    return "summarize" if state.relevant_documents else END
+
+
+def build_graph(
+        llm: BaseChatModel,
+        retriever: BaseRetriever,
+        reranker: BaseRetriever
+) -> CompiledStateGraph:
     graph_builder = StateGraph(RetrieveAgentState)
 
     graph_builder.add_node("retrieve", lambda state: retrieve(retriever, state))
+    graph_builder.add_node("rerank", lambda state: retrieve(reranker, state))
     graph_builder.add_node("filter", lambda state: filter_relevant(llm, state))
     graph_builder.add_node("summarize", lambda state: summarize(llm, state))
-    graph_builder.add_edge(START, "retrieve")
+    graph_builder.add_conditional_edges(START, rerank_or_retrieve)
+    graph_builder.add_edge("rerank", "filter")
     graph_builder.add_edge("retrieve", "filter")
-    graph_builder.add_conditional_edges("filter", summarize_condition)
+    graph_builder.add_conditional_edges("filter", summarize_or_end)
     graph_builder.add_edge("summarize", END)
 
     return graph_builder.compile(checkpointer=InMemorySaver())
@@ -134,11 +143,16 @@ def build_graph(llm: BaseChatModel, retriever: BaseRetriever) -> CompiledStateGr
 RetrieveAgentGraph = GraphWrapper[RetrieveAgentState]
 
 
-def build_agent(llm: BaseChatModel, retriever: BaseRetriever) -> RetrieveAgentGraph:
+def build_agent(
+        llm: BaseChatModel,
+        retriever: BaseRetriever,
+        reranker: BaseRetriever
+) -> RetrieveAgentGraph:
     return GraphWrapper.from_builder(
         RetrieveAgentState,
         build_graph,
         None,
         llm,
-        retriever
+        retriever,
+        reranker
     )

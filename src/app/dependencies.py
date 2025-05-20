@@ -3,6 +3,9 @@ from typing import Annotated
 from fastapi import Depends
 from sqlmodel import Session, create_engine
 from psycopg_pool import ConnectionPool
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import CrossEncoderReranker
+from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
@@ -25,13 +28,21 @@ llm = ChatGoogleGenerativeAI(
 
 # TODO: Make Chroma connection settings configurable
 
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+bi_encoder = OpenAIEmbeddings(model="text-embedding-3-small")
+cross_encoder = HuggingFaceCrossEncoder(model_name="cross-encoder/ms-marco-MiniLM-L6-v2")
+reranker = CrossEncoderReranker(model=cross_encoder, top_n=4)
+
 chroma = Chroma(
     client=chromadb.HttpClient(host="localhost", port=5000),
     collection_name="kaleido_search_products",
-    embedding_function=embeddings
+    embedding_function=bi_encoder
 )
+
 chroma_retriever = chroma.as_retriever(search_kwargs={"k": 4})
+rerank_retriever = ContextualCompressionRetriever(
+    base_compressor=reranker,
+    base_retriever=chroma.as_retriever(search_kwargs={"k": 20})
+)
 
 
 def search_agent():
@@ -49,7 +60,7 @@ def search_agent():
 
 
 def retrieve_agent():
-    return build_retrieve_agent(llm, chroma_retriever)
+    return build_retrieve_agent(llm, chroma_retriever, rerank_retriever)
 
 
 def db_session():
