@@ -61,6 +61,7 @@
   overflow-y: auto;
   padding-right: 10px;
   box-sizing: border-box;
+  margin: 0 auto;
 }
 
 .results-container::-webkit-scrollbar {

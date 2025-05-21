@@ -7,6 +7,8 @@
   --light-text-color: #efefef;
   --border-color: #74787f;
   --shadow-color: rgba(0, 0, 0, 0.05);
+  --logout-button-bg: #dc3545;
+  --logout-button-hover-bg: #c82333;
 } */
 
 :root {
@@ -18,6 +20,8 @@
   --light-text-color: #efefef;
   --border-color: #cbc0d5;
   --shadow-color: rgba(0, 0, 0, 0.1);
+  --logout-button-bg: #dc3545;
+  --logout-button-hover-bg: #c82333;
 }
 
 body {
@@ -33,15 +37,12 @@ body {
   box-sizing: border-box;
 }
 
-#root {
-  margin: 0 auto;
+main {
+  width: 100%;
 }
 
-.container {
+#root {
   width: 100%;
-  max-width: 900px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 20px;
 }

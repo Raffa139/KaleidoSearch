@@ -1,37 +1,37 @@
 const DEFAULT_HEADERS = {
-    "Content-Type": "application/json"
+  "Content-Type": "application/json"
 };
 
 class KaleidoClient {
-    url: string;
+  url: string;
 
-    constructor(host: string, port: number) {
-        this.url = `http://${host}:${port}`;
+  constructor(host: string, port: number) {
+    this.url = `http://${host}:${port}`;
+  }
+
+  async createUser(sub_id: string, username: string, picture_url: string | null): Promise<{ id: number; sub_id: string; username: string; picture_url: string | null }> {
+    const response = await fetch(`${this.url}/users`, {
+      method: "POST",
+      headers: DEFAULT_HEADERS,
+      body: JSON.stringify({ sub_id, username, picture_url })
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create user");
     }
 
-    async createUser(sub_id: string, username: string, picture_url: string | null): Promise<{ id: number; sub_id: string; username: string; picture_url: string | null }> {
-        const response = await fetch(`${this.url}/users`, {
-            method: "POST",
-            headers: DEFAULT_HEADERS,
-            body: JSON.stringify({ sub_id, username, picture_url })
-        });
+    return response.json();
+  }
 
-        if (!response.ok) {
-            throw new Error("Failed to create user");
-        }
+  async getUserById(uid: number): Promise<{ id: number; sub_id: string; username: string; picture_url: string | null }> {
+    const response = await fetch(`${this.url}/users/${uid}`, { headers: DEFAULT_HEADERS });
 
-        return response.json();
+    if (!response.ok) {
+      throw new Error("Failed to fetch user");
     }
 
-    async getUserById(uid: number): Promise<{ id: number; sub_id: string; username: string; picture_url: string | null }> {
-        const response = await fetch(`${this.url}/users/${uid}`, { headers: DEFAULT_HEADERS });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch user");
-        }
-
-        return response.json();
-    }
+    return response.json();
+  }
 }
 
 export const client = new KaleidoClient("localhost", 8000);

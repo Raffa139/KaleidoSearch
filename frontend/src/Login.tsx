@@ -1,6 +1,6 @@
 import type { FunctionComponent } from "react";
 import { Form } from "react-router";
-import "./Login.css";
+import "./login.css";
 
 export const Login: FunctionComponent = () => {
   return (
