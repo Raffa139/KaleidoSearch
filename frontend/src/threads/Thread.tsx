@@ -1,9 +1,9 @@
 import type { FunctionComponent } from "react";
 import { useOutletContext } from "react-router";
-import type { UserLoaderData } from "./user-loader";
-import "./search.css";
+import type { UserLoaderData } from "../authentication/userLoader";
+import "./thread.css";
 
-export const Search: FunctionComponent = () => {
+export const Thread: FunctionComponent = () => {
   const { user } = useOutletContext<UserLoaderData>();
 
   console.log("Logged in as", user);

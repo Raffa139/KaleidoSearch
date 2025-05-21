@@ -1,10 +1,10 @@
 import { createBrowserRouter, redirect } from 'react-router';
 import { v4 as uuidv4 } from "uuid";
-import { Layout } from './Layout';
-import { Login } from './Login';
-import { Search } from './Search';
-import { client } from './client/kaleido-client';
-import { userLoader } from './user-loader';
+import { Layout } from './layout/Layout';
+import { Login } from './authentication/Login';
+import { Thread } from './threads/Thread';
+import { client } from './client/kaleidoClient';
+import { userLoader } from './authentication/userLoader';
 
 export const router = createBrowserRouter([
   {
@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "threads",
-        Component: Search
+        Component: Thread
       }
     ]
   }

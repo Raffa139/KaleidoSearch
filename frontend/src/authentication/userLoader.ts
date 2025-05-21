@@ -1,11 +1,11 @@
 import type { LoaderFunction } from "react-router";
-import { client, type User } from "./client/kaleido-client";
+import { client, type User } from "../client/kaleidoClient";
 
 export interface UserLoaderData {
-    user: User;
+  user: User;
 }
 
 export const userLoader: LoaderFunction = async ({ params }): Promise<UserLoaderData> => {
-    const user = await client.getUserById(Number(params.uid));
-    return { user };
+  const user = await client.getUserById(Number(params.uid));
+  return { user };
 };
