@@ -3,9 +3,9 @@ import { useLoaderData } from "react-router";
 import "./Search.css";
 
 export const Search: FunctionComponent = () => {
-  const { username } = useLoaderData();
+  const { user } = useLoaderData();
 
-  console.log("Logged in as", username);
+  console.log("Logged in as", user);
 
   return (
     <>
@@ -22,7 +22,7 @@ export const Search: FunctionComponent = () => {
             <button className="icon-btn"><i className="fas fa-bookmark"></i></button>
             <button className="icon-btn"><i className="fas fa-share-alt"></i></button>
           </div>
-          <img src="placeholder.png" alt="Result Image" className="result-image" />
+          <img src="/placeholder.png" alt="Result Image" className="result-image" />
           <div className="result-content">
             <h3 className="result-title">Example Search Result Title One</h3>
             <span className="price-tag">$19.99</span>
@@ -38,7 +38,7 @@ export const Search: FunctionComponent = () => {
             <button className="icon-btn"><i className="fas fa-heart"></i></button>
             <button className="icon-btn"><i className="fas fa-plus"></i></button>
           </div>
-          <img src="placeholder.png" alt="Result Image" className="result-image" />
+          <img src="/placeholder.png" alt="Result Image" className="result-image" />
           <div className="result-content">
             <h3 className="result-title">Another Product or Service Here</h3>
             <span className="price-tag">$49.50</span>
@@ -53,7 +53,7 @@ export const Search: FunctionComponent = () => {
           <div className="result-icons">
             <button className="icon-btn"><i className="fas fa-shopping-cart"></i></button>
           </div>
-          <img src="placeholder.png" alt="Result Image" className="result-image" />
+          <img src="/placeholder.png" alt="Result Image" className="result-image" />
           <div className="result-content">
             <h3 className="result-title">Third Item in the List</h3>
             <span className="price-tag">$75.00</span>
@@ -69,7 +69,7 @@ export const Search: FunctionComponent = () => {
             <button className="icon-btn"><i className="fas fa-bookmark"></i></button>
             <button className="icon-btn"><i className="fas fa-share-alt"></i></button>
           </div>
-          <img src="placeholder.png" alt="Result Image" className="result-image" />
+          <img src="/placeholder.png" alt="Result Image" className="result-image" />
           <div className="result-content">
             <h3 className="result-title">Example Search Result Title One</h3>
             <span className="price-tag">$19.99</span>
@@ -85,7 +85,7 @@ export const Search: FunctionComponent = () => {
             <button className="icon-btn"><i className="fas fa-heart"></i></button>
             <button className="icon-btn"><i className="fas fa-plus"></i></button>
           </div>
-          <img src="placeholder.png" alt="Result Image" className="result-image" />
+          <img src="/placeholder.png" alt="Result Image" className="result-image" />
           <div className="result-content">
             <h3 className="result-title">Another Product or Service Here</h3>
             <span className="price-tag">$49.50</span>
@@ -100,7 +100,7 @@ export const Search: FunctionComponent = () => {
           <div className="result-icons">
             <button className="icon-btn"><i className="fas fa-shopping-cart"></i></button>
           </div>
-          <img src="placeholder.png" alt="Result Image" className="result-image" />
+          <img src="/placeholder.png" alt="Result Image" className="result-image" />
           <div className="result-content">
             <h3 className="result-title">Third Item in the List</h3>
             <span className="price-tag">$75.00</span>

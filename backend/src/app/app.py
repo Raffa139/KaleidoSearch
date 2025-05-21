@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel
-
 from backend.src.app.dependencies import db_engine
 from backend.src.products.router import router as products_router
 from backend.src.shops.router import router as shops_router
@@ -22,6 +22,13 @@ def create_app():
     app.include_router(products_router)
     app.include_router(shops_router)
     app.include_router(users_router)
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:5173"],
+        allow_credentials=True,
+        allow_methods=["GET", "POST"]
+    )
 
     app.add_exception_handler(ValueError, handle_value_error)
 
