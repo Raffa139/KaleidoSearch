@@ -1,12 +1,10 @@
 import type { FunctionComponent } from 'react'
-import { Login } from './Login';
-import { Search } from './Search';
+import { Outlet } from 'react-router';
 
 export const App: FunctionComponent = () => {
   return (
     <div className="container">
-      <Login />
-      <Search />
+      <Outlet />
     </div>
   )
 };

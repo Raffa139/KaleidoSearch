@@ -1,4 +1,5 @@
 import type { FunctionComponent } from "react";
+import { Link } from "react-router";
 import "./Login.css";
 
 export const Login: FunctionComponent = () => {
@@ -14,7 +15,9 @@ export const Login: FunctionComponent = () => {
       <form className="login-form">
         <input type="email" placeholder="Email" className="login-input" />
         <input type="password" placeholder="Password" className="login-input" />
-        <button type="submit" className="login-button">Log In</button>
+        <Link to="/users/uid/threads">
+          <button className="login-button">Log In</button>
+        </Link>
       </form>
     </div>
   );
