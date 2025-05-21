@@ -1,5 +1,6 @@
 import type { LoaderFunction } from "react-router";
-import { client, type User } from "../client/kaleidoClient";
+import type { User } from "../client/types";
+import { client } from "../client/kaleidoClient";
 
 export interface UserLoaderData {
   user: User;
