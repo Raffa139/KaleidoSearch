@@ -10,9 +10,9 @@ from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langgraph.checkpoint.postgres import PostgresSaver
-from src.search.graphs.search_graph import SearchGraph, build as build_search_graph
-from src.search.graphs.retrieve_graph import RetrieveGraph, build as build_retrieve_graph
-from src.environment import datasource_url, chroma_host, chroma_port, chroma_collection, \
+from backend.src.search.graphs.search_graph import SearchGraph, build as build_search_graph
+from backend.src.search.graphs.retrieve_graph import RetrieveGraph, build as build_retrieve_graph
+from backend.src.environment import datasource_url, chroma_host, chroma_port, chroma_collection, \
     llm_model, llm_provider
 
 # TODO: Maybe create all dependencies here and none inside routers?

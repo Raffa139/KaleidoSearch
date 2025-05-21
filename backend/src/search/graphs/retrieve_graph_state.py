@@ -1,7 +1,7 @@
 from typing import List
 from pydantic import BaseModel, Field
 from langchain_core.documents import Document
-from src.search.graphs.graph_wrapper import MessageState
+from backend.src.search.graphs.graph_wrapper import MessageState
 
 
 class RelevanceScore(BaseModel):

@@ -1,6 +1,6 @@
 from sqlmodel import Session, select, delete
 from sqlmodel.sql.expression import Select, SelectOfScalar
-from src.shops.models import Shop, ShopIn
+from backend.src.shops.models import Shop, ShopIn
 
 
 class ShopService:

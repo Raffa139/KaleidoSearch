@@ -4,12 +4,12 @@ import tiktoken
 from pydantic import BaseModel
 from langchain_core.documents import Document
 from langchain_core.vectorstores import VectorStore
-from src.environment import max_tokens_minute
-from src.products.models import ProductBase, ProductIn
-from src.products.service import ProductService
-from src.shops.models import ShopIn
-from src.shops.service import ShopService
-from src.data_import.stopwatch import Stopwatch
+from backend.src.environment import max_tokens_minute
+from backend.src.products.models import ProductBase, ProductIn
+from backend.src.products.service import ProductService
+from backend.src.shops.models import ShopIn
+from backend.src.shops.service import ShopService
+from backend.src.data_import.stopwatch import Stopwatch
 
 log = logging.getLogger(__name__)
 

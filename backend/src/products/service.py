@@ -1,7 +1,7 @@
 from sqlmodel import Session, select, delete
 from sqlmodel.sql.expression import Select, SelectOfScalar
-from src.products.models import Product, ProductIn
-from src.shops.service import ShopService
+from backend.src.products.models import Product, ProductIn
+from backend.src.shops.service import ShopService
 
 
 class ProductService:

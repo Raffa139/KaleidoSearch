@@ -1,8 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
-from src.app.dependencies import SessionDep
-from src.shops.models import ShopOut, ShopIn
-from src.shops.service import ShopService
+from backend.src.app.dependencies import SessionDep
+from backend.src.shops.models import ShopOut, ShopIn
+from backend.src.shops.service import ShopService
 
 router = APIRouter(prefix="/shops", tags=["shops"])
 

@@ -1,10 +1,10 @@
 from langchain_core.documents import Document
 from langchain_core.runnables import RunnableConfig
-from src.products.service import ProductService
-from src.users.service import UserService
-from src.search.models import ProductRecommendation, QueryEvaluationOut, BaseUserSearch
-from src.search.graphs.search_graph import SearchGraph
-from src.search.graphs.retrieve_graph import RetrieveGraph
+from backend.src.products.service import ProductService
+from backend.src.users.service import UserService
+from backend.src.search.models import ProductRecommendation, QueryEvaluationOut, BaseUserSearch
+from backend.src.search.graphs.search_graph import SearchGraph
+from backend.src.search.graphs.retrieve_graph import RetrieveGraph
 
 
 class SearchService:

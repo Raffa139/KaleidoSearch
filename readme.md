@@ -56,6 +56,7 @@ search endeavours.
    ```
 2. Install dependencies:
    ```bash
+   cd backend
    pip install -r requirements.txt
    # Configure database settings in config file or environment variables
    ```
@@ -83,6 +84,7 @@ search endeavours.
    ```
 2. Start the FastAPI server:
    ```bash
+   cd backend
    uvicorn main:app --reload
    ```
 
@@ -92,7 +94,7 @@ To populate the product catalog you can download amazon product metadata from th
 [Amazon Reviews'23](https://amazon-reviews-2023.github.io/#grouped-by-category) page.
 Choose a category of your likings (or all) and download the product metadata via the 'meta' link.
 
-1. Put the downloaded product metadata files into the `/data` directory
+1. Put the downloaded product metadata files into the `/backend/data` directory
 2. Provide the file names and max. token limit/minute in `.env`
    ```.env
    IMPORT_PRODUCT_CATALOGUES="<Filenames-Separated-By-Comma>"
@@ -100,9 +102,9 @@ Choose a category of your likings (or all) and download the product metadata via
    ```
 3. Make sure the main application ran at least once to create the database schema and docker
    containers for DB & Vector Store are up and running
-4. Run the `import_data.py` file inside `/src/data_import`
+4. Run the `import_data.py` file inside `/backend/src/data_import`
    ```bash
-   cd src/data_import
+   cd backend/src/data_import
    python import_data.py
    ```
 5. Each catalog needs confirmation to proceed with the expensive persisting and embedding of the
@@ -115,15 +117,15 @@ Choose a category of your likings (or all) and download the product metadata via
    ```
    > **Note:**
    > Embeddings are created using OpenAI's text-embedding-3-small, make sure to provide an OpenAI
-   API-Key or go into `/src/app/dependencies.py` and change the embedding model.
+   API-Key or go into `/backend/src/app/dependencies.py` and change the embedding model.
 
 ## Evaluate RAG
 
 To evaluate RAG capabilities and compare actual with expected output, the file `evaluate_rag.py`
-inside `/src/data_import` can be executed.
+inside `/backend/src/data_import` can be executed.
 
 ```bash
-cd src/data_import
+cd backend/src/data_import
 python evaluate_rag.py
 ```
 
@@ -132,7 +134,8 @@ inside chroma (import products before), by default it will use product descripti
 catalog specified in `.env`. Each artificial query goes through the whole retrieve pipeline and the
 actual vs. expected results will be shown in the console.
 
-Generated test data is stored inside `/data` following naming schema `testset_{catalog_name}.jsonl`.
+Generated test data is stored inside `/backend/data` following naming schema
+`testset_{catalog_name}.jsonl`.
 
 This evaluation can be used to compare f. ex. the performance of a reranker or query expansion.
 

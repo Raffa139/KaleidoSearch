@@ -1,8 +1,8 @@
 from abc import ABC
 from typing import List
 from pydantic import BaseModel
-from src.search.graphs.search_graph_state import QueryEvaluation, AnsweredQuestion
-from src.products.models import ProductBase
+from backend.src.search.graphs.search_graph_state import QueryEvaluation, AnsweredQuestion
+from backend.src.products.models import ProductBase
 
 
 class BaseUserSearch(ABC, BaseModel):

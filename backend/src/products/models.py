@@ -1,6 +1,6 @@
 from pydantic import HttpUrl
 from sqlmodel import SQLModel, Field, Relationship
-from src.common.http_url_type import HttpUrlType
+from backend.src.common.http_url_type import HttpUrlType
 
 
 class ProductBase(SQLModel):

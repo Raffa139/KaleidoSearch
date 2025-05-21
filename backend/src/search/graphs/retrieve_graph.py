@@ -4,8 +4,8 @@ from langchain_core.retrievers import BaseRetriever
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.memory import InMemorySaver
-from src.search.graphs.graph_wrapper import GraphWrapper
-from src.search.graphs.retrieve_graph_state import RetrieveGraphState, RelevanceScoreList, \
+from backend.src.search.graphs.graph_wrapper import GraphWrapper
+from backend.src.search.graphs.retrieve_graph_state import RetrieveGraphState, RelevanceScoreList, \
     SummarizedContentList
 
 FILTER_DOCS_PROMPT = (

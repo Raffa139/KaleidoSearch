@@ -1,9 +1,9 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
-from src.app.dependencies import SessionDep
-from src.products.models import ProductOut, ProductIn
-from src.products.service import ProductService
-from src.shops.service import ShopService
+from backend.src.app.dependencies import SessionDep
+from backend.src.products.models import ProductOut, ProductIn
+from backend.src.products.service import ProductService
+from backend.src.shops.service import ShopService
 
 router = APIRouter(prefix="/products", tags=["products"])
 

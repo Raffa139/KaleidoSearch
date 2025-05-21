@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
-from src.users.models import User, UserIn, Thread
+from backend.src.users.models import User, UserIn, Thread
 
 
 class UserService:

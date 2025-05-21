@@ -1,14 +1,14 @@
 import os
 import sys
 import logging
-from src.definitions import DATA_DIR
-from src.environment import product_catalogues
-from src.data_import.extract import extract_amazon_data
-from src.data_import.service import ImportService
-from src.data_import.stopwatch import Stopwatch
-from src.products.service import ProductService
-from src.shops.service import ShopService
-from src.app.dependencies import db_session, chroma
+from backend.src.definitions import DATA_DIR
+from backend.src.environment import product_catalogues
+from backend.src.data_import.extract import extract_amazon_data
+from backend.src.data_import.service import ImportService
+from backend.src.data_import.stopwatch import Stopwatch
+from backend.src.products.service import ProductService
+from backend.src.shops.service import ShopService
+from backend.src.app.dependencies import db_session, chroma
 
 logging.basicConfig(format="%(asctime)s [%(name)s] %(levelname)s: %(message)s", level=logging.INFO)
 log = logging.getLogger(__name__)

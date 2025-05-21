@@ -1,12 +1,12 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
-from src.app.dependencies import SessionDep, SearchGraphDep, RetrieveGraphDep
-from src.search.service import SearchService, ProductRecommendation
-from src.search.models import QueryEvaluationOut, NewUserSearch, UserSearch, BaseUserSearch
-from src.products.service import ProductService
-from src.shops.service import ShopService
-from src.users.service import UserService
-from src.users.models import UserOut, UserIn
+from backend.src.app.dependencies import SessionDep, SearchGraphDep, RetrieveGraphDep
+from backend.src.search.service import SearchService, ProductRecommendation
+from backend.src.search.models import QueryEvaluationOut, NewUserSearch, UserSearch, BaseUserSearch
+from backend.src.products.service import ProductService
+from backend.src.shops.service import ShopService
+from backend.src.users.service import UserService
+from backend.src.users.models import UserOut, UserIn
 
 router = APIRouter(prefix="/users", tags=["users"])
 

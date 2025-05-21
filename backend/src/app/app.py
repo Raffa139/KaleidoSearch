@@ -2,10 +2,10 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from sqlmodel import SQLModel
 
-from src.app.dependencies import db_engine
-from src.products.router import router as products_router
-from src.shops.router import router as shops_router
-from src.users.router import router as users_router
+from backend.src.app.dependencies import db_engine
+from backend.src.products.router import router as products_router
+from backend.src.shops.router import router as shops_router
+from backend.src.users.router import router as users_router
 
 
 def initialize_db():
