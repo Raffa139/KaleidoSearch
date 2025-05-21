@@ -1,0 +1,118 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: center;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--secondary-bg-color);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px var(--shadow-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.login-container h1 {
+  font-size: 24px;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.google-login-button {
+  background-color: #ffffff;
+  color: #1e1e1e;
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 1px 3px var(--shadow-color);
+}
+
+.google-login-button:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 5px var(--shadow-color);
+}
+
+.google-login-button i {
+  color: #4285f4;
+}
+
+.separator {
+  width: 100%;
+  text-align: center;
+  color: var(--light-text-color);
+  position: relative;
+}
+
+.separator::before,
+.separator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: var(--border-color);
+}
+
+.separator::before {
+  left: 0;
+}
+
+.separator::after {
+  right: 0;
+}
+
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.login-input {
+  padding: 12px 20px;
+  font-size: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  background-color: var(--secondary-bg-color);
+  color: var(--text-color);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 1px 3px var(--shadow-color);
+}
+
+.login-input::placeholder {
+  color: var(--light-text-color);
+}
+
+.login-button {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.login-button:hover {
+  background-color: var(--accent-color-hover);
+}
