@@ -1,6 +1,7 @@
 import type { FunctionComponent } from "react";
 import { useOutletContext } from "react-router";
 import type { UserLoaderData } from "../authentication/userLoader";
+import { ProductRecommendation } from "../products/ProductRecommendation";
 import "./thread.css";
 
 export const Thread: FunctionComponent = () => {
@@ -18,99 +19,47 @@ export const Thread: FunctionComponent = () => {
       </header>
 
       <div className="results-container">
-        <div className="search-result">
-          <div className="result-icons">
-            <button className="icon-btn"><i className="fas fa-bookmark"></i></button>
-            <button className="icon-btn"><i className="fas fa-share-alt"></i></button>
-          </div>
-          <img src="/placeholder-product.png" alt="Result Image" className="result-image" />
-          <div className="result-content">
-            <h3 className="result-title">Example Search Result Title One</h3>
-            <span className="price-tag">$19.99</span>
-            <p className="result-description">
-              This is a concise description of the search result. It provides a brief overview
-              of the item or content.
-            </p>
-          </div>
-        </div>
+        <ProductRecommendation
+          title="Example Search Result Title One"
+          price={19.99}
+          description="This is a concise description of the search result. It provides a brief overview of the item or content."
+          url="#"
+        />
 
-        <div className="search-result">
-          <div className="result-icons">
-            <button className="icon-btn"><i className="fas fa-heart"></i></button>
-            <button className="icon-btn"><i className="fas fa-plus"></i></button>
-          </div>
-          <img src="/placeholder-product.png" alt="Result Image" className="result-image" />
-          <div className="result-content">
-            <h3 className="result-title">Another Product or Service Here</h3>
-            <span className="price-tag">$49.50</span>
-            <p className="result-description">
-              Here's another descriptive text for a search result, giving more details about
-              what's offered.
-            </p>
-          </div>
-        </div>
+        <ProductRecommendation
+          title="Another Product or Service Here"
+          price={49.50}
+          description="Here's another descriptive text for a search result, giving more details about what's offered."
+          url="#"
+        />
 
-        <div className="search-result">
-          <div className="result-icons">
-            <button className="icon-btn"><i className="fas fa-shopping-cart"></i></button>
-          </div>
-          <img src="/placeholder-product.png" alt="Result Image" className="result-image" />
-          <div className="result-content">
-            <h3 className="result-title">Third Item in the List</h3>
-            <span className="price-tag">$75.00</span>
-            <p className="result-description">
-              A short and sweet description for the third search result, highlighting its key
-              features.
-            </p>
-          </div>
-        </div>
+        <ProductRecommendation
+          title="Third Item in the List"
+          price={75.00}
+          description="A short and sweet description for the third search result, highlighting its key features."
+          url="#"
+        />
 
-        <div className="search-result">
-          <div className="result-icons">
-            <button className="icon-btn"><i className="fas fa-bookmark"></i></button>
-            <button className="icon-btn"><i className="fas fa-share-alt"></i></button>
-          </div>
-          <img src="/placeholder-product.png" alt="Result Image" className="result-image" />
-          <div className="result-content">
-            <h3 className="result-title">Example Search Result Title One</h3>
-            <span className="price-tag">$19.99</span>
-            <p className="result-description">
-              This is a concise description of the search result. It provides a brief overview
-              of the item or content.
-            </p>
-          </div>
-        </div>
+        <ProductRecommendation
+          title="Example Search Result Title One"
+          price={19.99}
+          description="This is a concise description of the search result. It provides a brief overview of the item or content."
+          url="#"
+        />
 
-        <div className="search-result">
-          <div className="result-icons">
-            <button className="icon-btn"><i className="fas fa-heart"></i></button>
-            <button className="icon-btn"><i className="fas fa-plus"></i></button>
-          </div>
-          <img src="/placeholder-product.png" alt="Result Image" className="result-image" />
-          <div className="result-content">
-            <h3 className="result-title">Another Product or Service Here</h3>
-            <span className="price-tag">$49.50</span>
-            <p className="result-description">
-              Here's another descriptive text for a search result, giving more details about
-              what's offered.
-            </p>
-          </div>
-        </div>
+        <ProductRecommendation
+          title="Another Product or Service Here"
+          price={49.50}
+          description="Here's another descriptive text for a search result, giving more details about what's offered."
+          url="#"
+        />
 
-        <div className="search-result">
-          <div className="result-icons">
-            <button className="icon-btn"><i className="fas fa-shopping-cart"></i></button>
-          </div>
-          <img src="/placeholder-product.png" alt="Result Image" className="result-image" />
-          <div className="result-content">
-            <h3 className="result-title">Third Item in the List</h3>
-            <span className="price-tag">$75.00</span>
-            <p className="result-description">
-              A short and sweet description for the third search result, highlighting its key
-              features.
-            </p>
-          </div>
-        </div>
+        <ProductRecommendation
+          title="Third Item in the List"
+          price={75.00}
+          description="A short and sweet description for the third search result, highlighting its key features."
+          url="#"
+        />
       </div>
     </>
   );
