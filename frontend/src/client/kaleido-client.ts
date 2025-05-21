@@ -2,6 +2,13 @@ const DEFAULT_HEADERS = {
   "Content-Type": "application/json"
 };
 
+export interface User {
+  id: number;
+  sub_id: string;
+  username: string | null;
+  picture_url: string | null;
+}
+
 class KaleidoClient {
   url: string;
 
@@ -9,7 +16,7 @@ class KaleidoClient {
     this.url = `http://${host}:${port}`;
   }
 
-  async createUser(sub_id: string, username: string, picture_url: string | null): Promise<{ id: number; sub_id: string; username: string; picture_url: string | null }> {
+  async createUser(sub_id: string, username: string, picture_url: string | null): Promise<User> {
     const response = await fetch(`${this.url}/users`, {
       method: "POST",
       headers: DEFAULT_HEADERS,
@@ -23,7 +30,7 @@ class KaleidoClient {
     return response.json();
   }
 
-  async getUserById(uid: number): Promise<{ id: number; sub_id: string; username: string; picture_url: string | null }> {
+  async getUserById(uid: number): Promise<User> {
     const response = await fetch(`${this.url}/users/${uid}`, { headers: DEFAULT_HEADERS });
 
     if (!response.ok) {

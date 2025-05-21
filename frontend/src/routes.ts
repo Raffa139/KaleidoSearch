@@ -4,6 +4,7 @@ import { Layout } from './Layout';
 import { Login } from './Login';
 import { Search } from './Search';
 import { client } from './client/kaleido-client';
+import { userLoader } from './user-loader';
 
 export const router = createBrowserRouter([
   {
@@ -23,10 +24,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "users/:uid",
-    loader: async ({ params }) => {
-      const user = await client.getUserById(Number(params.uid));
-      return { user };
-    },
+    loader: userLoader,
     Component: Layout,
     children: [
       {

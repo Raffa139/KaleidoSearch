@@ -1,9 +1,10 @@
 import type { FunctionComponent } from "react";
 import { useOutletContext } from "react-router";
+import type { UserLoaderData } from "./user-loader";
 import "./search.css";
 
 export const Search: FunctionComponent = () => {
-  const { user } = useOutletContext();
+  const { user } = useOutletContext<UserLoaderData>();
 
   console.log("Logged in as", user);
 
