@@ -1,7 +1,12 @@
 import type { FunctionComponent } from "react";
+import { useLoaderData } from "react-router";
 import "./Search.css";
 
 export const Search: FunctionComponent = () => {
+  const { username } = useLoaderData();
+
+  console.log("Logged in as", username);
+
   return (
     <>
       <header className="search-header">
