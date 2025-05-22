@@ -12,10 +12,10 @@ export const Thread: FunctionComponent = () => {
   console.log("Logged in as", user, "in thread", thread_id);
 
   return (
-    <>
+    <div className="container">
       <SearchBar />
 
-      {/* <div className="results-container">
+      <div className="results-container">
         <ProductRecommendation
           title="Example Search Result Title One"
           price={19.99}
@@ -57,7 +57,7 @@ export const Thread: FunctionComponent = () => {
           description="A short and sweet description for the third search result, highlighting its key features."
           url="#"
         />
-      </div> */}
-    </>
+      </div>
+    </div>
   );
 };

@@ -1,3 +1,7 @@
+.container {
+  max-height: 100vh;
+}
+
 .results-container {
   width: 100%;
   max-width: 600px;
@@ -25,5 +29,3 @@
 .results-container::-webkit-scrollbar-thumb:hover {
   background: var(--light-text-color);
 }
-
-
