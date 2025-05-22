@@ -21,6 +21,7 @@ class KaleidoClient {
     });
 
     if (!response.ok) {
+      console.error(response.status, await response.text());
       throw new Error("Failed to create user");
     }
 
@@ -31,6 +32,7 @@ class KaleidoClient {
     const response = await fetch(`${this.url}/users/${uid}`, { headers: DEFAULT_HEADERS });
 
     if (!response.ok) {
+      console.error(response.status, await response.text());
       throw new Error("Failed to fetch user");
     }
 
@@ -45,25 +47,35 @@ class KaleidoClient {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to create user");
+      console.error(response.status, await response.text());
+      throw new Error("Failed to start new thread");
     }
 
     return response.json();
   }
 
-  async postToThread(uid: number, tid: number, query?: string, answers?: Answer[]): Promise<QueryEvaluation> {
-    if (!query && !answers) {
-      throw new Error("Either query or answers must be provided");
+  async postToThread(uid: number, tid: number, content: { query?: string, answers?: Answer[] }): Promise<QueryEvaluation> {
+    if (!content.query && !content.answers) {
+      throw new Error("Either query string or answers must be provided");
     }
+
+    // TODO: Already anwsered questions can be remove by an empty string, add flag to Answer type
+    const payload = {
+      query: content.query?.trim() || undefined,
+      answers: content.answers?.map(a => ({ ...a, answer: a.answer.trim() })).filter(a => a.answer)
+    };
+
+    console.log("Payload:", payload);
 
     const response = await fetch(`${this.url}/users/${uid}/threads/${tid}`, {
       method: "POST",
       headers: DEFAULT_HEADERS,
-      body: JSON.stringify({ query, answers })
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
-      throw new Error("Failed to create user");
+      console.error(response.status, await response.text());
+      throw new Error("Failed to post to thread");
     }
 
     return response.json();
