@@ -8,18 +8,17 @@ import type { Product, QueryEvaluation } from "../../client/types";
 import "./thread.css";
 
 export const Thread: FunctionComponent = () => {
-  const [queryEvaluation, setQueryEvaluation] = useState<QueryEvaluation>();
-  const [products, setProducts] = useState<Product[]>([]);
-
-  const { thread_id } = useLoaderData();
+  const thread = useLoaderData<QueryEvaluation>();
   const { user } = useOutletContext<UserLoaderData>();
 
-  console.log("Logged in as", user, "in thread", thread_id);
+  const [queryEvaluation, setQueryEvaluation] = useState<QueryEvaluation | undefined>(thread);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  console.log("Logged in as", user, "in thread", thread);
 
   const handleSearch = async (queryEvaluation?: QueryEvaluation) => {
     setQueryEvaluation(queryEvaluation);
-    const products = await client.getRecommendations(user.id, thread_id);
-    console.log("Products:", products);
+    const products = await client.getRecommendations(user.id, thread.thread_id);
     setProducts(products);
   };
 

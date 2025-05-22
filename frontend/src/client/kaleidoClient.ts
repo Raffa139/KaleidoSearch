@@ -66,6 +66,19 @@ class KaleidoClient {
     return response.json();
   }
 
+  async getUserThread(uid: number, tid: number): Promise<QueryEvaluation> {
+    const response = await fetch(`${this.url}/users/${uid}/threads/${tid}`, {
+      headers: DEFAULT_HEADERS
+    });
+
+    if (!response.ok) {
+      console.error(response.status, await response.text());
+      throw new Error("Failed to fetch thread");
+    }
+
+    return response.json();
+  }
+
   async postToThread(uid: number, tid: number, content: { query?: string, answers?: Answer[] }): Promise<QueryEvaluation> {
     if (!content.query && !content.answers) {
       throw new Error("Either query string or answers must be provided");

@@ -40,9 +40,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "threads/:tid",
-        loader: async ({ params }) => {
-          return { thread_id: params.tid };
-        },
+        loader: async ({ params }) => client.getUserThread(Number(params.uid), Number(params.tid)),
         Component: Thread
       }
     ]

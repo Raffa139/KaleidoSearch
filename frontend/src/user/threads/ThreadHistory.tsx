@@ -3,7 +3,7 @@ import { Link, useLoaderData, useOutletContext } from "react-router";
 import type { UserLoaderData } from "../../authentication/userLoader";
 
 export const ThreadHistory: FunctionComponent = () => {
-  const threads = useLoaderData();
+  const threads = useLoaderData<Array<{ thread_id: number }>>();
   const { user } = useOutletContext<UserLoaderData>();
 
   return (
@@ -11,11 +11,11 @@ export const ThreadHistory: FunctionComponent = () => {
       <h1>Thread History</h1>
 
       {threads.map(({ thread_id }: { thread_id: number }) => (
-        <button className="button">
-          <Link key={thread_id} to={`/users/${user.id}/threads/${thread_id}`}>
+        <Link key={thread_id} to={`/users/${user.id}/threads/${thread_id}`}>
+          <button className="button">
             Thread {thread_id}
-          </Link>
-        </button>
+          </button>
+        </Link>
       ))}
     </div>
   );

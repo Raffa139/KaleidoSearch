@@ -69,6 +69,22 @@ def create_thread(uid: int, user_service: UserServiceDep):
     return ThreadOut(thread_id=thread.id)
 
 
+@router.get("/{uid}/threads/{tid}", response_model=QueryEvaluationOut)
+def get_user_thread(
+        uid: int,
+        tid: int,
+        search_service: SearchServiceDep,
+        user_service: UserServiceDep
+):
+    if not user_service.find_user_by_id(uid):
+        raise HTTPException(status_code=401)
+
+    if tid and not user_service.has_user_access_to_thread(uid, tid):
+        raise HTTPException(status_code=403)
+
+    return search_service.get_query_evaluation(tid)
+
+
 @router.post("/{uid}/threads/{tid}", response_model=QueryEvaluationOut)
 def post_to_thread(
         uid: int,

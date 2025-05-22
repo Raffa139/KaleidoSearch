@@ -36,6 +36,21 @@ class SearchService:
                 self._user_service.delete_thread(new_thread_id)
             raise
 
+    def get_query_evaluation(self, thread_id: int) -> QueryEvaluationOut | None:
+        config = self.__get_graph_config(thread_id)
+        state = self._search_graph.get_state(config)
+        query_evaluation = state.query_evaluation if state else None
+
+        return QueryEvaluationOut(
+            **query_evaluation.model_dump(),
+            thread_id=thread_id
+        ) if query_evaluation else QueryEvaluationOut(
+            thread_id=thread_id,
+            valid=False,
+            answered_questions=[],
+            follow_up_questions=[]
+        )
+
     def get_recommendations(
             self,
             thread_id: int,

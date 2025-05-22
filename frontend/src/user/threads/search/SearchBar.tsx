@@ -12,8 +12,8 @@ interface SearchBarProps {
 }
 
 export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, onSearch }) => {
-  const [search, setSearch] = useState<string>("");
-  const [lastSearch, setLastSearch] = useState<string>("");
+  const [search, setSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
+  const [lastSearch, setLastSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [answers, setAnswers] = useState<Answer[]>([]);
 
   const { user } = useOutletContext<UserLoaderData>();
