@@ -1,0 +1,32 @@
+.question-container {
+  width: calc(100% - 20px);
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  background-color: var(--secondary-bg-color);
+  box-shadow: 0 2px 5px var(--shadow-color);
+  transition: all 0.3s ease;
+  padding-left: 20px;
+}
+
+.question-container:focus-within {
+  border-color: var(--accent-color);
+  box-shadow: 0 1px 6px var(--shadow-color);
+}
+
+.question-short {
+  width: 150px;
+}
+
+.question-container .search-input {
+  background: rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0 24px 24px 0;
+  padding: 5px 5px;
+  margin: 5px 10px;
+}
+
+.question-container .icon-btn {
+  cursor: default;
+}

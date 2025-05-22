@@ -46,3 +46,9 @@ main {
   display: flex;
   align-items: center;
 }
+
+.text-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

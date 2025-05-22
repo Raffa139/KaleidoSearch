@@ -2,6 +2,7 @@ import type { FunctionComponent } from "react";
 import { useOutletContext } from "react-router";
 import type { UserLoaderData } from "../authentication/userLoader";
 import { ProductRecommendation } from "../products/ProductRecommendation";
+import { SearchBar } from "./search/SearchBar";
 import "./thread.css";
 
 export const Thread: FunctionComponent = () => {
@@ -11,12 +12,7 @@ export const Thread: FunctionComponent = () => {
 
   return (
     <>
-      <header className="search-header">
-        <div className="search-bar">
-          <input type="text" placeholder="Search..." className="search-input" />
-          <button className="search-button"><i className="fas fa-search"></i></button>
-        </div>
-      </header>
+      <SearchBar />
 
       <div className="results-container">
         <ProductRecommendation
