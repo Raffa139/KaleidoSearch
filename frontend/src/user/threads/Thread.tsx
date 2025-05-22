@@ -13,6 +13,8 @@ export const Thread: FunctionComponent = () => {
 
   const [queryEvaluation, setQueryEvaluation] = useState<QueryEvaluation | undefined>(thread);
   const [products, setProducts] = useState<Product[]>([]);
+  const [hasSearched, setHasSearched] = useState<boolean>(false);
+  const [hasSearchResults, setHasSearchResults] = useState<boolean>(false);
 
   console.log("Logged in as", user, "in thread", thread);
 
@@ -20,6 +22,8 @@ export const Thread: FunctionComponent = () => {
     setQueryEvaluation(queryEvaluation);
     const products = await client.getRecommendations(user.id, thread.thread_id);
     setProducts(products);
+    setHasSearched(true);
+    setHasSearchResults(products.length > 0);
   };
 
   return (
@@ -32,6 +36,10 @@ export const Thread: FunctionComponent = () => {
             <ProductCard {...product} />
           </Fragment>
         ))}
+
+        {hasSearched && !hasSearchResults && (
+          <p>No results found. Please try a different search.</p>
+        )}
       </div>
     </div>
   );
