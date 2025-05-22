@@ -1,5 +1,5 @@
 import { type FunctionComponent } from "react";
-import type { FollowUpQuestion } from "../../client/types";
+import type { FollowUpQuestion } from "../../../client/types";
 import "./question.css";
 
 interface QuestionProps extends FollowUpQuestion {

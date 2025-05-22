@@ -1,7 +1,7 @@
 import type { FunctionComponent } from "react";
 import { useLoaderData, useOutletContext } from "react-router";
-import type { UserLoaderData } from "../authentication/userLoader";
-import { ProductRecommendation } from "../products/ProductRecommendation";
+import type { UserLoaderData } from "../../authentication/userLoader";
+import { ProductRecommendation } from "../../products/ProductRecommendation";
 import { SearchBar } from "./search/SearchBar";
 import "./thread.css";
 
@@ -15,7 +15,7 @@ export const Thread: FunctionComponent = () => {
     <>
       <SearchBar />
 
-      <div className="results-container">
+      {/* <div className="results-container">
         <ProductRecommendation
           title="Example Search Result Title One"
           price={19.99}
@@ -57,7 +57,7 @@ export const Thread: FunctionComponent = () => {
           description="A short and sweet description for the third search result, highlighting its key features."
           url="#"
         />
-      </div>
+      </div> */}
     </>
   );
 };

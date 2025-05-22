@@ -1,8 +1,8 @@
 import { Fragment, useState, type FunctionComponent } from "react";
 import { useOutletContext } from "react-router";
-import type { Answer, QueryEvaluation } from "../../client/types";
-import { client } from "../../client/kaleidoClient";
-import type { UserLoaderData } from "../../authentication/userLoader";
+import type { Answer, QueryEvaluation } from "../../../client/types";
+import { client } from "../../../client/kaleidoClient";
+import type { UserLoaderData } from "../../../authentication/userLoader";
 import { Question } from "./Question";
 import "./searchBar.css";
 

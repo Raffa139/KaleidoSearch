@@ -1,6 +1,6 @@
 import type { FunctionComponent } from "react";
 import { Link, useLoaderData, useOutletContext } from "react-router";
-import type { UserLoaderData } from "../authentication/userLoader";
+import type { UserLoaderData } from "../../authentication/userLoader";
 
 export const ThreadHistory: FunctionComponent = () => {
   const threads = useLoaderData();
