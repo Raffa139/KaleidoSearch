@@ -39,16 +39,15 @@ class KaleidoClient {
     return response.json();
   }
 
-  async startNewTread(uid: number, query: string): Promise<QueryEvaluation> {
+  async createThread(uid: number): Promise<{ thread_id: number }> {
     const response = await fetch(`${this.url}/users/${uid}/threads`, {
       method: "POST",
-      headers: DEFAULT_HEADERS,
-      body: JSON.stringify({ query })
+      headers: DEFAULT_HEADERS
     });
 
     if (!response.ok) {
       console.error(response.status, await response.text());
-      throw new Error("Failed to start new thread");
+      throw new Error("Failed to create new thread");
     }
 
     return response.json();

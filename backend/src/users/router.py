@@ -2,7 +2,8 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
 from backend.src.app.dependencies import SessionDep, SearchGraphDep, RetrieveGraphDep
 from backend.src.search.service import SearchService, ProductRecommendation
-from backend.src.search.models import QueryEvaluationOut, NewUserSearch, UserSearch, BaseUserSearch
+from backend.src.search.models import QueryEvaluationOut, UserSearch, BaseUserSearch, \
+    CreateThreadOut
 from backend.src.products.service import ProductService
 from backend.src.shops.service import ShopService
 from backend.src.users.service import UserService
@@ -50,14 +51,13 @@ def get_user_by_id(uid: int, user_service: UserServiceDep):
     return user
 
 
-@router.post("/{uid}/threads", response_model=QueryEvaluationOut)
-def start_new_tread(
-        uid: int,
-        user_search: NewUserSearch,
-        search_service: SearchServiceDep,
-        user_service: UserServiceDep
-):
-    return handle_thread_posts(uid, None, user_search, search_service, user_service)
+@router.post("/{uid}/threads", response_model=CreateThreadOut, status_code=201)
+def create_thread(uid: int, user_service: UserServiceDep):
+    if not user_service.find_user_by_id(uid):
+        raise HTTPException(status_code=401)
+
+    thread = user_service.create_thread(uid)
+    return CreateThreadOut(thread_id=thread.id)
 
 
 @router.post("/{uid}/threads/{tid}", response_model=QueryEvaluationOut)

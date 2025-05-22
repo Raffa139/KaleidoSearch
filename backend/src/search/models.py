@@ -18,10 +18,6 @@ class BaseUserSearch(ABC, BaseModel):
         return None
 
 
-class NewUserSearch(BaseUserSearch):
-    pass
-
-
 class UserSearch(BaseUserSearch):
     query: str | None = None
     answers: List[AnsweredQuestion] | None = None
@@ -48,3 +44,7 @@ class QueryEvaluationOut(QueryEvaluation):
 
 class ProductRecommendation(ProductBase):
     description: str
+
+
+class CreateThreadOut(BaseModel):
+    thread_id: int
