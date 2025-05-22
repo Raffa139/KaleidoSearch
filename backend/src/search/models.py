@@ -46,5 +46,5 @@ class ProductRecommendation(ProductBase):
     description: str
 
 
-class CreateThreadOut(BaseModel):
+class ThreadOut(BaseModel):
     thread_id: int

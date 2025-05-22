@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from backend.src.app.dependencies import SessionDep, SearchGraphDep, RetrieveGraphDep
 from backend.src.search.service import SearchService, ProductRecommendation
 from backend.src.search.models import QueryEvaluationOut, UserSearch, BaseUserSearch, \
-    CreateThreadOut
+    ThreadOut
 from backend.src.products.service import ProductService
 from backend.src.shops.service import ShopService
 from backend.src.users.service import UserService
@@ -51,13 +51,22 @@ def get_user_by_id(uid: int, user_service: UserServiceDep):
     return user
 
 
-@router.post("/{uid}/threads", response_model=CreateThreadOut, status_code=201)
+@router.get("/{uid}/threads", response_model=list[ThreadOut])
+def get_user_threads(uid: int, user_service: UserServiceDep):
+    if not user_service.find_user_by_id(uid):
+        raise HTTPException(status_code=401)
+
+    threads = user_service.find_user_threads(uid)
+    return map(lambda thread: ThreadOut(thread_id=thread.id), threads)
+
+
+@router.post("/{uid}/threads", response_model=ThreadOut, status_code=201)
 def create_thread(uid: int, user_service: UserServiceDep):
     if not user_service.find_user_by_id(uid):
         raise HTTPException(status_code=401)
 
     thread = user_service.create_thread(uid)
-    return CreateThreadOut(thread_id=thread.id)
+    return ThreadOut(thread_id=thread.id)
 
 
 @router.post("/{uid}/threads/{tid}", response_model=QueryEvaluationOut)

@@ -39,6 +39,19 @@ class KaleidoClient {
     return response.json();
   }
 
+  async getUserThreads(uid: number): Promise<Array<{ thread_id: number }>> {
+    const response = await fetch(`${this.url}/users/${uid}/threads`, {
+      headers: DEFAULT_HEADERS
+    });
+
+    if (!response.ok) {
+      console.error(response.status, await response.text());
+      throw new Error("Failed to fetch user threads");
+    }
+
+    return response.json();
+  }
+
   async createThread(uid: number): Promise<{ thread_id: number }> {
     const response = await fetch(`${this.url}/users/${uid}/threads`, {
       method: "POST",
