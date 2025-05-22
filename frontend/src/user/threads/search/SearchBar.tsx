@@ -7,18 +7,22 @@ import "./searchBar.css";
 
 interface SearchBarProps {
   queryEvaluation?: QueryEvaluation;
+  disabled?: boolean;
   onSearch: (queryEvaluation?: QueryEvaluation) => void;
 }
 
-export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, onSearch }) => {
+export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, disabled, onSearch }) => {
   const user = useOutletContext<User>();
   const { thread_id } = useLoaderData();
 
   const [search, setSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [lastSearch, setLastSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [answers, setAnswers] = useState<Answer[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSearch = async () => {
+    setLoading(true);
+
     try {
       const content = { query: lastSearch !== search ? search : undefined, answers };
       const result = await client.postToThread(user.id, thread_id, content);
@@ -29,6 +33,8 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
     } catch (error) {
       onSearch(queryEvaluation);
     }
+
+    setLoading(false);
   };
 
   const handleAnswerChange = (id: number, answer: string) => {
@@ -43,7 +49,7 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
   };
 
   return (
-    <div className="search-header">
+    <div className={`search-header ${loading || disabled ? "loading" : ""}`}>
       <div className="search-bar">
         <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="search-input" />
         <button onClick={handleSearch} className="search-button"><i className="fas fa-search"></i></button>

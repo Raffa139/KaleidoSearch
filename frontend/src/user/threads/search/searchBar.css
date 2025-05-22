@@ -9,6 +9,12 @@
   margin: 0 auto;
 }
 
+.loading {
+  pointer-events: none;
+  filter: saturate(0.65);
+  opacity: 0.9;
+}
+
 .search-bar {
   width: 100%;
   display: flex;
