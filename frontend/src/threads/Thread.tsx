@@ -1,14 +1,15 @@
 import type { FunctionComponent } from "react";
-import { useOutletContext } from "react-router";
+import { useLoaderData, useOutletContext } from "react-router";
 import type { UserLoaderData } from "../authentication/userLoader";
 import { ProductRecommendation } from "../products/ProductRecommendation";
 import { SearchBar } from "./search/SearchBar";
 import "./thread.css";
 
 export const Thread: FunctionComponent = () => {
+  const { thread_id } = useLoaderData();
   const { user } = useOutletContext<UserLoaderData>();
 
-  console.log("Logged in as", user);
+  console.log("Logged in as", user, "in thread", thread_id);
 
   return (
     <>

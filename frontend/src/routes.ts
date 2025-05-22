@@ -5,13 +5,14 @@ import { Login } from './authentication/Login';
 import { Thread } from './threads/Thread';
 import { client } from './client/kaleidoClient';
 import { userLoader } from './authentication/userLoader';
+import { Home } from './user/home/Home';
 
 export const router = createBrowserRouter([
   {
     path: "/",
     index: true,
     action: async ({ request }) => {
-      return redirect(`/users/2/threads`); // TODO: remove this, just for testing
+      return redirect(`/users/2/home`); // TODO: remove this, just for testing
 
       const formData = await request.formData();
       const username = formData.get("username");
@@ -28,7 +29,18 @@ export const router = createBrowserRouter([
     Component: Layout,
     children: [
       {
+        path: "home",
+        Component: Home
+      },
+      /* {
         path: "threads",
+        Component: Thread
+      }, */
+      {
+        path: "threads/:tid",
+        loader: async ({ params }) => {
+          return { thread_id: params.tid };
+        },
         Component: Thread
       }
     ]

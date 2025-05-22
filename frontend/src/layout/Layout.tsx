@@ -1,5 +1,5 @@
 import type { FunctionComponent } from "react";
-import { Outlet, useLoaderData } from "react-router";
+import { NavLink, Outlet, useLoaderData } from "react-router";
 import "./layout.css";
 
 export const Layout: FunctionComponent = () => {
@@ -14,8 +14,8 @@ export const Layout: FunctionComponent = () => {
         </div>
 
         <ul className="nav-links">
-          <li><a href="#"><i className="fas fa-home"></i> Home</a></li>
-          <li><a href="#"><i className="fas fa-search"></i> Search</a></li>
+          <li><NavLink to="home"><i className="fas fa-home"></i> Home</NavLink></li>
+          <li><NavLink to="threads"><i className="fas fa-search"></i> Search</NavLink></li>
           <li><a href="#"><i className="fas fa-bookmark"></i> Saved Items</a></li>
           <li><a href="#"><i className="fas fa-cog"></i> Settings</a></li>
           <li><a href="#"><i className="fas fa-question-circle"></i> Help</a></li>

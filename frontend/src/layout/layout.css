@@ -61,6 +61,7 @@
   font-size: 18px;
 }
 
+.nav-links a.active,
 .nav-links a:hover {
   background-color: var(--primary-bg-color);
   color: var(--accent-color);
