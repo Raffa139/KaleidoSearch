@@ -1,4 +1,4 @@
-import type { Answer, QueryEvaluation, User } from "./types";
+import type { Answer, Product, QueryEvaluation, User } from "./types";
 
 const DEFAULT_HEADERS = {
   "Content-Type": "application/json"
@@ -88,6 +88,19 @@ class KaleidoClient {
     if (!response.ok) {
       console.error(response.status, await response.text());
       throw new Error("Failed to post to thread");
+    }
+
+    return response.json();
+  }
+
+  async getRecommendations(uid: number, tid: number): Promise<Product[]> {
+    const response = await fetch(`${this.url}/users/${uid}/threads/${tid}/recommendations`, {
+      headers: DEFAULT_HEADERS
+    });
+
+    if (!response.ok) {
+      console.error(response.status, await response.text());
+      throw new Error("Failed to fetch product recommendations");
     }
 
     return response.json();

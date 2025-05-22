@@ -1,15 +1,8 @@
 import type { FunctionComponent } from "react";
-import "./productRecommendation.css";
+import type { Product } from "../client/types";
+import "./productCard.css";
 
-interface ProductRecommendationProps {
-  title: string;
-  price: number;
-  description: string;
-  url: string;
-  thumbnail_url?: string;
-}
-
-export const ProductRecommendation: FunctionComponent<ProductRecommendationProps> = ({ title, price, description, url, thumbnail_url }) => {
+export const ProductCard: FunctionComponent<Product> = ({ title, price, description, url, thumbnail_url }) => {
   return (
     <div className="search-result">
       <div className="result-icons">

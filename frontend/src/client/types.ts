@@ -25,3 +25,11 @@ export interface QueryEvaluation {
   follow_up_questions: FollowUpQuestion[];
   cleaned_query?: string;
 }
+
+export interface Product {
+  title: string;
+  price: number;
+  description: string;
+  url: string;
+  thumbnail_url?: string;
+}

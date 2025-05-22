@@ -6,22 +6,30 @@ import type { UserLoaderData } from "../../../authentication/userLoader";
 import { Question } from "./Question";
 import "./searchBar.css";
 
-export const SearchBar: FunctionComponent = () => {
+interface SearchBarProps {
+  queryEvaluation?: QueryEvaluation;
+  onSearch: (queryEvaluation?: QueryEvaluation) => void;
+}
+
+export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, onSearch }) => {
   const [search, setSearch] = useState<string>("");
   const [lastSearch, setLastSearch] = useState<string>("");
-  const [searchResult, setSearchResult] = useState<QueryEvaluation>();
   const [answers, setAnswers] = useState<Answer[]>([]);
 
   const { user } = useOutletContext<UserLoaderData>();
   const { thread_id } = useLoaderData();
 
   const handleSearch = async () => {
-    const content = { query: lastSearch !== search ? search : undefined, answers };
-    const result = await client.postToThread(user.id, thread_id, content);
-    console.log("Search result:", result);
-    console.log("Answers:", answers);
-    setSearchResult(result);
-    setLastSearch(search);
+    try {
+      const content = { query: lastSearch !== search ? search : undefined, answers };
+      const result = await client.postToThread(user.id, thread_id, content);
+      console.log("Search result:", result);
+      console.log("Answers:", answers);
+      onSearch(result);
+      setLastSearch(search);
+    } catch (error) {
+      onSearch(queryEvaluation);
+    }
   };
 
   const handleAnswerChange = (id: number, answer: string) => {
@@ -42,9 +50,9 @@ export const SearchBar: FunctionComponent = () => {
         <button onClick={handleSearch} className="search-button"><i className="fas fa-search"></i></button>
       </div>
 
-      {searchResult && (
+      {queryEvaluation && (
         <div className="follow-up-questions">
-          {searchResult.follow_up_questions.map((question) => (
+          {queryEvaluation.follow_up_questions.map((question) => (
             <Fragment key={question.id}>
               <Question onAnswerChange={handleAnswerChange} {...question} />
             </Fragment>
