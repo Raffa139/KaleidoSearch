@@ -1,10 +1,10 @@
 import type { FunctionComponent } from "react";
 import { Link, useLoaderData, useOutletContext } from "react-router";
-import type { UserLoaderData } from "../../authentication/userLoader";
+import type { User } from "../../client/types";
 
 export const ThreadHistory: FunctionComponent = () => {
   const threads = useLoaderData<Array<{ thread_id: number }>>();
-  const { user } = useOutletContext<UserLoaderData>();
+  const user = useOutletContext<User>();
 
   return (
     <div className="container" style={{ gap: "5px" }}>

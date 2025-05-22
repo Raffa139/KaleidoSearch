@@ -1,13 +1,13 @@
 import { type FunctionComponent } from "react";
 import { useNavigate, useOutletContext } from "react-router";
 import { client } from "../../client/kaleidoClient";
-import type { UserLoaderData } from "../../authentication/userLoader";
+import type { User } from "../../client/types";
 import "./home.css";
 
 export const Home: FunctionComponent = () => {
   const navigate = useNavigate();
 
-  const { user } = useOutletContext<UserLoaderData>();
+  const user = useOutletContext<User>();
 
   const handleClick = async () => {
     const { thread_id } = await client.createThread(user.id);

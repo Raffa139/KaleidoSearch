@@ -1,8 +1,7 @@
 import { Fragment, useState, type FunctionComponent } from "react";
 import { useLoaderData, useOutletContext } from "react-router";
-import type { Answer, QueryEvaluation } from "../../../client/types";
+import type { Answer, QueryEvaluation, User } from "../../../client/types";
 import { client } from "../../../client/kaleidoClient";
-import type { UserLoaderData } from "../../../authentication/userLoader";
 import { Question } from "./Question";
 import "./searchBar.css";
 
@@ -12,12 +11,12 @@ interface SearchBarProps {
 }
 
 export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, onSearch }) => {
+  const user = useOutletContext<User>();
+  const { thread_id } = useLoaderData();
+
   const [search, setSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [lastSearch, setLastSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [answers, setAnswers] = useState<Answer[]>([]);
-
-  const { user } = useOutletContext<UserLoaderData>();
-  const { thread_id } = useLoaderData();
 
   const handleSearch = async () => {
     try {

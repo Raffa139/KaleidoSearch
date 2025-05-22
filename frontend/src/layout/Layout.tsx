@@ -1,9 +1,10 @@
 import type { FunctionComponent } from "react";
 import { NavLink, Outlet, useLoaderData } from "react-router";
+import type { User } from "../client/types";
 import "./layout.css";
 
 export const Layout: FunctionComponent = () => {
-  const { user } = useLoaderData();
+  const user = useLoaderData<User>();
 
   return (
     <>
@@ -29,7 +30,7 @@ export const Layout: FunctionComponent = () => {
       </nav>
 
       <main>
-        <Outlet context={{ user }} />
+        <Outlet context={user} />
       </main>
     </>
   );

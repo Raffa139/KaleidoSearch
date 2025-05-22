@@ -1,15 +1,14 @@
 import { Fragment, useState, type FunctionComponent } from "react";
 import { useLoaderData, useOutletContext } from "react-router";
-import type { UserLoaderData } from "../../authentication/userLoader";
 import { ProductCard } from "../../products/ProductCard";
 import { SearchBar } from "./search/SearchBar";
 import { client } from "../../client/kaleidoClient";
-import type { Product, QueryEvaluation } from "../../client/types";
+import type { Product, QueryEvaluation, User } from "../../client/types";
 import "./thread.css";
 
 export const Thread: FunctionComponent = () => {
   const thread = useLoaderData<QueryEvaluation>();
-  const { user } = useOutletContext<UserLoaderData>();
+  const user = useOutletContext<User>();
 
   const [queryEvaluation, setQueryEvaluation] = useState<QueryEvaluation | undefined>(thread);
   const [products, setProducts] = useState<Product[]>([]);
