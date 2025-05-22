@@ -1,5 +1,5 @@
 import { Fragment, useState, type FunctionComponent } from "react";
-import { useOutletContext } from "react-router";
+import { useLoaderData, useOutletContext } from "react-router";
 import type { Answer, QueryEvaluation } from "../../../client/types";
 import { client } from "../../../client/kaleidoClient";
 import type { UserLoaderData } from "../../../authentication/userLoader";
@@ -13,35 +13,11 @@ export const SearchBar: FunctionComponent = () => {
   const [answers, setAnswers] = useState<Answer[]>([]);
 
   const { user } = useOutletContext<UserLoaderData>();
+  const { thread_id } = useLoaderData();
 
   const handleSearch = async () => {
-    console.log("Searching for:", search);
-    //const result = await client.startNewTread(user.id, search);
-    let result: QueryEvaluation = {
-      valid: false,
-      answered_questions: [],
-      follow_up_questions: [
-        {
-          id: 0,
-          short: "Product Type",
-          long: "What kind of product are you interested in today?"
-        },
-        {
-          id: 1,
-          short: "Product Use",
-          long: "What are you planning to use the product for?"
-        },
-        {
-          id: 2,
-          short: "Budget",
-          long: "What is your budget for this product?"
-        }
-      ],
-      thread_id: 4
-    }
-    setSearchResult(result);
     const content = { query: lastSearch !== search ? search : undefined, answers };
-    result = await client.postToThread(user.id, 4, content);
+    const result = await client.postToThread(user.id, thread_id, content);
     console.log("Search result:", result);
     console.log("Answers:", answers);
     setSearchResult(result);
