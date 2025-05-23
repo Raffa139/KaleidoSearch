@@ -9,7 +9,7 @@ interface HasId {
   id: number;
 }
 
-export interface Answer extends HasId {
+export interface UserAnswer extends HasId {
   answer: string;
 }
 
@@ -18,10 +18,12 @@ export interface FollowUpQuestion extends HasId {
   long: string;
 }
 
+export type AnsweredQuestion = FollowUpQuestion & UserAnswer;
+
 export interface QueryEvaluation {
   thread_id: number;
   valid: boolean;
-  answered_questions: Answer[];
+  answered_questions: AnsweredQuestion[];
   follow_up_questions: FollowUpQuestion[];
   cleaned_query?: string;
 }

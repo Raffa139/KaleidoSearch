@@ -30,3 +30,12 @@
 .question-container .icon-btn {
   cursor: default;
 }
+
+.answered {
+  opacity: 0.5;
+}
+
+.answered:hover,
+.answered:focus-within {
+  opacity: 1;
+}

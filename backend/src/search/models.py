@@ -1,14 +1,29 @@
 from abc import ABC
 from typing import List
-from pydantic import BaseModel
-from backend.src.search.graphs.search_graph_state import QueryEvaluation, AnsweredQuestion
+from pydantic import BaseModel, Field
+from backend.src.search.graphs.search_graph_state import QueryEvaluation
 from backend.src.products.models import ProductBase
+
+
+class UserAnswer(BaseModel):
+    id: int = Field(
+        description="Unique integer identifier, starting from 0 and incrementing sequentially"
+    )
+    answer: str = Field(
+        description="Answer from the user"
+    )
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return hash(id)
 
 
 class BaseUserSearch(ABC, BaseModel):
     query: str
 
-    def get_answers(self) -> List[AnsweredQuestion] | None:
+    def get_answers(self) -> List[UserAnswer] | None:
         return None
 
     def has_content(self) -> bool:
@@ -20,9 +35,9 @@ class BaseUserSearch(ABC, BaseModel):
 
 class UserSearch(BaseUserSearch):
     query: str | None = None
-    answers: List[AnsweredQuestion] | None = None
+    answers: List[UserAnswer] | None = None
 
-    def get_answers(self) -> List[AnsweredQuestion] | None:
+    def get_answers(self) -> List[UserAnswer] | None:
         return self.answers
 
     def has_content(self) -> bool:

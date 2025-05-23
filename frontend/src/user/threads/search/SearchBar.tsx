@@ -1,6 +1,6 @@
 import { Fragment, useState, type FunctionComponent } from "react";
 import { useLoaderData, useOutletContext } from "react-router";
-import type { Answer, QueryEvaluation, User } from "../../../client/types";
+import type { QueryEvaluation, User, UserAnswer } from "../../../client/types";
 import { useThreadContext } from "../useThreadContext";
 import { Question } from "./Question";
 import "./searchBar.css";
@@ -18,7 +18,7 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
 
   const [search, setSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [lastSearch, setLastSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
-  const [answers, setAnswers] = useState<Answer[]>([]);
+  const [answers, setAnswers] = useState<UserAnswer[]>([]);
 
   const handleSearch = async () => {
     try {
@@ -26,6 +26,7 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
       const result = await postToThread(user.id, thread_id, content);
       console.log("Search result:", result);
       console.log("Answers:", answers);
+      // TODO: Clear answers after search
       onSearch(result);
       setLastSearch(search);
     } catch (error) {
@@ -53,7 +54,7 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
 
       {queryEvaluation && (
         <div className="follow-up-questions">
-          {queryEvaluation.follow_up_questions.map((question) => (
+          {[...queryEvaluation.answered_questions, ...queryEvaluation.follow_up_questions].map((question) => (
             <Fragment key={question.id}>
               <Question onAnswerChange={handleAnswerChange} {...question} />
             </Fragment>

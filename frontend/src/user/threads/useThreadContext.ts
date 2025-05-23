@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { ThreadContext, type ThreadContextProps } from "./ThreadContext";
-import type { Answer, Product, QueryEvaluation } from "../../client/types";
+import type { Product, QueryEvaluation, UserAnswer } from "../../client/types";
 import { client } from "../../client/kaleidoClient";
 
 interface UseThreadContext {
@@ -28,7 +28,7 @@ export const useThreadContext: UseThreadContext = () => {
     }
   };
 
-  const postToThread = async (uid: number, tid: number, content: { query?: string, answers?: Answer[] }): Promise<QueryEvaluation> => {
+  const postToThread = async (uid: number, tid: number, content: { query?: string, answers?: UserAnswer[] }): Promise<QueryEvaluation> => {
     setBusy(true);
     const response = await client.postToThread(uid, tid, content);
     setBusy(false);

@@ -92,13 +92,15 @@ Your response should be structured as follows:
 **Query Score**: True or False
 
 **Answered Questions**:
-    * 0: Answer 1
-    * 1: Answer 2
+    * 0: Q = Question 1
+    * 0: A = Answer 1
+    * 1: Q = Question 2
+    * 1: A = Answer 2
 
 **Follow Up Questions**:
-    * 2: Question 1
-    * 3: Question 2
-    * 4: Question 3
+    * 2: Question 3
+    * 3: Question 4
+    * 4: Question 5
 
 **Cleand Query**: Users cleaned query
     """

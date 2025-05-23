@@ -1,10 +1,8 @@
-import type { Answer, Product, QueryEvaluation, User } from "./types";
+import type { Product, QueryEvaluation, User, UserAnswer } from "./types";
 
 const DEFAULT_HEADERS = {
   "Content-Type": "application/json"
 };
-
-
 
 class KaleidoClient {
   url: string;
@@ -79,7 +77,7 @@ class KaleidoClient {
     return response.json();
   }
 
-  async postToThread(uid: number, tid: number, content: { query?: string, answers?: Answer[] }): Promise<QueryEvaluation> {
+  async postToThread(uid: number, tid: number, content: { query?: string, answers?: UserAnswer[] }): Promise<QueryEvaluation> {
     if (!content.query && !content.answers) {
       throw new Error("Either query string or answers must be provided");
     }

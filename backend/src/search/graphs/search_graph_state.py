@@ -3,21 +3,6 @@ from pydantic import BaseModel, Field
 from backend.src.search.graphs.graph_wrapper import MessageState
 
 
-class AnsweredQuestion(BaseModel):
-    id: int = Field(
-        description="Unique integer identifier, starting from 0 and incrementing sequentially"
-    )
-    answer: str = Field(
-        description="Answer from the user"
-    )
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __hash__(self):
-        return hash(id)
-
-
 class FollowUpQuestion(BaseModel):
     id: int = Field(
         description="Unique integer identifier, starting from 0 and incrementing sequentially"
@@ -27,6 +12,12 @@ class FollowUpQuestion(BaseModel):
     )
     long: str = Field(
         description="Short and concise one sentence description of a question"
+    )
+
+
+class AnsweredQuestion(FollowUpQuestion):
+    answer: str = Field(
+        description="Answer from the user"
     )
 
 
