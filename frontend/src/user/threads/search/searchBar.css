@@ -63,6 +63,21 @@
   background-color: var(--accent-color-hover);
 }
 
+.search-options {
+  display: flex;
+  gap: 10px;
+}
+
+.search-options .icon-btn {
+  cursor: default;
+}
+
+.search-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
 .follow-up-questions {
   display: flex;
   flex-direction: column;

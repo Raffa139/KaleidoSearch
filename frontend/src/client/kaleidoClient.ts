@@ -105,8 +105,8 @@ class KaleidoClient {
     return response.json();
   }
 
-  async getRecommendations(uid: number, tid: number): Promise<Product[]> {
-    const response = await fetch(`${this.url}/users/${uid}/threads/${tid}/recommendations`, {
+  async getRecommendations(uid: number, tid: number, rerank: boolean = false): Promise<Product[]> {
+    const response = await fetch(`${this.url}/users/${uid}/threads/${tid}/recommendations?rerank=${rerank}`, {
       headers: DEFAULT_HEADERS
     });
 

@@ -6,19 +6,21 @@ import { client } from "../../client/kaleidoClient";
 interface UseThreadContext {
   (props?: {}): {
     isBusy: boolean;
+    rerank: boolean;
+    setRerank: (rerank: boolean) => void;
     getRecommendations: typeof client.getRecommendations;
     postToThread: typeof client.postToThread;
   };
 }
 
 export const useThreadContext: UseThreadContext = () => {
-  const { isBusy, setBusy } = useContext(ThreadContext) as ThreadContextProps;
+  const { isBusy, setBusy, rerank, setRerank } = useContext(ThreadContext) as ThreadContextProps;
 
   const getRecommendations = async (uid: number, tid: number): Promise<Product[]> => {
     setBusy(true);
 
     try {
-      const response = await client.getRecommendations(uid, tid);
+      const response = await client.getRecommendations(uid, tid, rerank);
       setBusy(false);
       return response;
     } catch (error) {
@@ -35,5 +37,5 @@ export const useThreadContext: UseThreadContext = () => {
     return response;
   };
 
-  return { isBusy, getRecommendations, postToThread };
+  return { isBusy, rerank, setRerank, getRecommendations, postToThread };
 };

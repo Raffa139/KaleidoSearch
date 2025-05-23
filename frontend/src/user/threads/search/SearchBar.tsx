@@ -14,11 +14,13 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
   const user = useOutletContext<User>();
   const { thread_id } = useLoaderData();
 
-  const { isBusy, postToThread } = useThreadContext();
+  const { isBusy, rerank, setRerank, postToThread } = useThreadContext();
 
   const [search, setSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [lastSearch, setLastSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [answers, setAnswers] = useState<UserAnswer[]>([]);
+  const [hideAnswers, setHideAnswers] = useState<boolean>(false);
+  // TODO: Answers in state & on display out of sync after hiding/showing answers
 
   const handleSearch = async () => {
     try {
@@ -58,9 +60,24 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
         <button onClick={handleSearch} className="search-button"><i className="fas fa-search"></i></button>
       </div>
 
+      <div className="search-options">
+        <div className="search-option">
+          <div onClick={() => setRerank(!rerank)}>
+            <input type="checkbox" checked={rerank} />
+            <span>Rerank results</span>
+          </div>
+          <i title="Enabling this option might improve search results at the cost of speed, depending on the specific search term(s)." className="fas fa-question-circle icon-btn" />
+        </div>
+
+        <div onClick={() => setHideAnswers(!hideAnswers)} className="search-option">
+          <input type="checkbox" checked={hideAnswers} />
+          <span>Hide answers</span>
+        </div>
+      </div>
+
       {queryEvaluation && (
         <div className="follow-up-questions">
-          {[...queryEvaluation.answered_questions, ...queryEvaluation.follow_up_questions].map((question) => (
+          {[...(hideAnswers ? [] : queryEvaluation.answered_questions), ...queryEvaluation.follow_up_questions].map((question) => (
             <Fragment key={question.id}>
               <Question onAnswerChange={handleAnswerChange} {...question} />
             </Fragment>
