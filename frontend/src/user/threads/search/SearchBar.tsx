@@ -26,23 +26,29 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
       const result = await postToThread(user.id, thread_id, content);
       console.log("Search result:", result);
       console.log("Answers:", answers);
-      // TODO: Clear answers after search
       onSearch(result);
+      setAnswers([]);
       setLastSearch(search);
     } catch (error) {
       onSearch(queryEvaluation);
     }
   };
 
-  const handleAnswerChange = (id: number, answer: string) => {
-    setAnswers((prevAnswers) => {
-      const existingAnswer = prevAnswers.find((a) => a.id === id);
-      if (existingAnswer) {
-        return prevAnswers.map((a) => a.id === id ? { ...a, answer } : a);
-      } else {
-        return [...prevAnswers, { id, answer }];
-      }
-    });
+  const handleAnswerChange = (id: number, answer: string, remove: boolean, hasChanged: boolean) => {
+    if (hasChanged) {
+      setAnswers((prevAnswers) => {
+        const existingAnswer = prevAnswers.find((a) => a.id === id);
+        const newAnswer = { id, answer, remove };
+
+        if (existingAnswer) {
+          return prevAnswers.map((a) => a.id === id ? newAnswer : a);
+        } else {
+          return [...prevAnswers, newAnswer];
+        }
+      });
+    } else {
+      setAnswers((prevAnswers) => prevAnswers.filter((a) => a.id !== id));
+    }
   };
 
   return (

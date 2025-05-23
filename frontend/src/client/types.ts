@@ -11,6 +11,7 @@ interface HasId {
 
 export interface UserAnswer extends HasId {
   answer: string;
+  remove: boolean;
 }
 
 export interface FollowUpQuestion extends HasId {
@@ -18,7 +19,7 @@ export interface FollowUpQuestion extends HasId {
   long: string;
 }
 
-export type AnsweredQuestion = FollowUpQuestion & UserAnswer;
+export type AnsweredQuestion = FollowUpQuestion & Omit<UserAnswer, "remove">;
 
 export interface QueryEvaluation {
   thread_id: number;

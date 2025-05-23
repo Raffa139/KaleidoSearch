@@ -82,10 +82,11 @@ class KaleidoClient {
       throw new Error("Either query string or answers must be provided");
     }
 
-    // TODO: Already anwsered questions can be remove by an empty string, add flag to Answer type
     const payload = {
       query: content.query?.trim() || undefined,
-      answers: content.answers?.map(a => ({ ...a, answer: a.answer.trim() })).filter(a => a.answer)
+      answers: content.answers
+        ?.map(a => ({ ...a, answer: a.answer.trim() }))
+        .filter(a => a.remove || a.answer)
     };
 
     console.log("Payload:", payload);

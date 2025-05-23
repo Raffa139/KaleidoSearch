@@ -4,16 +4,19 @@ import "./question.css";
 
 interface QuestionProps extends FollowUpQuestion {
   answer?: string;
-  onAnswerChange: (id: number, answer: string) => void;
+  onAnswerChange: (id: number, answer: string, remove: boolean, hasChanged: boolean) => void;
 }
 
 export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, answer, onAnswerChange }) => {
   const [newAnswer, setNewAnswer] = useState<string>(answer ?? "");
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // TODO: Handle trimming
     const value = e.target.value;
+    const remove = !!answer && value === "";
+    const hasChanged = answer !== value;
     setNewAnswer(value);
-    onAnswerChange(id, value);
+    onAnswerChange(id, value, remove, hasChanged);
   };
 
   return (
