@@ -3,7 +3,7 @@ import { useLoaderData, useOutletContext } from "react-router";
 import { PuffLoader } from "react-spinners";
 import { ProductCard } from "../../products/ProductCard";
 import { SearchBar } from "./search/SearchBar";
-import { client } from "../../client/kaleidoClient";
+import { useThreadContext } from "./useThreadContext";
 import type { Product, QueryEvaluation, User } from "../../client/types";
 import "./thread.css";
 
@@ -11,46 +11,39 @@ export const Thread: FunctionComponent = () => {
   const thread = useLoaderData<QueryEvaluation>();
   const user = useOutletContext<User>();
 
+  const { isBusy, getRecommendations } = useThreadContext();
+
   const [queryEvaluation, setQueryEvaluation] = useState<QueryEvaluation | undefined>(thread);
   const [products, setProducts] = useState<Product[]>([]);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const [hasSearchResults, setHasSearchResults] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
 
   console.log("Logged in as", user, "in thread", thread);
 
   const handleSearch = async (queryEvaluation?: QueryEvaluation) => {
-    setLoading(true);
-
-    try {
-      setQueryEvaluation(queryEvaluation);
-      const products = await client.getRecommendations(user.id, thread.thread_id);
-      setProducts(products);
-      setHasSearched(true);
-      setHasSearchResults(products.length > 0);
-    } catch (error) {
-      // TODO: Display that search needs refinement
-    }
-
-    setLoading(false);
+    setQueryEvaluation(queryEvaluation);
+    const products = await getRecommendations(user.id, thread.thread_id);
+    setProducts(products);
+    setHasSearched(true);
+    setHasSearchResults(products.length > 0);
   };
 
   return (
     <div className="container">
-      <SearchBar queryEvaluation={queryEvaluation} disabled={loading} onSearch={handleSearch} />
+      <SearchBar queryEvaluation={queryEvaluation} onSearch={handleSearch} />
 
       <div>
-        <PuffLoader color="white" loading={loading} />
+        <PuffLoader color="white" loading={isBusy} />
       </div>
 
       <div className="results-container">
-        {!loading && products.map((product) => (
+        {!isBusy && products.map((product) => (
           <Fragment key={product.url}>
             <ProductCard {...product} />
           </Fragment>
         ))}
 
-        {hasSearched && !hasSearchResults && (
+        {hasSearched && !hasSearchResults && !isBusy && (
           <p>No results found. Please try a different search.</p>
         )}
       </div>

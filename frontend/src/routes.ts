@@ -2,7 +2,7 @@ import { createBrowserRouter, redirect } from 'react-router';
 import { v4 as uuidv4 } from "uuid";
 import { Layout } from './layout/Layout';
 import { Login } from './authentication/Login';
-import { Thread } from './user/threads/Thread';
+import { ThreadWithContext } from './user/threads/ThreadContext';
 import { client } from './client/kaleidoClient';
 import { userLoader } from './authentication/userLoader';
 import { Home } from './user/home/Home';
@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
       {
         path: "threads/:tid",
         loader: async ({ params }) => client.getUserThread(Number(params.uid), Number(params.tid)),
-        Component: Thread
+        Component: ThreadWithContext
       }
     ]
   }

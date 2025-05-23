@@ -1,31 +1,29 @@
 import { Fragment, useState, type FunctionComponent } from "react";
 import { useLoaderData, useOutletContext } from "react-router";
 import type { Answer, QueryEvaluation, User } from "../../../client/types";
-import { client } from "../../../client/kaleidoClient";
+import { useThreadContext } from "../useThreadContext";
 import { Question } from "./Question";
 import "./searchBar.css";
 
 interface SearchBarProps {
   queryEvaluation?: QueryEvaluation;
-  disabled?: boolean;
   onSearch: (queryEvaluation?: QueryEvaluation) => void;
 }
 
-export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, disabled, onSearch }) => {
+export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, onSearch }) => {
   const user = useOutletContext<User>();
   const { thread_id } = useLoaderData();
+
+  const { isBusy, postToThread } = useThreadContext();
 
   const [search, setSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [lastSearch, setLastSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [answers, setAnswers] = useState<Answer[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSearch = async () => {
-    setLoading(true);
-
     try {
       const content = { query: lastSearch !== search ? search : undefined, answers };
-      const result = await client.postToThread(user.id, thread_id, content);
+      const result = await postToThread(user.id, thread_id, content);
       console.log("Search result:", result);
       console.log("Answers:", answers);
       onSearch(result);
@@ -33,8 +31,6 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
     } catch (error) {
       onSearch(queryEvaluation);
     }
-
-    setLoading(false);
   };
 
   const handleAnswerChange = (id: number, answer: string) => {
@@ -49,7 +45,7 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
   };
 
   return (
-    <div className={`search-header ${loading || disabled ? "loading" : ""}`}>
+    <div className={`search-header ${isBusy ? "loading" : ""}`}>
       <div className="search-bar">
         <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="search-input" />
         <button onClick={handleSearch} className="search-button"><i className="fas fa-search"></i></button>
