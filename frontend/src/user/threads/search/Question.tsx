@@ -11,12 +11,12 @@ export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, an
   const [newAnswer, setNewAnswer] = useState<string>(answer ?? "");
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // TODO: Handle trimming
     const value = e.target.value;
-    const remove = !!answer && value === "";
-    const hasChanged = answer !== value;
+    const trimmedValue = value.trim();
+    const remove = !!answer && trimmedValue === "";
+    const hasChanged = answer !== trimmedValue;
     setNewAnswer(value);
-    onAnswerChange(id, value, remove, hasChanged);
+    onAnswerChange(id, trimmedValue, remove, hasChanged);
   };
 
   return (
