@@ -1,9 +1,12 @@
 import type { FunctionComponent } from "react";
-import { NavLink, Outlet, useLoaderData } from "react-router";
+import { NavLink, Outlet, useLoaderData, useNavigation } from "react-router";
 import type { User } from "../client/types";
+import { GlobalSpinner } from "./GlobalSpinner";
 import "./layout.css";
 
 export const Layout: FunctionComponent = () => {
+  const navigation = useNavigation();
+  const isNavigating = Boolean(navigation.location);
   const user = useLoaderData<User>();
 
   return (
@@ -30,7 +33,11 @@ export const Layout: FunctionComponent = () => {
       </nav>
 
       <main>
-        <Outlet context={user} />
+        {isNavigating ? (
+          <GlobalSpinner />
+        ) : (
+          <Outlet context={user} />
+        )}
       </main>
     </>
   );
