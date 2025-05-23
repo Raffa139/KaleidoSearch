@@ -2,6 +2,7 @@ import type { FunctionComponent } from "react";
 import { NavLink, Outlet, useLoaderData, useNavigation } from "react-router";
 import type { User } from "../client/types";
 import { GlobalSpinner } from "./GlobalSpinner";
+import logo from "../../public/logo.svg";
 import "./layout.css";
 
 export const Layout: FunctionComponent = () => {
@@ -12,6 +13,11 @@ export const Layout: FunctionComponent = () => {
   return (
     <>
       <nav className="sidebar-nav">
+        <div className="branding-section">
+          <img src={logo} alt="Logo" />
+          <h1 className="branding-title">Kaleido</h1>
+        </div>
+
         <div className="profile-section">
           <img src={user.picture_url ?? "/placeholder-profile.jpg"} alt="User Profile" className="profile-picture" />
           <span className="username">{user.username}</span>

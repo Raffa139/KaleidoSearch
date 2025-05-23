@@ -5,8 +5,25 @@
   box-shadow: 2px 0 5px var(--shadow-color);
   display: flex;
   flex-direction: column;
-  padding: 20px 0;
   box-sizing: border-box;
+}
+
+.branding-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.branding-section img {
+  width: 32px;
+  animation: glow 12s infinite;
+}
+
+.branding-section h1 {
+  text-transform: uppercase;
+  margin: 0;
 }
 
 .profile-section {
@@ -93,4 +110,22 @@
 .logout-button:hover {
   background-color: var(--logout-button-hover-bg);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes glow {
+  0% {
+    filter: drop-shadow(0 0 0 var(--accent-color));
+  }
+
+  15% {
+    filter: drop-shadow(0 0 10px var(--accent-color));
+  }
+
+  85% {
+    filter: drop-shadow(0 0 10px var(--accent-color));
+  }
+
+  100% {
+    filter: drop-shadow(0 0 0 var(--accent-color));
+  }
 }
