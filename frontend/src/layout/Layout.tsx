@@ -2,7 +2,7 @@ import type { FunctionComponent } from "react";
 import { NavLink, Outlet, useLoaderData, useNavigation } from "react-router";
 import type { User } from "../client/types";
 import { GlobalSpinner } from "./GlobalSpinner";
-import logo from "../../public/logo.svg";
+import logo from "/logo.svg";
 import "./layout.css";
 
 export const Layout: FunctionComponent = () => {
