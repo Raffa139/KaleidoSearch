@@ -106,6 +106,7 @@ class SearchService:
             product = next(filter(lambda p: p.id == ref_id, products))
             recommendations.append(ProductRecommendation(
                 **product.model_dump(),
+                shop={**product.shop.model_dump()},
                 ai_title=metadata.get("ai_title"),
                 description=document.page_content
             ))

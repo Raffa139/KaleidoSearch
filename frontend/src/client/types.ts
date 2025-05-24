@@ -36,4 +36,8 @@ export interface Product {
   description: string;
   url: string;
   thumbnail_url?: string;
+  shop: {
+    name: string;
+    url: string;
+  }
 }

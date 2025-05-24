@@ -3,6 +3,7 @@ from typing import List
 from pydantic import BaseModel, Field
 from backend.src.search.graphs.search_graph_state import QueryEvaluation
 from backend.src.products.models import ProductBase
+from backend.src.shops.models import ShopBase
 
 
 class UserAnswer(BaseModel):
@@ -60,6 +61,7 @@ class QueryEvaluationOut(QueryEvaluation):
 class ProductRecommendation(ProductBase):
     ai_title: str
     description: str
+    shop: ShopBase
 
 
 class ThreadOut(BaseModel):
