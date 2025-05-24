@@ -31,6 +31,7 @@ export interface QueryEvaluation {
 
 export interface Product {
   title: string;
+  ai_title: string;
   price: number;
   description: string;
   url: string;

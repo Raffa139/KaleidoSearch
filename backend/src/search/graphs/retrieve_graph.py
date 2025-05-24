@@ -39,23 +39,24 @@ document presented.
 
 SUMMARIZE_PROMPT = (
     """
-You are an AI E-commerce expert who writes compelling product descriptions.
+You are an AI E-commerce expert who writes compelling product descriptions and titles.
 I am going to provide a list of e-commerce product descriptions in the form of documents. Each 
-document has a unique ID and I want you to rewrite and enhance all descriptions. The new 
-descriptions should be referenced to their original document using its ID.
+document has a unique ID and I want you to rewrite and enhance all descriptions and generate a 
+short and concise product title for each description. The new descriptions should be referenced 
+to their original document using its ID.
 
 Each document/product is presented in the following format:
 
 Document ID: [document_id]
 Description: [product_description]
 
-The main point of these commands is for you to develop new informative, and captivating 
-product summaries/descriptions which are less than {n_words} words long. The purpose of product 
-descriptions is marketing the products to users looking to buy.
+The main point of these commands is for you to develop new informative, and captivating product 
+summaries/descriptions which are about {n_words_descriptions} words long. And to develop precise 
+product titles based on the enhanced description which are {n_words_titles} words long. The 
+purpose of product descriptions and titles is marketing the products to users looking to buy.
 
-Do not use any kind of text formatting besides line breaks. Do not echo my prompt. Do not remind 
-me what I asked you for. Do not apologize. Do not self-reference. Do not include Document IDs in 
-your output.
+Do not use any kind of text formatting. Do not echo my prompt. Do not remind me what I asked you 
+for. Do not apologize. Do not self-reference. Do not include Document IDs in your output.
 
 Here are the documents/products:
 
@@ -95,7 +96,8 @@ def filter_relevant(llm: BaseChatModel, s: RetrieveGraphState):
 def summarize(llm: BaseChatModel, s: RetrieveGraphState):
     def invoke(state: RetrieveGraphState):
         prompt = SUMMARIZE_PROMPT.format(
-            n_words=state.summary_length,
+            n_words_titles=state.title_length,
+            n_words_descriptions=state.summary_length,
             documents="\n\n".join(map(
                 lambda d: f"Document ID: {d.metadata.get('ref_id')}\nDescription: {d.page_content}",
                 state.relevant_documents
@@ -106,7 +108,10 @@ def summarize(llm: BaseChatModel, s: RetrieveGraphState):
         summaries = llm.with_structured_output(SummarizedContentList).invoke(prompt)
 
         return {"summarized_documents": [
-            Document(d.description, metadata={"ref_id": d.id}) for d in summaries.list
+            Document(
+                content.description,
+                metadata={"ref_id": content.id, "ai_title": content.title}
+            ) for content in summaries.list
         ]}
 
     return invoke(s)

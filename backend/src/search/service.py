@@ -99,10 +99,12 @@ class SearchService:
         recommendations = []
 
         for document in documents:
-            ref_id = document.metadata.get("ref_id")
+            metadata = document.metadata
+            ref_id = metadata.get("ref_id")
             product = next(filter(lambda p: p.id == ref_id, products))
             recommendations.append(ProductRecommendation(
                 **product.model_dump(),
+                ai_title=metadata.get("ai_title"),
                 description=document.page_content
             ))
 

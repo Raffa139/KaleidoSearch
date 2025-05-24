@@ -58,6 +58,7 @@ class QueryEvaluationOut(QueryEvaluation):
 
 
 class ProductRecommendation(ProductBase):
+    ai_title: str
     description: str
 
 
