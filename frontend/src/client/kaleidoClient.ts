@@ -105,10 +105,13 @@ class KaleidoClient {
     return response.json();
   }
 
-  async getRecommendations(uid: number, tid: number, rerank: boolean = false): Promise<Product[]> {
-    const response = await fetch(`${this.url}/users/${uid}/threads/${tid}/recommendations?rerank=${rerank}`, {
-      headers: DEFAULT_HEADERS
-    });
+  async getRecommendations(uid: number, tid: number, rerank: boolean = false, summary_length: number = 25): Promise<Product[]> {
+    const response = await fetch(
+      `${this.url}/users/${uid}/threads/${tid}/recommendations?rerank=${rerank}&summary_length=${summary_length}`,
+      {
+        headers: DEFAULT_HEADERS
+      }
+    );
 
     if (!response.ok) {
       console.error(response.status, await response.text());

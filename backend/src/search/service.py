@@ -55,7 +55,8 @@ class SearchService:
             self,
             thread_id: int,
             *,
-            rerank: bool = False
+            rerank: bool = False,
+            summary_length: int = 100
     ) -> list[ProductRecommendation] | None:
         config = self.__get_graph_config(thread_id)
         state = self._search_graph.get_state(config)
@@ -67,7 +68,8 @@ class SearchService:
 
         if documents := self._retrieve_graph.invoke(
                 query=query,
-                rerank_documents=rerank
+                rerank_documents=rerank,
+                summary_length=summary_length
         ).summarized_documents:
             return self._map_documents_to_products(documents)
 
