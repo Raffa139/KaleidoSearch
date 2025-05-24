@@ -20,7 +20,6 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
   const [lastSearch, setLastSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [answers, setAnswers] = useState<UserAnswer[]>([]);
   const [hideAnswers, setHideAnswers] = useState<boolean>(false);
-  // TODO: Answers in state & on display out of sync after hiding/showing answers
 
   const handleSearch = async () => {
     try {
@@ -77,9 +76,9 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
 
       {queryEvaluation && (
         <div className="follow-up-questions">
-          {[...(hideAnswers ? [] : queryEvaluation.answered_questions), ...queryEvaluation.follow_up_questions].map((question) => (
+          {[...queryEvaluation.answered_questions, ...queryEvaluation.follow_up_questions].map((question) => (
             <Fragment key={question.id}>
-              <Question onAnswerChange={handleAnswerChange} {...question} />
+              <Question onAnswerChange={handleAnswerChange} hideAnswered={hideAnswers} {...question} />
             </Fragment>
           ))}
         </div>

@@ -4,10 +4,11 @@ import "./question.css";
 
 interface QuestionProps extends FollowUpQuestion {
   answer?: string;
+  hideAnswered: boolean;
   onAnswerChange: (id: number, answer: string, remove: boolean, hasChanged: boolean) => void;
 }
 
-export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, answer, onAnswerChange }) => {
+export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, answer, hideAnswered, onAnswerChange }) => {
   const [newAnswer, setNewAnswer] = useState<string>(answer ?? "");
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -20,7 +21,7 @@ export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, an
   };
 
   return (
-    <div className={`question-container ${answer ? "answered" : ""}`}>
+    <div className={`question-container ${answer ? "answered" : ""} ${hideAnswered && answer ? "hidden" : ""}`}>
       <span className="question-short text-ellipsis">{short}</span>
       <i title={`${short}: ${long}`} className="fas fa-question-circle icon-btn"></i>
       <input type="text" value={newAnswer} onChange={handleChange} className="search-input" />
