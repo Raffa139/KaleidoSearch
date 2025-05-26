@@ -25,7 +25,9 @@ class UserService:
         return user
 
     def find_user_threads(self, user_id: int) -> list[Thread]:
-        return self._query(select(Thread).where(Thread.user_id == user_id)).all()
+        return self._query(
+            select(Thread).where(Thread.user_id == user_id).order_by(Thread.updated_at.desc())
+        ).all()
 
     def create_thread(self, user_id: int) -> Thread:
         thread = Thread(user_id=user_id)
