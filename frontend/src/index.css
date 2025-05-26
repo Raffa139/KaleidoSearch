@@ -63,6 +63,12 @@ main {
   text-overflow: ellipsis;
 }
 
+.loading {
+  pointer-events: none;
+  filter: saturate(0.65);
+  opacity: 0.9;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }

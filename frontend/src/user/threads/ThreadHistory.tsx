@@ -1,7 +1,7 @@
 import { useState, type FunctionComponent } from "react";
 import { Link, useLoaderData, useNavigate, useOutletContext } from "react-router";
 import type { User } from "../../client/types";
-import { client } from "../../client/kaleidoClient";
+import { useThreadContext } from "./useThreadContext";
 import { SearchInput } from "./search/SearchInput";
 import "./threadHistory.css";
 
@@ -11,11 +11,13 @@ export const ThreadHistory: FunctionComponent = () => {
 
   const navigate = useNavigate();
 
+  const { isBusy, createThread } = useThreadContext();
+
   const [newSearch, setNewSearch] = useState<string>("");
 
   const handleNewSearch = async () => {
     if (newSearch.trim()) {
-      const { thread_id } = await client.createThread(user.id, newSearch);
+      const { thread_id } = await createThread(user.id, newSearch);
       navigate(`/users/${user.id}/threads/${thread_id}`);
     }
   };
@@ -24,16 +26,18 @@ export const ThreadHistory: FunctionComponent = () => {
     <div className="thread-history">
       <h2 className="title-header">Recent Searches</h2>
 
-      <SearchInput value={newSearch} onChange={e => setNewSearch(e.target.value)} onSearch={handleNewSearch} placeholder="Start new Search..." />
+      <div className={`${isBusy ? "loading" : ""}`}>
+        <SearchInput value={newSearch} onChange={e => setNewSearch(e.target.value)} onSearch={handleNewSearch} placeholder="Start new Search..." />
 
-      <div className="thread-list">
-        {threads.map(({ thread_id }: { thread_id: number }) => (
-          <Link key={thread_id} to={`/users/${user.id}/threads/${thread_id}`}>
-            <button className="button">
-              Thread {thread_id}
-            </button>
-          </Link>
-        ))}
+        <div className="thread-list">
+          {threads.map(({ thread_id }: { thread_id: number }) => (
+            <Link key={thread_id} to={`/users/${user.id}/threads/${thread_id}`}>
+              <button className="button">
+                Thread {thread_id}
+              </button>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
-import { createContext, useState, type FunctionComponent } from "react";
-import { Thread } from "./Thread";
+import { createContext, useState, type FunctionComponent, type ReactNode } from "react";
 
 export interface ThreadContextProps {
   isBusy: boolean;
@@ -8,15 +7,19 @@ export interface ThreadContextProps {
   setRerank: (rerank: boolean) => void;
 }
 
+interface ThreadContextWrapperProps {
+  children: ReactNode;
+}
+
 export const ThreadContext = createContext<Partial<ThreadContextProps>>({});
 
-export const ThreadWithContext: FunctionComponent = () => {
+export const ThreadContextWrapper: FunctionComponent<ThreadContextWrapperProps> = ({ children }) => {
   const [isBusy, setBusy] = useState<boolean>(false);
   const [rerank, setRerank] = useState<boolean>(false);
 
   return (
     <ThreadContext.Provider value={{ isBusy, setBusy, rerank, setRerank }}>
-      <Thread />
+      {children}
     </ThreadContext.Provider>
   );
 };

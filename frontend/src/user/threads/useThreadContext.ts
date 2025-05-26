@@ -10,6 +10,7 @@ interface UseThreadContext {
     setRerank: (rerank: boolean) => void;
     getRecommendations: typeof client.getRecommendations;
     postToThread: typeof client.postToThread;
+    createThread: typeof client.createThread;
   };
 }
 
@@ -37,5 +38,12 @@ export const useThreadContext: UseThreadContext = () => {
     return response;
   };
 
-  return { isBusy, rerank, setRerank, getRecommendations, postToThread };
+  const createThread = async (uid: number, query?: string): Promise<QueryEvaluation> => {
+    setBusy(true);
+    const response = await client.createThread(uid, query);
+    setBusy(false);
+    return response;
+  };
+
+  return { isBusy, rerank, setRerank, getRecommendations, postToThread, createThread };
 };

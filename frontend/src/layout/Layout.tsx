@@ -2,6 +2,7 @@ import type { FunctionComponent } from "react";
 import { NavLink, Outlet, useLoaderData, useNavigation } from "react-router";
 import type { User } from "../client/types";
 import { GlobalSpinner } from "./GlobalSpinner";
+import { ThreadContextWrapper } from "../user/threads/ThreadContext";
 import logo from "/logo.svg";
 import "./layout.css";
 
@@ -41,7 +42,9 @@ export const Layout: FunctionComponent = () => {
         {isNavigating ? (
           <GlobalSpinner />
         ) : (
-          <Outlet context={user} />
+          <ThreadContextWrapper>
+            <Outlet context={user} />
+          </ThreadContextWrapper>
         )}
       </main>
     </>
