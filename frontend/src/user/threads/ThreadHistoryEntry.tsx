@@ -1,6 +1,8 @@
 import { useEffect, useState, type FunctionComponent } from "react";
 import { Link } from "react-router";
 import TimeAgo from "react-timeago";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 import { client } from "../../client/kaleidoClient";
 import type { Thread } from "../../client/types";
 import "./threadHistoryEntry.css";
@@ -12,7 +14,7 @@ interface ThreadHistoryEntryProps {
 }
 
 export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({ user_id, thread, onDelete }) => {
-  const [title, setTitle] = useState<string>();
+  const [title, setTitle] = useState<string | null>();
 
   const capitalizeSentence = (sentence: string) => {
     const capitalizeWord = (word: string) => word.charAt(0).toUpperCase() + word.slice(1);
@@ -25,6 +27,8 @@ export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({
       const queryEvaluation = await client.getUserThread(user_id, thread.thread_id);
       if (queryEvaluation.cleaned_query) {
         setTitle(capitalizeSentence(queryEvaluation.cleaned_query));
+      } else {
+        setTitle(null);
       }
     };
 
@@ -40,7 +44,7 @@ export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({
     <div className="thread-history-entry">
       <div className="thread-history-title">
         <TimeAgo date={thread.updated_at} />
-        <span>{title ?? <i>Untitled Search</i>}</span>
+        <span>{title === null ? <i>Untitled Search</i> : title ?? <Skeleton />}</span>
       </div>
 
       <div className="thread-history-entry-icon-btns">
