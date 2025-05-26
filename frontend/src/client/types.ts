@@ -29,6 +29,12 @@ export interface QueryEvaluation {
   cleaned_query?: string;
 }
 
+export interface Thread {
+  thread_id: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export interface Product {
   title: string;
   ai_title: string;

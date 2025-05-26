@@ -7,8 +7,8 @@
   --light-text-color: #efefef;
   --border-color: #74787f;
   --shadow-color: rgba(0, 0, 0, 0.05);
-  --logout-button-bg: #dc3545;
-  --logout-button-hover-bg: #c82333;
+  --destructive-bg: #dc3545;
+  --destructive-hover-bg: #c82333;
 } */
 
 :root {
@@ -20,8 +20,10 @@
   --light-text-color: #efefef;
   --border-color: #cbc0d5;
   --shadow-color: rgba(0, 0, 0, 0.1);
-  --logout-button-bg: #dc3545;
-  --logout-button-hover-bg: #c82333;
+  --success-bg: #28a745;
+  --success-hover-bg: #218838;
+  --destructive-bg: #dc3545;
+  --destructive-hover-bg: #c82333;
 }
 
 body {

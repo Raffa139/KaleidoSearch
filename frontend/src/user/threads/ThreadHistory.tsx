@@ -1,12 +1,13 @@
-import { useState, type FunctionComponent } from "react";
-import { Link, useLoaderData, useNavigate, useOutletContext } from "react-router";
-import type { User } from "../../client/types";
+import { Fragment, useState, type FunctionComponent } from "react";
+import { useLoaderData, useNavigate, useOutletContext } from "react-router";
+import type { Thread, User } from "../../client/types";
 import { useThreadContext } from "./useThreadContext";
 import { SearchInput } from "./search/SearchInput";
+import { ThreadHistoryEntry } from "./ThreadHistoryEntry";
 import "./threadHistory.css";
 
 export const ThreadHistory: FunctionComponent = () => {
-  const threads = useLoaderData<Array<{ thread_id: number }>>();
+  const threads = useLoaderData<Thread[]>();
   const user = useOutletContext<User>();
 
   const navigate = useNavigate();
@@ -30,12 +31,10 @@ export const ThreadHistory: FunctionComponent = () => {
         <SearchInput value={newSearch} onChange={e => setNewSearch(e.target.value)} onSearch={handleNewSearch} placeholder="Start new Search..." />
 
         <div className="thread-list">
-          {threads.map(({ thread_id }: { thread_id: number }) => (
-            <Link key={thread_id} to={`/users/${user.id}/threads/${thread_id}`}>
-              <button className="button">
-                Thread {thread_id}
-              </button>
-            </Link>
+          {threads.map((thread) => (
+            <Fragment key={thread.thread_id}>
+              <ThreadHistoryEntry user_id={user.id} thread={thread} />
+            </Fragment>
           ))}
         </div>
       </div>

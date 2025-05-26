@@ -1,0 +1,61 @@
+.thread-history-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--secondary-bg-color);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.thread-history-entry:hover {
+  box-shadow: 0 4px 10px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.thread-history-title {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 20px;
+}
+
+.thread-history-entry time {
+  font-size: 14px;
+  color: var(--light-text-color);
+}
+
+.thread-history-entry-icon-btns {
+  display: flex;
+  gap: 5px;
+  height: 100%;
+}
+
+.thread-history-entry-icon-btn {
+  background: none;
+  border: none;
+  width: 64px;
+  height: 100%;
+  color: var(--light-text-color);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.success {
+  background-color: var(--success-bg);
+}
+
+.success:hover {
+  background-color: var(--success-hover-bg);
+}
+
+.destructive {
+  background-color: var(--destructive-bg);
+}
+
+.destructive:hover {
+  background-color: var(--destructive-hover-bg);
+}

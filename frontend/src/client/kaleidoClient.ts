@@ -1,4 +1,4 @@
-import type { Product, QueryEvaluation, User, UserAnswer } from "./types";
+import type { Product, QueryEvaluation, Thread, User, UserAnswer } from "./types";
 
 const DEFAULT_HEADERS = {
   "Content-Type": "application/json"
@@ -37,7 +37,7 @@ class KaleidoClient {
     return response.json();
   }
 
-  async getUserThreads(uid: number): Promise<Array<{ thread_id: number }>> {
+  async getUserThreads(uid: number): Promise<Thread[]> {
     const response = await fetch(`${this.url}/users/${uid}/threads`, {
       headers: DEFAULT_HEADERS
     });
@@ -47,7 +47,14 @@ class KaleidoClient {
       throw new Error("Failed to fetch user threads");
     }
 
-    return response.json();
+    const json = await response.json();
+
+    // Map dates from UTC to browsers timezone
+    return json.map((thread: Thread) => ({
+      ...thread,
+      created_at: new Date(`${thread.created_at}Z`),
+      updated_at: new Date(`${thread.updated_at}Z`)
+    }));
   }
 
   async createThread(uid: number, query?: string): Promise<QueryEvaluation> {

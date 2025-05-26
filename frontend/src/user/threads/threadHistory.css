@@ -9,14 +9,11 @@
 .thread-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  height: calc(100vh - 123px);
+  gap: 10px;
+  height: calc(100vh - 133px);
   overflow-y: auto;
   padding-right: 10px;
-}
-
-a .button {
-  width: 100%;
+  margin-bottom: 10px;
 }
 
 .thread-history .search-input {

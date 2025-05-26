@@ -92,7 +92,7 @@
 
 .logout-button {
   width: 100%;
-  background-color: var(--logout-button-bg);
+  background-color: var(--destructive-bg);
   color: white;
   border: none;
   border-radius: 24px;
@@ -108,7 +108,7 @@
 }
 
 .logout-button:hover {
-  background-color: var(--logout-button-hover-bg);
+  background-color: var(--destructive-hover-bg);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
