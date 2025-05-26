@@ -1,5 +1,5 @@
 import { Fragment, useState, type FunctionComponent } from "react";
-import { useLoaderData, useOutletContext } from "react-router";
+import { useLoaderData, useNavigate, useOutletContext } from "react-router";
 import type { QueryEvaluation, User, UserAnswer } from "../../../client/types";
 import { useThreadContext } from "../useThreadContext";
 import { Question } from "./Question";
@@ -14,6 +14,8 @@ interface SearchBarProps {
 export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, onSearch }) => {
   const user = useOutletContext<User>();
   const { thread_id } = useLoaderData();
+
+  const navigate = useNavigate();
 
   const { isBusy, rerank, setRerank, postToThread } = useThreadContext();
 
@@ -53,9 +55,16 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
     }
   };
 
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
   return (
     <div className={`search-header ${isBusy ? "loading" : ""}`}>
-      <SearchInput value={search} onChange={e => setSearch(e.target.value)} onSearch={handleSearch} placeholder="Search..." />
+      <div className="search-input-container">
+        <button onClick={handleBackClick} className="back-button"><i className="fa-solid fa-arrow-left"></i></button>
+        <SearchInput value={search} onChange={e => setSearch(e.target.value)} onSearch={handleSearch} placeholder="Search..." />
+      </div>
 
       <div className="search-options">
         <div className="search-option">
