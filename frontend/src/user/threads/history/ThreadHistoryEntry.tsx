@@ -3,8 +3,8 @@ import { Link } from "react-router";
 import TimeAgo from "react-timeago";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { client } from "../../client/kaleidoClient";
-import type { Thread } from "../../client/types";
+import { client } from "../../../client/kaleidoClient";
+import type { Thread } from "../../../client/types";
 import "./threadHistoryEntry.css";
 
 interface ThreadHistoryEntryProps {

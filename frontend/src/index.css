@@ -7,6 +7,8 @@
   --light-text-color: #efefef;
   --border-color: #74787f;
   --shadow-color: rgba(0, 0, 0, 0.05);
+  --success-bg: #28a745;
+  --success-hover-bg: #218838;
   --destructive-bg: #dc3545;
   --destructive-hover-bg: #c82333;
 } */

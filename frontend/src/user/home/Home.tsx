@@ -1,5 +1,5 @@
 import { type FunctionComponent } from "react";
-import { ThreadHistory } from "../threads/ThreadHistory";
+import { ThreadHistory } from "../threads/history/ThreadHistory";
 import "./home.css";
 
 export const Home: FunctionComponent = () => {

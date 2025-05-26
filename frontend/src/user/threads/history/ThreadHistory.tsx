@@ -1,8 +1,8 @@
 import { Fragment, useState, type FunctionComponent } from "react";
 import { useLoaderData, useNavigate, useOutletContext } from "react-router";
-import type { Thread, User } from "../../client/types";
-import { useThreadContext } from "./useThreadContext";
-import { SearchInput } from "./search/SearchInput";
+import type { Thread, User } from "../../../client/types";
+import { useThreadContext } from "../useThreadContext";
+import { SearchInput } from "../search/SearchInput";
 import { ThreadHistoryEntry } from "./ThreadHistoryEntry";
 import "./threadHistory.css";
 
