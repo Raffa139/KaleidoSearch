@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from sqlmodel import Session, select
 from sqlmodel.sql.expression import Select, SelectOfScalar
 from backend.src.users.models import User, UserIn, Thread
@@ -32,6 +33,16 @@ class UserService:
         self._session.commit()
         self._session.refresh(thread)
         return thread
+
+    def update_thread(self, thread_id: int) -> Thread:
+        if thread := self.find_thread_by_id(thread_id):
+            thread.updated_at = datetime.now(timezone.utc)
+            self._session.add(thread)
+            self._session.commit()
+            self._session.refresh(thread)
+            return thread
+
+        raise ValueError(f"Thread {thread_id} not found")
 
     def delete_thread(self, thread_id: int):
         thread = self.find_thread_by_id(thread_id)

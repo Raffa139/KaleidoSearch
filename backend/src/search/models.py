@@ -66,7 +66,3 @@ class ProductRecommendation(ProductBase):
     ai_title: str
     description: str
     shop: ShopBase
-
-
-class ThreadOut(BaseModel):
-    thread_id: int

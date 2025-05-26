@@ -93,6 +93,7 @@ class SearchService:
             query_evaluation = self._search_graph.invoke(formatted_answers, config).query_evaluation
 
         thread_id = config.get("configurable").get("thread_id")
+        self._user_service.update_thread(thread_id)
         return QueryEvaluationOut(**query_evaluation.model_dump(), thread_id=thread_id)
 
     def _map_documents_to_products(self, documents: list[Document]) -> list[ProductRecommendation]:

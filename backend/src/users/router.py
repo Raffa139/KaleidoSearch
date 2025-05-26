@@ -2,12 +2,11 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
 from backend.src.app.dependencies import SessionDep, SearchGraphDep, RetrieveGraphDep
 from backend.src.search.service import SearchService, ProductRecommendation
-from backend.src.search.models import QueryEvaluationOut, UserSearch, BaseUserSearch, \
-    ThreadOut, NewUserSearch
+from backend.src.search.models import QueryEvaluationOut, UserSearch, BaseUserSearch, NewUserSearch
 from backend.src.products.service import ProductService
 from backend.src.shops.service import ShopService
 from backend.src.users.service import UserService
-from backend.src.users.models import UserOut, UserIn
+from backend.src.users.models import UserOut, UserIn, ThreadOut
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -57,7 +56,7 @@ def get_user_threads(uid: int, user_service: UserServiceDep):
         raise HTTPException(status_code=401)
 
     threads = user_service.find_user_threads(uid)
-    return map(lambda thread: ThreadOut(thread_id=thread.id), threads)
+    return map(lambda thread: ThreadOut(**thread.model_dump(), thread_id=thread.id), threads)
 
 
 @router.post("/{uid}/threads", response_model=QueryEvaluationOut)
