@@ -109,6 +109,17 @@ def post_to_thread(
     return handle_thread_posts(uid, tid, user_search, search_service, user_service)
 
 
+@router.delete("/{uid}/threads/{tid}")
+def delete_thread(uid: int, tid: int, user_service: UserServiceDep):
+    if not user_service.find_user_by_id(uid):
+        raise HTTPException(status_code=401)
+
+    if tid and not user_service.has_user_access_to_thread(uid, tid):
+        raise HTTPException(status_code=403)
+
+    user_service.delete_thread(tid)
+
+
 @router.get("/{uid}/threads/{tid}/recommendations", response_model=list[ProductRecommendation])
 def get_recommendations_from_thread(
         uid: int,

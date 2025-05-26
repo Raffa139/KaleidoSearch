@@ -27,7 +27,7 @@ def create_app():
         CORSMiddleware,
         allow_origins=["http://localhost:5173"],
         allow_credentials=True,
-        allow_methods=["GET", "POST"]
+        allow_methods=["GET", "POST", "DELETE"]
     )
 
     app.add_exception_handler(ValueError, handle_value_error)

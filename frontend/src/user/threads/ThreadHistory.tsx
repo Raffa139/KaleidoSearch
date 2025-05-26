@@ -7,13 +7,14 @@ import { ThreadHistoryEntry } from "./ThreadHistoryEntry";
 import "./threadHistory.css";
 
 export const ThreadHistory: FunctionComponent = () => {
-  const threads = useLoaderData<Thread[]>();
+  const loadedThreads = useLoaderData<Thread[]>();
   const user = useOutletContext<User>();
 
   const navigate = useNavigate();
 
   const { isBusy, createThread } = useThreadContext();
 
+  const [threads, setThreads] = useState<Thread[]>(loadedThreads);
   const [newSearch, setNewSearch] = useState<string>("");
 
   const handleNewSearch = async () => {
@@ -21,6 +22,10 @@ export const ThreadHistory: FunctionComponent = () => {
       const { thread_id } = await createThread(user.id, newSearch);
       navigate(`/users/${user.id}/threads/${thread_id}`);
     }
+  };
+
+  const handleDelete = (thread_id: number) => {
+    setThreads(prevThreads => prevThreads.filter(thread => thread.thread_id !== thread_id));
   };
 
   return (
@@ -33,7 +38,7 @@ export const ThreadHistory: FunctionComponent = () => {
         <div className="thread-list">
           {threads.map((thread) => (
             <Fragment key={thread.thread_id}>
-              <ThreadHistoryEntry user_id={user.id} thread={thread} />
+              <ThreadHistoryEntry user_id={user.id} thread={thread} onDelete={handleDelete} />
             </Fragment>
           ))}
         </div>

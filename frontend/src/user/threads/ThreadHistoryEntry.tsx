@@ -8,9 +8,10 @@ import "./threadHistoryEntry.css";
 interface ThreadHistoryEntryProps {
   thread: Thread;
   user_id: number;
+  onDelete: (thread_id: number) => void;
 }
 
-export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({ user_id, thread }) => {
+export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({ user_id, thread, onDelete }) => {
   const [title, setTitle] = useState<string>();
 
   const capitalizeSentence = (sentence: string) => {
@@ -30,7 +31,10 @@ export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({
     fetchThreadTitle();
   }, [thread.thread_id]);
 
-  const handleDelete = async () => { };
+  const handleDelete = () => {
+    client.deleteThread(user_id, thread.thread_id);
+    onDelete(thread.thread_id);
+  };
 
   return (
     <div className="thread-history-entry">

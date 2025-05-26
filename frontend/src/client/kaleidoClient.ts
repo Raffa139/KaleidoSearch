@@ -113,6 +113,18 @@ class KaleidoClient {
     return response.json();
   }
 
+  async deleteThread(uid: number, tid: number): Promise<void> {
+    const response = await fetch(`${this.url}/users/${uid}/threads/${tid}`, {
+      method: "DELETE",
+      headers: DEFAULT_HEADERS
+    });
+
+    if (!response.ok) {
+      console.error(response.status, await response.text());
+      throw new Error("Failed to delete thread");
+    }
+  }
+
   async getRecommendations(uid: number, tid: number, rerank: boolean = false, summary_length: number = 25): Promise<Product[]> {
     const response = await fetch(
       `${this.url}/users/${uid}/threads/${tid}/recommendations?rerank=${rerank}&summary_length=${summary_length}`,
