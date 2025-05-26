@@ -6,7 +6,6 @@ import { ThreadWithContext } from './user/threads/ThreadContext';
 import { client } from './client/kaleidoClient';
 import { userLoader } from './authentication/userLoader';
 import { Home } from './user/home/Home';
-import { ThreadHistory } from './user/threads/ThreadHistory';
 
 export const router = createBrowserRouter([
   {
@@ -31,12 +30,8 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "home",
-        Component: Home
-      },
-      {
-        path: "threads",
         loader: async ({ params }) => client.getUserThreads(Number(params.uid)),
-        Component: ThreadHistory
+        Component: Home
       },
       {
         path: "threads/:tid",

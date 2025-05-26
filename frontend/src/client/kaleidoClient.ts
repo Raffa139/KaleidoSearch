@@ -54,7 +54,7 @@ class KaleidoClient {
     const response = await fetch(`${this.url}/users/${uid}/threads`, {
       method: "POST",
       headers: DEFAULT_HEADERS,
-      body: query ? JSON.stringify({ query }) : undefined
+      body: query ? JSON.stringify({ query: query.trim() }) : undefined
     });
 
     if (!response.ok) {

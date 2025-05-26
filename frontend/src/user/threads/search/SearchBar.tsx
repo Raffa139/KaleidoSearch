@@ -3,6 +3,7 @@ import { useLoaderData, useOutletContext } from "react-router";
 import type { QueryEvaluation, User, UserAnswer } from "../../../client/types";
 import { useThreadContext } from "../useThreadContext";
 import { Question } from "./Question";
+import { SearchInput } from "./SearchInput";
 import "./searchBar.css";
 
 interface SearchBarProps {
@@ -54,10 +55,7 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
 
   return (
     <div className={`search-header ${isBusy ? "loading" : ""}`}>
-      <div className="search-bar">
-        <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="search-input" />
-        <button onClick={handleSearch} className="search-button"><i className="fas fa-search"></i></button>
-      </div>
+      <SearchInput value={search} onChange={e => setSearch(e.target.value)} onSearch={handleSearch} placeholder="Search..." />
 
       <div className="search-options">
         <div className="search-option">

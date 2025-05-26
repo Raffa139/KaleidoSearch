@@ -24,7 +24,7 @@ export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, an
     <div className={`question-container ${answer ? "answered" : ""} ${hideAnswered && answer ? "hidden" : ""}`}>
       <span className="question-short text-ellipsis">{short}</span>
       <i title={`${short}: ${long}`} className="fas fa-question-circle icon-btn"></i>
-      <input type="text" value={newAnswer} onChange={handleChange} className="search-input" />
+      <input type="text" value={newAnswer} onChange={handleChange} className="input" />
     </div>
   );
 };
