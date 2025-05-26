@@ -4,28 +4,8 @@
 
 .results-container {
   width: 100%;
-  max-width: 600px;
   height: calc(100vh - 105px);
   overflow-y: auto;
   padding-right: 10px;
   box-sizing: border-box;
-  margin: 0 auto;
-}
-
-.results-container::-webkit-scrollbar {
-  width: 8px;
-}
-
-.results-container::-webkit-scrollbar-track {
-  background: var(--primary-bg-color);
-  border-radius: 10px;
-}
-
-.results-container::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 10px;
-}
-
-.results-container::-webkit-scrollbar-thumb:hover {
-  background: var(--light-text-color);
 }

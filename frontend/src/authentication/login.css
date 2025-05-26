@@ -1,11 +1,3 @@
-.container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  align-self: center;
-}
-
 .login-container {
   width: 100%;
   max-width: 400px;

@@ -1,0 +1,24 @@
+.thread-history {
+  width: 100%;
+}
+
+.title-header {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.thread-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  height: calc(100vh - 123px);
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+a .button {
+  width: 100%;
+}
+
+.thread-history .search-bar {
+  margin-bottom: 10px;
+}
