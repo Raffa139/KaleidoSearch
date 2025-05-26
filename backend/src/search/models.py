@@ -34,6 +34,10 @@ class BaseUserSearch(ABC, BaseModel):
         return None
 
 
+class NewUserSearch(BaseUserSearch):
+    pass
+
+
 class UserSearch(BaseUserSearch):
     query: str | None = None
     answers: List[UserAnswer] | None = None

@@ -50,10 +50,11 @@ class KaleidoClient {
     return response.json();
   }
 
-  async createThread(uid: number): Promise<{ thread_id: number }> {
+  async createThread(uid: number, query?: string): Promise<QueryEvaluation> {
     const response = await fetch(`${this.url}/users/${uid}/threads`, {
       method: "POST",
-      headers: DEFAULT_HEADERS
+      headers: DEFAULT_HEADERS,
+      body: query ? JSON.stringify({ query }) : undefined
     });
 
     if (!response.ok) {

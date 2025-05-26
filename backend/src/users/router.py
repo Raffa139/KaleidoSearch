@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from backend.src.app.dependencies import SessionDep, SearchGraphDep, RetrieveGraphDep
 from backend.src.search.service import SearchService, ProductRecommendation
 from backend.src.search.models import QueryEvaluationOut, UserSearch, BaseUserSearch, \
-    ThreadOut
+    ThreadOut, NewUserSearch
 from backend.src.products.service import ProductService
 from backend.src.shops.service import ShopService
 from backend.src.users.service import UserService
@@ -60,13 +60,27 @@ def get_user_threads(uid: int, user_service: UserServiceDep):
     return map(lambda thread: ThreadOut(thread_id=thread.id), threads)
 
 
-@router.post("/{uid}/threads", response_model=ThreadOut, status_code=201)
-def create_thread(uid: int, user_service: UserServiceDep):
-    if not user_service.find_user_by_id(uid):
-        raise HTTPException(status_code=401)
+@router.post("/{uid}/threads", response_model=QueryEvaluationOut)
+def create_thread(
+        uid: int,
+        search_service: SearchServiceDep,
+        user_service: UserServiceDep,
+        user_search: NewUserSearch | None = None
+):
+    if not user_search:
+        if not user_service.find_user_by_id(uid):
+            raise HTTPException(status_code=401)
 
-    thread = user_service.create_thread(uid)
-    return ThreadOut(thread_id=thread.id)
+        thread = user_service.create_thread(uid)
+
+        return QueryEvaluationOut(
+            thread_id=thread.id,
+            valid=False,
+            answered_questions=[],
+            follow_up_questions=[]
+        )
+
+    return handle_thread_posts(uid, None, user_search, search_service, user_service)
 
 
 @router.get("/{uid}/threads/{tid}", response_model=QueryEvaluationOut)
