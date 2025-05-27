@@ -1,9 +1,12 @@
 import type { FunctionComponent } from "react";
 import { PhotoProvider, PhotoView } from "react-photo-view";
-import type { Product } from "../client/types";
+import Skeleton from "react-loading-skeleton";
+import type { Product, ProductSummary } from "../client/types";
 import "./productCard.css";
 
-export const ProductCard: FunctionComponent<Product> = ({ title, price, description, url, thumbnail_url, shop }) => {
+type ProductCardProps = Product & Partial<ProductSummary>
+
+export const ProductCard: FunctionComponent<ProductCardProps> = ({ ai_title, price, ai_description, url, thumbnail_url, shop }) => {
   return (
     <div className="search-result">
       <PhotoProvider>
@@ -16,8 +19,14 @@ export const ProductCard: FunctionComponent<Product> = ({ title, price, descript
         <div className="result-title">
           <a href={url} target="_blank">
             <h3>
-              {title}
-              <i className="fa-solid fa-arrow-up-right-from-square"></i>
+              {ai_title ? (
+                <>
+                  {ai_title}
+                  <i className="fa-solid fa-arrow-up-right-from-square"></i>
+                </>
+              ) : (
+                <Skeleton width={300} />
+              )}
             </h3>
           </a>
 
@@ -32,7 +41,16 @@ export const ProductCard: FunctionComponent<Product> = ({ title, price, descript
 
         <span className="price-tag">${price}</span>
 
-        <p className="result-description">{description}</p>
+        <p className="result-description">
+          {ai_description ? (
+            ai_description
+          ) : (
+            <>
+              <Skeleton width={400} />
+              <Skeleton width={350} />
+            </>
+          )}
+        </p>
       </div>
     </div>
   );
