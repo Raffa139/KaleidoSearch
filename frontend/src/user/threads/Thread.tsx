@@ -1,10 +1,10 @@
 import { Fragment, useState, type FunctionComponent } from "react";
 import { useLoaderData, useOutletContext } from "react-router";
-import { PuffLoader } from "react-spinners";
 import { ProductCard } from "../../products/ProductCard";
 import { SearchBar } from "./search/SearchBar";
 import { useThreadContext } from "./useThreadContext";
 import type { Product, QueryEvaluation, User } from "../../client/types";
+import { ProductSkeleton } from "../../products/ProductSkeleton";
 import "./thread.css";
 
 export const Thread: FunctionComponent = () => {
@@ -32,11 +32,9 @@ export const Thread: FunctionComponent = () => {
     <div className="container">
       <SearchBar queryEvaluation={queryEvaluation} onSearch={handleSearch} />
 
-      <div>
-        <PuffLoader color="white" loading={isBusy} />
-      </div>
-
       <div className="results-container">
+        <ProductSkeleton loading={isBusy} count={3} />
+
         {!isBusy && products.map((product) => (
           <Fragment key={product.url}>
             <ProductCard {...product} />
