@@ -4,6 +4,7 @@ import type { QueryEvaluation, User, UserAnswer } from "../../../client/types";
 import { useThreadContext } from "../useThreadContext";
 import { Question } from "./Question";
 import { SearchInput } from "./SearchInput";
+import { ModalPuffLoader } from "../ModalPuffLoader";
 import "./searchBar.css";
 
 interface SearchBarProps {
@@ -90,6 +91,8 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
           ))}
         </div>
       )}
+
+      <ModalPuffLoader loading={isBusy} />
     </div>
   );
 };

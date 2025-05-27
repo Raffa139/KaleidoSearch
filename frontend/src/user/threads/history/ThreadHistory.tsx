@@ -4,6 +4,7 @@ import type { Thread, User } from "../../../client/types";
 import { useThreadContext } from "../useThreadContext";
 import { SearchInput } from "../search/SearchInput";
 import { ThreadHistoryEntry } from "./ThreadHistoryEntry";
+import { ModalPuffLoader } from "../ModalPuffLoader";
 import "./threadHistory.css";
 
 export const ThreadHistory: FunctionComponent = () => {
@@ -41,6 +42,8 @@ export const ThreadHistory: FunctionComponent = () => {
               <ThreadHistoryEntry user_id={user.id} thread={thread} onDelete={handleDelete} />
             </Fragment>
           ))}
+
+          <ModalPuffLoader loading={isBusy} />
         </div>
       </div>
     </div>

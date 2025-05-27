@@ -7,5 +7,6 @@
   height: calc(100vh - 105px);
   overflow-y: auto;
   padding-right: 10px;
+  margin-bottom: 10px;
   box-sizing: border-box;
 }
