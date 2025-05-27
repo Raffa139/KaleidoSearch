@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from backend.src.app.dependencies import SessionDep, SummarizeGraphDep
 from backend.src.products.models import ProductOut, ProductIn
 from backend.src.products.service import ProductService
@@ -18,7 +18,11 @@ ServiceDep = Annotated[ProductService, Depends(product_service)]
 
 
 @router.get("/", response_model=list[ProductOut])
-def get_products(service: ServiceDep):
+def get_products(service: ServiceDep, ids: Annotated[str | None, Query(pattern="[\d]+,?")] = None):
+    if ids:
+        product_ids = [int(id) for id in ids.split(",") if id]
+        return service.find_by_ids(product_ids)
+
     return service.find_all()
 
 
