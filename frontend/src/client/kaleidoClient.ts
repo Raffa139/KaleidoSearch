@@ -1,4 +1,4 @@
-import type { Product, QueryEvaluation, Thread, User, UserAnswer } from "./types";
+import type { Product, ProductSummary, QueryEvaluation, Thread, User, UserAnswer } from "./types";
 
 const DEFAULT_HEADERS = {
   "Content-Type": "application/json"
@@ -125,17 +125,27 @@ class KaleidoClient {
     }
   }
 
-  async getRecommendations(uid: number, tid: number, rerank: boolean = false, summary_length: number = 25): Promise<Product[]> {
-    const response = await fetch(
-      `${this.url}/users/${uid}/threads/${tid}/recommendations?rerank=${rerank}&summary_length=${summary_length}`,
-      {
-        headers: DEFAULT_HEADERS
-      }
-    );
+  async getRecommendations(uid: number, tid: number, rerank: boolean = false): Promise<Product[]> {
+    const response = await fetch(`${this.url}/users/${uid}/threads/${tid}/recommendations?rerank=${rerank}`, {
+      headers: DEFAULT_HEADERS
+    });
 
     if (!response.ok) {
       console.error(response.status, await response.text());
       throw new Error("Failed to fetch product recommendations");
+    }
+
+    return response.json();
+  }
+
+  async summarizeProduct(id: number, summary_length: number = 25): Promise<ProductSummary> {
+    const response = await fetch(`${this.url}/products/${id}/summary?summary_length=${summary_length}`, {
+      headers: DEFAULT_HEADERS
+    });
+
+    if (!response.ok) {
+      console.error(response.status, await response.text());
+      throw new Error("Failed to fetch product summary");
     }
 
     return response.json();

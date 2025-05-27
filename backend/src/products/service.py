@@ -1,13 +1,21 @@
 from sqlmodel import Session, select, delete
 from sqlmodel.sql.expression import Select, SelectOfScalar
 from backend.src.products.models import Product, ProductIn
+from backend.src.products.graphs.summarize_graph import SummarizeGraph
+from backend.src.products.graphs.summarize_graph_state import ProductSummary
 from backend.src.shops.service import ShopService
 
 
 class ProductService:
-    def __init__(self, session: Session, shop_service: ShopService):
+    def __init__(
+            self,
+            session: Session,
+            shop_service: ShopService,
+            summarize_graph: SummarizeGraph
+    ):
         self._session = session
         self._shop_service = shop_service
+        self._summarize_graph = summarize_graph
 
     def find_all(self) -> list[Product]:
         return self._query(select(Product)).all()
@@ -32,6 +40,12 @@ class ProductService:
         ids = [product.id for product in products]
         self._query(delete(Product).where(Product.id.in_(ids)))
         self._session.commit()
+
+    def summarize(self, ids: list[int], summary_length: int = 100) -> list[ProductSummary]:
+        return self._summarize_graph.invoke(
+            product_ids=ids,
+            summary_length=summary_length
+        ).summarized_products
 
     def _validate_new_product(self, product_in: ProductIn) -> Product:
         shop = self._shop_service.find_by_id(product_in.shop_id)

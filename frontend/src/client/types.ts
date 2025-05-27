@@ -37,7 +37,6 @@ export interface Thread {
 
 export interface Product {
   title: string;
-  ai_title: string;
   price: number;
   description: string;
   url: string;
@@ -46,4 +45,9 @@ export interface Product {
     name: string;
     url: string;
   }
+}
+
+export interface ProductSummary {
+  ai_title: string;
+  ai_description: string;
 }

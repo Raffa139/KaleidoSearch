@@ -3,7 +3,7 @@ import { PhotoProvider, PhotoView } from "react-photo-view";
 import type { Product } from "../client/types";
 import "./productCard.css";
 
-export const ProductCard: FunctionComponent<Product> = ({ ai_title, price, description, url, thumbnail_url, shop }) => {
+export const ProductCard: FunctionComponent<Product> = ({ title, price, description, url, thumbnail_url, shop }) => {
   return (
     <div className="search-result">
       <PhotoProvider>
@@ -16,7 +16,7 @@ export const ProductCard: FunctionComponent<Product> = ({ ai_title, price, descr
         <div className="result-title">
           <a href={url} target="_blank">
             <h3>
-              {ai_title}
+              {title}
               <i className="fa-solid fa-arrow-up-right-from-square"></i>
             </h3>
           </a>

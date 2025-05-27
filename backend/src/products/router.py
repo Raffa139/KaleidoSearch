@@ -1,16 +1,17 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
-from backend.src.app.dependencies import SessionDep
+from backend.src.app.dependencies import SessionDep, SummarizeGraphDep
 from backend.src.products.models import ProductOut, ProductIn
 from backend.src.products.service import ProductService
+from backend.src.products.graphs.summarize_graph_state import ProductSummary
 from backend.src.shops.service import ShopService
 
 router = APIRouter(prefix="/products", tags=["products"])
 
 
-def product_service(session: SessionDep):
+def product_service(session: SessionDep, summarize_graph: SummarizeGraphDep):
     shop_service = ShopService(session)
-    return ProductService(session, shop_service)
+    return ProductService(session, shop_service, summarize_graph)
 
 
 ServiceDep = Annotated[ProductService, Depends(product_service)]
@@ -32,3 +33,11 @@ def get_product_by_id(id: int, service: ServiceDep):
     if not product:
         raise HTTPException(status_code=404)
     return product
+
+
+@router.get("/{id}/summary", response_model=list[ProductSummary])
+def summarize_product(id: int, service: ServiceDep, summary_length: int = 100):
+    if service.find_by_id(id):
+        return service.summarize([id], summary_length)
+
+    raise HTTPException(status_code=404)

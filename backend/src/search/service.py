@@ -55,8 +55,7 @@ class SearchService:
             self,
             thread_id: int,
             *,
-            rerank: bool = False,
-            summary_length: int = 100
+            rerank: bool = False
     ) -> list[ProductRecommendation] | None:
         config = self.__get_graph_config(thread_id)
         state = self._search_graph.get_state(config)
@@ -68,9 +67,8 @@ class SearchService:
 
         if documents := self._retrieve_graph.invoke(
                 query=query,
-                rerank_documents=rerank,
-                summary_length=summary_length
-        ).summarized_documents:
+                rerank_documents=rerank
+        ).relevant_documents:
             return self._map_documents_to_products(documents)
 
         return []
@@ -102,13 +100,11 @@ class SearchService:
         recommendations = []
 
         for document in documents:
-            metadata = document.metadata
-            ref_id = metadata.get("ref_id")
+            ref_id = document.metadata.get("ref_id")
             product = next(filter(lambda p: p.id == ref_id, products))
             recommendations.append(ProductRecommendation(
                 **product.model_dump(),
                 shop={**product.shop.model_dump()},
-                ai_title=metadata.get("ai_title"),
                 description=document.page_content
             ))
 

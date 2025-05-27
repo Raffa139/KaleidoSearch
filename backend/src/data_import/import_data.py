@@ -8,7 +8,7 @@ from backend.src.data_import.service import ImportService
 from backend.src.data_import.stopwatch import Stopwatch
 from backend.src.products.service import ProductService
 from backend.src.shops.service import ShopService
-from backend.src.app.dependencies import db_session, chroma
+from backend.src.app.dependencies import db_session, chroma, summarize_graph
 
 logging.basicConfig(format="%(asctime)s [%(name)s] %(levelname)s: %(message)s", level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ def main():
 
     with next(db_session()) as session:
         shop_service = ShopService(session)
-        product_service = ProductService(session, shop_service)
+        product_service = ProductService(session, shop_service, summarize_graph())
         import_service = ImportService(product_service, shop_service, chroma)
 
         data_files = get_data_files()

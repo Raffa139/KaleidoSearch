@@ -1,6 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
-from backend.src.app.dependencies import SessionDep, SearchGraphDep, RetrieveGraphDep
+from backend.src.app.dependencies import SessionDep, SearchGraphDep, RetrieveGraphDep, \
+    SummarizeGraphDep
 from backend.src.search.service import SearchService, ProductRecommendation
 from backend.src.search.models import QueryEvaluationOut, UserSearch, BaseUserSearch, NewUserSearch
 from backend.src.products.service import ProductService
@@ -22,10 +23,11 @@ def create_search_service(
         session: SessionDep,
         search_graph: SearchGraphDep,
         retrieve_graph: RetrieveGraphDep,
+        summarize_graph: SummarizeGraphDep,
         user_service: UserServiceDep
 ):
     shop_service = ShopService(session)
-    product_service = ProductService(session, shop_service)
+    product_service = ProductService(session, shop_service, summarize_graph)
     return SearchService(product_service, user_service, search_graph, retrieve_graph)
 
 
@@ -126,8 +128,7 @@ def get_recommendations_from_thread(
         tid: int,
         search_service: SearchServiceDep,
         user_service: UserServiceDep,
-        rerank: bool = False,
-        summary_length: int = 100
+        rerank: bool = False
 ):
     if not user_service.find_user_by_id(uid):
         raise HTTPException(status_code=401)
@@ -135,7 +136,7 @@ def get_recommendations_from_thread(
     if not user_service.has_user_access_to_thread(uid, tid):
         raise HTTPException(status_code=403)
 
-    return search_service.get_recommendations(tid, rerank=rerank, summary_length=summary_length)
+    return search_service.get_recommendations(tid, rerank=rerank)
 
 
 def handle_thread_posts(

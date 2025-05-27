@@ -12,6 +12,8 @@ from langchain_chroma import Chroma
 from langgraph.checkpoint.postgres import PostgresSaver
 from backend.src.search.graphs.search_graph import SearchGraph, build as build_search_graph
 from backend.src.search.graphs.retrieve_graph import RetrieveGraph, build as build_retrieve_graph
+from backend.src.products.graphs.summarize_graph import SummarizeGraph, \
+    build as build_summarize_graph
 from backend.src.environment import datasource_url, chroma_host, chroma_port, chroma_collection, \
     llm_model, llm_provider
 
@@ -56,6 +58,10 @@ def retrieve_graph():
     return build_retrieve_graph(llm, chroma_retriever, rerank_retriever)
 
 
+def summarize_graph():
+    return build_summarize_graph(llm, chroma)
+
+
 def db_session():
     with Session(db_engine) as session:
         yield session
@@ -66,3 +72,5 @@ SessionDep = Annotated[Session, Depends(db_session)]
 SearchGraphDep = Annotated[SearchGraph, Depends(search_graph)]
 
 RetrieveGraphDep = Annotated[RetrieveGraph, Depends(retrieve_graph)]
+
+SummarizeGraphDep = Annotated[SummarizeGraph, Depends(summarize_graph)]
