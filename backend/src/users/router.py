@@ -7,27 +7,32 @@ from backend.src.search.models import QueryEvaluationOut, UserSearch, BaseUserSe
 from backend.src.products.service import ProductService
 from backend.src.shops.service import ShopService
 from backend.src.users.service import UserService
-from backend.src.users.models import UserOut, UserIn, ThreadOut
+from backend.src.users.models import UserOut, UserIn, ThreadOut, BookmarkOut, BookmarkIn
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-def create_user_service(session: SessionDep):
-    return UserService(session)
+def create_product_service(session: SessionDep, summarize_graph: SummarizeGraphDep):
+    shop_service = ShopService(session)
+    return ProductService(session, shop_service, summarize_graph)
+
+
+ProductServiceDep = Annotated[ProductService, Depends(create_product_service)]
+
+
+def create_user_service(session: SessionDep, product_service: ProductServiceDep):
+    return UserService(session, product_service)
 
 
 UserServiceDep = Annotated[UserService, Depends(create_user_service)]
 
 
 def create_search_service(
-        session: SessionDep,
         search_graph: SearchGraphDep,
         retrieve_graph: RetrieveGraphDep,
-        summarize_graph: SummarizeGraphDep,
+        product_service: ProductServiceDep,
         user_service: UserServiceDep
 ):
-    shop_service = ShopService(session)
-    product_service = ProductService(session, shop_service, summarize_graph)
     return SearchService(product_service, user_service, search_graph, retrieve_graph)
 
 
@@ -50,6 +55,33 @@ def get_user_by_id(uid: int, user_service: UserServiceDep):
     if not user:
         raise HTTPException(status_code=404)
     return user
+
+
+@router.get("/{uid}/bookmarks", response_model=list[BookmarkOut])
+def get_user_bookmarks(uid: int, user_service: UserServiceDep):
+    if not user_service.find_user_by_id(uid):
+        raise HTTPException(status_code=401)
+
+    return user_service.find_user_bookmarks(uid)
+
+
+@router.post("/{uid}/bookmarks", response_model=BookmarkOut)
+def create_bookmark(uid: int, bookmark: BookmarkIn, user_service: UserServiceDep):
+    if not user_service.find_user_by_id(uid):
+        raise HTTPException(status_code=401)
+
+    return user_service.create_bookmark(uid, bookmark.product_id)
+
+
+@router.delete("/{uid}/bookmarks/{bookmark_id}")
+def delete_bookmark(uid: int, bookmark_id: int, user_service: UserServiceDep):
+    if not user_service.find_user_by_id(uid):
+        raise HTTPException(status_code=401)
+
+    if not user_service.has_user_access_to_bookmark(uid, bookmark_id):
+        raise HTTPException(status_code=403)
+
+    user_service.delete_bookmark(bookmark_id)
 
 
 @router.get("/{uid}/threads", response_model=list[ThreadOut])

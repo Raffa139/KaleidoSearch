@@ -34,3 +34,20 @@ class Thread(ThreadBase, table=True):
 
 class ThreadOut(ThreadBase):
     thread_id: int
+
+
+class BookmarkBase(SQLModel):
+    product_id: int = Field(foreign_key="product.id")
+
+
+class BookmarkIn(BookmarkBase):
+    pass
+
+
+class BookmarkOut(BookmarkBase):
+    id: int | None = Field(default=None, primary_key=True)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class Bookmark(BookmarkOut, table=True):
+    user_id: int = Field(foreign_key="user.id")
