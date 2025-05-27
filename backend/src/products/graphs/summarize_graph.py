@@ -27,7 +27,8 @@ product titles based on the enhanced description which are {n_words_titles} word
 purpose of product descriptions and titles is marketing the products to users looking to buy.
 
 Do not use any kind of text formatting. Do not echo my prompt. Do not remind me what I asked you 
-for. Do not apologize. Do not self-reference. Do not include Document IDs in your output.
+for. Do not apologize. Do not self-reference. Do not include Document IDs in your output. Only 
+write one description and title per document, even if only one document is provided.
 
 Here are the documents/products:
 
@@ -60,9 +61,10 @@ def summarize(llm: BaseChatModel, chroma: Chroma, s: SummarizeGraphState):
 
         return {"summarized_products": [
             ProductSummary(
-                ai_title=content.title,
-                ai_description=content.description
-            ) for content in summaries.list
+                id=summary.id,
+                ai_title=summary.title,
+                ai_description=summary.description
+            ) for summary in summaries.list
         ]}
 
     return invoke(s)

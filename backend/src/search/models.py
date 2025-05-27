@@ -63,5 +63,6 @@ class QueryEvaluationOut(QueryEvaluation):
 
 
 class ProductRecommendation(ProductBase):
+    id: int
     description: str
     shop: ShopBase

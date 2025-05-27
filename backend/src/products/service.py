@@ -41,10 +41,10 @@ class ProductService:
         self._query(delete(Product).where(Product.id.in_(ids)))
         self._session.commit()
 
-    def summarize(self, ids: list[int], summary_length: int = 100) -> list[ProductSummary]:
+    def summarize(self, ids: list[int], length: int = 100) -> list[ProductSummary]:
         return self._summarize_graph.invoke(
             product_ids=ids,
-            summary_length=summary_length
+            summary_length=length
         ).summarized_products
 
     def _validate_new_product(self, product_in: ProductIn) -> Product:

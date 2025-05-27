@@ -138,9 +138,11 @@ class KaleidoClient {
     return response.json();
   }
 
-  async summarizeProduct(id: number, summary_length: number = 25): Promise<ProductSummary> {
-    const response = await fetch(`${this.url}/products/${id}/summary?summary_length=${summary_length}`, {
-      headers: DEFAULT_HEADERS
+  async summarizeProducts(ids: number[], length: number = 25): Promise<ProductSummary[]> {
+    const response = await fetch(`${this.url}/products/summarize?length=${length}`, {
+      method: "POST",
+      headers: DEFAULT_HEADERS,
+      body: JSON.stringify(ids)
     });
 
     if (!response.ok) {

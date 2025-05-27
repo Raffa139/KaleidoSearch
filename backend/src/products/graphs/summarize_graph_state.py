@@ -22,6 +22,7 @@ class SummarizedContentList(BaseModel):
 
 
 class ProductSummary(BaseModel):
+    id: int
     ai_title: str
     ai_description: str
 
