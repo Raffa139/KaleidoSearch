@@ -3,28 +3,31 @@ import type { Product, ProductSummary } from "../client/types";
 import { client } from "../client/kaleidoClient";
 import { ProductCard } from "./ProductCard";
 
+const CACHED_SUMMARIES: ProductSummary[] = [];
+
 interface ProductProviderProps {
   products: Product[];
 }
 
 export const ProductProvider: FunctionComponent<ProductProviderProps> = ({ products }) => {
-  const [productSummaries, setProductSummaries] = useState<Partial<ProductSummary>[]>([]);
+  const [productSummaries, setProductSummaries] = useState<ProductSummary[]>([]);
 
   useEffect(() => {
-    const fetchProductSummary = async () => {
-      try {
-        const summaries = await client.Products.summarize(products.map(p => p.id));
-        setProductSummaries(summaries);
-      } catch (error) {
-        setProductSummaries(products.map(p => ({
-          ai_title: p.title,
-          ai_description: p.description
-        })));
+    const fetchProductSummaries = async () => {
+      const productIds = products.map(p => p.id);
+      const notInCache = productIds.filter(id => !CACHED_SUMMARIES.some(summary => summary.id === id));
+
+      if (notInCache.length > 0) {
+        const newSummaries = await client.Products.summarize(notInCache);
+        CACHED_SUMMARIES.push(...newSummaries);
       }
+
+      const summaries = CACHED_SUMMARIES.filter(summary => productIds.includes(summary.id));
+      setProductSummaries(summaries);
     };
 
     if (products.length > 0) {
-      fetchProductSummary();
+      fetchProductSummaries();
     }
   }, [products]);
 

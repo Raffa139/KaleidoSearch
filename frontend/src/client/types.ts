@@ -55,6 +55,7 @@ export interface Product {
 }
 
 export interface ProductSummary {
+  id: number;
   ai_title: string;
   ai_description: string;
 }

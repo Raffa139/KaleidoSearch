@@ -11,7 +11,11 @@ export class ProductsClient extends Http.ClientBase {
     return Http.get(`${this.baseUrl()}${idsParam ? "/?ids=" + idsParam : ""}`);
   }
 
-  summarize(ids: number[], length: number = 25): Promise<ProductSummary[]> {
-    return Http.post(`${this.baseUrl()}/summarize?length=${length}`, ids);
+  async summarize(ids: number[], length: number = 25): Promise<ProductSummary[]> {
+    if (ids.length > 0) {
+      return Http.post(`${this.baseUrl()}/summarize?length=${length}`, ids);
+    }
+
+    return [];
   }
 }
