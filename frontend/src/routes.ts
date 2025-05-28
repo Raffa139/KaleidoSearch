@@ -4,7 +4,6 @@ import { Layout } from './layout/Layout';
 import { Login } from './authentication/Login';
 import { Thread } from './user/threads/Thread';
 import { client } from './client/kaleidoClient';
-import { userLoader } from './authentication/userLoader';
 import { Home } from './user/home/Home';
 
 export const router = createBrowserRouter([
@@ -19,23 +18,23 @@ export const router = createBrowserRouter([
       const password = formData.get("password");
 
       const user = await client.Users.create(uuidv4(), username as string, null);
-      return redirect(`/users/${user.id}/threads`);
+      return redirect(`/users/${user.id}/home`);
     },
     Component: Login
   },
   {
     path: "users/:uid",
-    loader: userLoader,
+    loader: ({ params }) => client.Users.getById(params.uid!),
     Component: Layout,
     children: [
       {
         path: "home",
-        loader: async ({ params }) => client.Users.Threads(params.uid!).getAll(),
+        loader: ({ params }) => client.Users.Threads(params.uid!).getAll(),
         Component: Home
       },
       {
         path: "threads/:tid",
-        loader: async ({ params }) => client.Users.Threads(params.uid!).getQueryEvaluation(params.tid!),
+        loader: ({ params }) => client.Users.Threads(params.uid!).getQueryEvaluation(params.tid!),
         Component: Thread
       }
     ]

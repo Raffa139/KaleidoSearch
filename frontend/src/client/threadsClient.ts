@@ -1,7 +1,7 @@
-import { ClientBase, DEFAULT_HEADERS } from "./clientBase";
+import * as Http from "./clientBase";
 import type { Product, QueryEvaluation, Thread, UserAnswer } from "./types";
 
-export class ThreadsClient extends ClientBase {
+export class ThreadsClient extends Http.ClientBase {
   uid: number | string;
 
   constructor(host: string, port: number, uid: number | string, rootPath: string = "") {
@@ -18,54 +18,25 @@ export class ThreadsClient extends ClientBase {
   }
 
   async getAll(): Promise<Thread[]> {
-    const response = await fetch(`${this.baseUrl()}`, {
-      headers: DEFAULT_HEADERS
-    });
-
-    if (!response.ok) {
-      console.error(response.status, await response.text());
-      throw new Error("Failed to fetch user threads");
-    }
-
-    const json = await response.json();
+    const threads: Thread[] = await Http.get(`${this.baseUrl()}`);
 
     // Map dates from UTC to browsers timezone
-    return json.map((thread: Thread) => ({
+    return threads.map((thread: Thread) => ({
       ...thread,
       created_at: new Date(`${thread.created_at}Z`),
       updated_at: new Date(`${thread.updated_at}Z`)
     }));
   }
 
-  async create(query?: string): Promise<QueryEvaluation> {
-    const response = await fetch(`${this.baseUrl()}`, {
-      method: "POST",
-      headers: DEFAULT_HEADERS,
-      body: query ? JSON.stringify({ query: query.trim() }) : undefined
-    });
-
-    if (!response.ok) {
-      console.error(response.status, await response.text());
-      throw new Error("Failed to create new thread");
-    }
-
-    return response.json();
+  create(query?: string): Promise<QueryEvaluation> {
+    return Http.post(`${this.baseUrl()}`, query ? { query: query.trim() } : undefined);
   }
 
-  async getQueryEvaluation(tid: number | string): Promise<QueryEvaluation> {
-    const response = await fetch(`${this.baseUrl()}/${tid}`, {
-      headers: DEFAULT_HEADERS
-    });
-
-    if (!response.ok) {
-      console.error(response.status, await response.text());
-      throw new Error("Failed to fetch thread");
-    }
-
-    return response.json();
+  getQueryEvaluation(tid: number | string): Promise<QueryEvaluation> {
+    return Http.get(`${this.baseUrl()}/${tid}`);
   }
 
-  async post(tid: number | string, content: { query?: string, answers?: UserAnswer[] }): Promise<QueryEvaluation> {
+  post(tid: number | string, content: { query?: string, answers?: UserAnswer[] }): Promise<QueryEvaluation> {
     if (!content.query && !content.answers) {
       throw new Error("Either query string or answers must be provided");
     }
@@ -79,42 +50,14 @@ export class ThreadsClient extends ClientBase {
 
     console.log("Payload:", payload);
 
-    const response = await fetch(`${this.baseUrl()}/${tid}`, {
-      method: "POST",
-      headers: DEFAULT_HEADERS,
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      console.error(response.status, await response.text());
-      throw new Error("Failed to post to thread");
-    }
-
-    return response.json();
+    return Http.post(`${this.baseUrl()}/${tid}`, payload);
   }
 
-  async delete(tid: number | string): Promise<void> {
-    const response = await fetch(`${this.baseUrl()}/${tid}`, {
-      method: "DELETE",
-      headers: DEFAULT_HEADERS
-    });
-
-    if (!response.ok) {
-      console.error(response.status, await response.text());
-      throw new Error("Failed to delete thread");
-    }
+  delete(tid: number | string): Promise<void> {
+    return Http.delete_(`${this.baseUrl()}/${tid}`);
   }
 
-  async getRecommendations(tid: number | string, rerank: boolean = false): Promise<Product[]> {
-    const response = await fetch(`${this.baseUrl()}/${tid}/recommendations?rerank=${rerank}`, {
-      headers: DEFAULT_HEADERS
-    });
-
-    if (!response.ok) {
-      console.error(response.status, await response.text());
-      throw new Error("Failed to fetch product recommendations");
-    }
-
-    return response.json();
+  getRecommendations(tid: number | string, rerank: boolean = false): Promise<Product[]> {
+    return Http.get(`${this.baseUrl()}/${tid}/recommendations?rerank=${rerank}`);
   }
 }

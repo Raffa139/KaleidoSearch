@@ -1,9 +1,9 @@
 import { BookmarksClient } from "./bookmarksClient";
-import { ClientBase, DEFAULT_HEADERS } from "./clientBase";
+import * as Http from "./clientBase";
 import { ThreadsClient } from "./threadsClient";
 import type { User } from "./types";
 
-export class UsersClient extends ClientBase {
+export class UsersClient extends Http.ClientBase {
   Bookmarks: (uid: number | string) => BookmarksClient;
   Threads: (uid: number | string) => ThreadsClient;
 
@@ -17,29 +17,11 @@ export class UsersClient extends ClientBase {
     return "users";
   }
 
-  async create(sub_id: string, username: string, picture_url: string | null): Promise<User> {
-    const response = await fetch(`${this.baseUrl()}`, {
-      method: "POST",
-      headers: DEFAULT_HEADERS,
-      body: JSON.stringify({ sub_id, username, picture_url })
-    });
-
-    if (!response.ok) {
-      console.error(response.status, await response.text());
-      throw new Error("Failed to create user");
-    }
-
-    return response.json();
+  create(sub_id: string, username: string, picture_url: string | null): Promise<User> {
+    return Http.post(`${this.baseUrl()}`, { sub_id, username, picture_url });
   }
 
-  async getById(uid: number | string): Promise<User> {
-    const response = await fetch(`${this.baseUrl()}/${uid}`, { headers: DEFAULT_HEADERS });
-
-    if (!response.ok) {
-      console.error(response.status, await response.text());
-      throw new Error("Failed to fetch user");
-    }
-
-    return response.json();
+  getById(uid: number | string): Promise<User> {
+    return Http.get(`${this.baseUrl()}/${uid}`);
   }
 }
