@@ -1,12 +1,39 @@
-import type { FunctionComponent } from "react";
+import { useEffect, useState, type FunctionComponent } from "react";
+import { useOutletContext } from "react-router";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import Skeleton from "react-loading-skeleton";
-import type { Product, ProductSummary } from "../client/types";
+import type { Bookmark, Product, ProductSummary, User } from "../client/types";
+import { client } from "../client/kaleidoClient";
 import "./productCard.css";
 
 type ProductCardProps = Product & Partial<ProductSummary>
 
-export const ProductCard: FunctionComponent<ProductCardProps> = ({ ai_title, price, ai_description, url, thumbnail_url, shop }) => {
+export const ProductCard: FunctionComponent<ProductCardProps> = ({ id: product_id, ai_title, price, ai_description, url, thumbnail_url, shop }) => {
+  const { id: uid } = useOutletContext<User>();
+
+  const [bookmark, setBookmark] = useState<Bookmark>();
+
+  useEffect(() => {
+    const fetchBookmark = async () => {
+      const bookmark = await client.Users.Bookmarks(uid).getByProductId(product_id);
+      if (bookmark) {
+        setBookmark(bookmark);
+      }
+    };
+
+    fetchBookmark();
+  }, [product_id]);
+
+  const handleBookmarking = async () => {
+    if (bookmark) {
+      client.Users.Bookmarks(uid).delete(bookmark.id);
+      setBookmark(undefined);
+    } else {
+      const bookmark = await client.Users.Bookmarks(uid).create(product_id);
+      setBookmark(bookmark);
+    }
+  };
+
   return (
     <div className="search-result">
       <PhotoProvider>
@@ -31,9 +58,11 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({ ai_title, pri
           </a>
 
           <div className="result-icon-btns">
-            <button className="icon-btn"><i className="fas fa-bookmark"></i></button>
+            <button onClick={handleBookmarking} className={`icon-btn ${bookmark ? "btn-active" : ""}`}>
+              <i className="fas fa-bookmark"></i>
+            </button>
+
             <button className="icon-btn"><i className="fa-solid fa-share-nodes"></i></button>
-            {/* <button className="icon-btn"><i className="fa-solid fa-wand-magic-sparkles"></i></button> */}
           </div>
         </div>
 

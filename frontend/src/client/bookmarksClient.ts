@@ -27,8 +27,12 @@ export class BookmarksClient extends Http.ClientBase {
     }));
   }
 
-  getByProductId(product_id: number): Promise<Bookmark> {
-    return Http.get(`${this.baseUrl()}/${product_id}`);
+  async getByProductId(product_id: number): Promise<Bookmark | null> {
+    try {
+      return await Http.get(`${this.baseUrl()}/${product_id}`);
+    } catch (error) {
+      return null;
+    }
   }
 
   create(product_id: number): Promise<Bookmark> {
