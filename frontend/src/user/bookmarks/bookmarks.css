@@ -1,0 +1,7 @@
+.bookmarks {
+  width: 100%;
+}
+
+.results-container {
+  height: calc(100vh - 90px);
+}

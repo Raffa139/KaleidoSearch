@@ -43,9 +43,9 @@ export interface Bookmark {
 
 export interface Product {
   id: number;
-  title: string;
+  title?: string;
   price: number;
-  description: string;
+  description?: string;
   url: string;
   thumbnail_url?: string;
   shop: {

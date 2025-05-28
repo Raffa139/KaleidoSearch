@@ -8,7 +8,7 @@ interface ProductProviderProps {
 }
 
 export const ProductProvider: FunctionComponent<ProductProviderProps> = ({ products }) => {
-  const [productSummaries, setProductSummaries] = useState<ProductSummary[]>([]);
+  const [productSummaries, setProductSummaries] = useState<Partial<ProductSummary>[]>([]);
 
   useEffect(() => {
     const fetchProductSummary = async () => {

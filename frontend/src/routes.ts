@@ -5,6 +5,7 @@ import { Login } from './authentication/Login';
 import { Thread } from './user/threads/Thread';
 import { client } from './client/kaleidoClient';
 import { Home } from './user/home/Home';
+import { Bookmarks } from './user/bookmarks/Bookmarks';
 
 export const router = createBrowserRouter([
   {
@@ -31,6 +32,11 @@ export const router = createBrowserRouter([
         path: "home",
         loader: ({ params }) => client.Users.Threads(params.uid!).getAll(),
         Component: Home
+      },
+      {
+        path: "bookmarks",
+        loader: ({ params }) => client.Users.Bookmarks(params.uid!).getAll(),
+        Component: Bookmarks
       },
       {
         path: "threads/:tid",
