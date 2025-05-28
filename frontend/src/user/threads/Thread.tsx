@@ -11,7 +11,7 @@ export const Thread: FunctionComponent = () => {
   const thread = useLoaderData<QueryEvaluation>();
   const user = useOutletContext<User>();
 
-  const { isBusy, getRecommendations } = useThreadContext();
+  const { isBusy, getRecommendations } = useThreadContext({ user });
 
   const [queryEvaluation, setQueryEvaluation] = useState<QueryEvaluation | undefined>(thread);
   const [products, setProducts] = useState<Product[]>([]);
@@ -22,7 +22,7 @@ export const Thread: FunctionComponent = () => {
 
   const handleSearch = async (queryEvaluation?: QueryEvaluation) => {
     setQueryEvaluation(queryEvaluation);
-    const products = await getRecommendations(user.id, thread.thread_id);
+    const products = await getRecommendations(thread.thread_id);
     setProducts(products);
     setHasSearched(true);
     setHasSearchResults(products.length > 0);

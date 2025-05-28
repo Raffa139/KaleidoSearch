@@ -18,7 +18,7 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
 
   const navigate = useNavigate();
 
-  const { isBusy, rerank, setRerank, postToThread } = useThreadContext();
+  const { isBusy, rerank, setRerank, postToThread } = useThreadContext({ user });
 
   const [search, setSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [lastSearch, setLastSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
@@ -28,7 +28,7 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
   const handleSearch = async () => {
     try {
       const content = { query: lastSearch !== search ? search : undefined, answers };
-      const result = await postToThread(user.id, thread_id, content);
+      const result = await postToThread(thread_id, content);
       console.log("Search result:", result);
       console.log("Answers:", answers);
       onSearch(result);

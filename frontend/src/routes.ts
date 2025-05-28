@@ -18,7 +18,7 @@ export const router = createBrowserRouter([
       const username = formData.get("username");
       const password = formData.get("password");
 
-      const user = await client.createUser(uuidv4(), username as string, null);
+      const user = await client.Users.create(uuidv4(), username as string, null);
       return redirect(`/users/${user.id}/threads`);
     },
     Component: Login
@@ -30,12 +30,12 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "home",
-        loader: async ({ params }) => client.getUserThreads(Number(params.uid)),
+        loader: async ({ params }) => client.Users.Threads(params.uid!).getAll(),
         Component: Home
       },
       {
         path: "threads/:tid",
-        loader: async ({ params }) => client.getUserThread(Number(params.uid), Number(params.tid)),
+        loader: async ({ params }) => client.Users.Threads(params.uid!).getQueryEvaluation(params.tid!),
         Component: Thread
       }
     ]

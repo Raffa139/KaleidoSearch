@@ -13,7 +13,7 @@ export const ProductProvider: FunctionComponent<ProductProviderProps> = ({ produ
   useEffect(() => {
     const fetchProductSummary = async () => {
       try {
-        const summaries = await client.summarizeProducts(products.map(p => p.id));
+        const summaries = await client.Products.summarize(products.map(p => p.id));
         setProductSummaries(summaries);
       } catch (error) {
         setProductSummaries(products.map(p => ({

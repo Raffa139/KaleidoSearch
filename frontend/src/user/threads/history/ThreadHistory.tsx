@@ -13,14 +13,14 @@ export const ThreadHistory: FunctionComponent = () => {
 
   const navigate = useNavigate();
 
-  const { isBusy, createThread } = useThreadContext();
+  const { isBusy, createThread } = useThreadContext({ user });
 
   const [threads, setThreads] = useState<Thread[]>(loadedThreads);
   const [newSearch, setNewSearch] = useState<string>("");
 
   const handleNewSearch = async () => {
     if (newSearch.trim()) {
-      const { thread_id } = await createThread(user.id, newSearch);
+      const { thread_id } = await createThread(newSearch);
       navigate(`/users/${user.id}/threads/${thread_id}`);
     }
   };

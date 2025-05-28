@@ -23,7 +23,7 @@ export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({
 
   useEffect(() => {
     const fetchThreadTitle = async () => {
-      const queryEvaluation = await client.getUserThread(user_id, thread.thread_id);
+      const queryEvaluation = await client.Users.Threads(user_id).getQueryEvaluation(thread.thread_id);
       if (queryEvaluation.cleaned_query) {
         setTitle(capitalizeSentence(queryEvaluation.cleaned_query));
       } else {
@@ -35,7 +35,7 @@ export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({
   }, [thread.thread_id]);
 
   const handleDelete = () => {
-    client.deleteThread(user_id, thread.thread_id);
+    client.Users.Threads(user_id).delete(thread.thread_id);
     onDelete(thread.thread_id);
   };
 
