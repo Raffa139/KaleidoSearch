@@ -73,6 +73,17 @@ def create_bookmark(uid: int, bookmark: BookmarkIn, user_service: UserServiceDep
     return user_service.create_bookmark(uid, bookmark.product_id)
 
 
+@router.get("/{uid}/bookmarks/{product_id}", response_model=BookmarkOut)
+def get_user_bookmark_by_product_id(uid: int, product_id: int, user_service: UserServiceDep):
+    if not user_service.find_user_by_id(uid):
+        raise HTTPException(status_code=401)
+
+    if bookmark := user_service.find_bookmark_by_user_product_id(uid, product_id):
+        return bookmark
+
+    raise HTTPException(status_code=404)
+
+
 @router.delete("/{uid}/bookmarks/{bookmark_id}")
 def delete_bookmark(uid: int, bookmark_id: int, user_service: UserServiceDep):
     if not user_service.find_user_by_id(uid):

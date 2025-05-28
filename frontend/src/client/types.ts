@@ -35,6 +35,12 @@ export interface Thread {
   updated_at: Date;
 }
 
+export interface Bookmark {
+  id: number;
+  product_id: number;
+  created_at: Date;
+}
+
 export interface Product {
   id: number;
   title: string;

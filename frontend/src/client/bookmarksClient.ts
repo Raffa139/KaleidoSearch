@@ -1,4 +1,5 @@
 import * as Http from "./clientBase";
+import type { Bookmark } from "./types";
 
 export class BookmarksClient extends Http.ClientBase {
   uid: number | string;
@@ -14,5 +15,27 @@ export class BookmarksClient extends Http.ClientBase {
 
   baseUrl(): string {
     return super.baseUrl().replace("{uid}", String(this.uid));
+  }
+
+  async getAll(): Promise<Bookmark[]> {
+    const bookmarks: Bookmark[] = await Http.get(`${this.baseUrl()}`);
+
+    // Map date from UTC to browsers timezone
+    return bookmarks.map((bookmark) => ({
+      ...bookmark,
+      created_at: new Date(`${bookmark.created_at}Z`)
+    }));
+  }
+
+  getByProductId(product_id: number): Promise<Bookmark> {
+    return Http.get(`${this.baseUrl()}/${product_id}`);
+  }
+
+  create(product_id: number): Promise<Bookmark> {
+    return Http.post(`${this.baseUrl()}`, { product_id });
+  }
+
+  delete(id: number | string): Promise<void> {
+    return Http.delete_(`${this.baseUrl()}/${id}`)
   }
 }
