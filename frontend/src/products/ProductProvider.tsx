@@ -1,15 +1,15 @@
 import { Fragment, useEffect, useState, type FunctionComponent } from "react";
 import type { Product, ProductSummary } from "../client/types";
 import { client } from "../client/kaleidoClient";
-import { ProductCard } from "./ProductCard";
+import { ProductCard, type AdditionalProductCardProps } from "./ProductCard";
 
 const CACHED_SUMMARIES: ProductSummary[] = [];
 
-interface ProductProviderProps {
+interface ProductProviderProps extends AdditionalProductCardProps {
   products: Product[];
 }
 
-export const ProductProvider: FunctionComponent<ProductProviderProps> = ({ products }) => {
+export const ProductProvider: FunctionComponent<ProductProviderProps> = ({ products, ...additional }) => {
   const [productSummaries, setProductSummaries] = useState<ProductSummary[]>([]);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export const ProductProvider: FunctionComponent<ProductProviderProps> = ({ produ
 
   return products ? products.map((product, i) => (
     <Fragment key={product.id}>
-      <ProductCard {...product} {...productSummaries[i]} />
+      <ProductCard {...product} {...productSummaries[i]} {...additional} />
     </Fragment>
   )) : null;
 };

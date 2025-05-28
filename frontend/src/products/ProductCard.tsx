@@ -6,9 +6,26 @@ import type { Bookmark, Product, ProductSummary, User } from "../client/types";
 import { client } from "../client/kaleidoClient";
 import "./productCard.css";
 
-type ProductCardProps = Product & Partial<ProductSummary>
+export interface AdditionalProductCardProps {
+  showBookmarkDate?: boolean;
+  onBookmarkAdd?: (productId: number) => void;
+  onBookmarkRemove?: (productId: number) => void;
+}
 
-export const ProductCard: FunctionComponent<ProductCardProps> = ({ id: productId, ai_title, price, ai_description, url, thumbnail_url, shop }) => {
+type ProductCardProps = Product & AdditionalProductCardProps & Partial<ProductSummary>
+
+export const ProductCard: FunctionComponent<ProductCardProps> = ({
+  id: productId,
+  ai_title,
+  ai_description,
+  price,
+  url,
+  thumbnail_url,
+  shop,
+  showBookmarkDate,
+  onBookmarkAdd,
+  onBookmarkRemove
+}) => {
   const { id: uid } = useOutletContext<User>();
 
   const [bookmark, setBookmark] = useState<Bookmark>();
@@ -26,9 +43,11 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({ id: productId
 
   const handleBookmarking = async () => {
     if (bookmark) {
+      onBookmarkRemove?.(productId);
       client.Users.Bookmarks(uid).delete(bookmark.id);
       setBookmark(undefined);
     } else {
+      onBookmarkAdd?.(productId);
       const bookmark = await client.Users.Bookmarks(uid).create(productId);
       setBookmark(bookmark);
     }

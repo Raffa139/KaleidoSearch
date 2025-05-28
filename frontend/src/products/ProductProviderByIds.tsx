@@ -2,13 +2,18 @@ import { useEffect, useState, type FunctionComponent } from "react";
 import type { Product } from "../client/types";
 import { client } from "../client/kaleidoClient";
 import { ProductProvider } from "./ProductProvider";
+import type { AdditionalProductCardProps } from "./ProductCard";
 
-interface ProductProviderByIdsProps {
+interface ProductProviderByIdsProps extends AdditionalProductCardProps {
   productIds: number[];
 }
 
-export const ProductProviderByIds: FunctionComponent<ProductProviderByIdsProps> = ({ productIds }) => {
+export const ProductProviderByIds: FunctionComponent<ProductProviderByIdsProps> = ({ productIds, ...additional }) => {
   const [products, setProducts] = useState<Product[]>([]);
+
+  const handleBookmarkRemove = (productId: number) => {
+    setProducts(prevProducts => prevProducts.filter(product => product.id !== productId));
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -21,5 +26,5 @@ export const ProductProviderByIds: FunctionComponent<ProductProviderByIdsProps> 
     }
   }, [productIds]);
 
-  return products ? <ProductProvider products={products} /> : null;
+  return products ? <ProductProvider onBookmarkRemove={handleBookmarkRemove} products={products} {...additional} /> : null;
 };
