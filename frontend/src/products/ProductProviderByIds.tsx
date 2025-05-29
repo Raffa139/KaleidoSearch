@@ -26,5 +26,7 @@ export const ProductProviderByIds: FunctionComponent<ProductProviderByIdsProps> 
     }
   }, [productIds]);
 
-  return products ? <ProductProvider onBookmarkRemove={handleBookmarkRemove} products={products} {...additional} /> : null;
+  return products.length > 0 ? (
+    <ProductProvider onBookmarkRemove={handleBookmarkRemove} products={products} {...additional} />
+  ) : null;
 };

@@ -10,11 +10,11 @@ interface ProductProviderProps extends AdditionalProductCardProps {
 }
 
 export const ProductProvider: FunctionComponent<ProductProviderProps> = ({ products, ...additional }) => {
-  const [productSummaries, setProductSummaries] = useState<ProductSummary[]>([]);
+  const [summarizedProducts, setSummarizedProducts] = useState<Array<Product & Partial<ProductSummary>>>(products);
 
   useEffect(() => {
     const fetchProductSummaries = async () => {
-      const productIds = products.map(p => p.id);
+      const productIds = products.map(product => product.id);
       const notInCache = productIds.filter(id => !CACHED_SUMMARIES.some(summary => summary.id === id));
 
       if (notInCache.length > 0) {
@@ -22,8 +22,12 @@ export const ProductProvider: FunctionComponent<ProductProviderProps> = ({ produ
         CACHED_SUMMARIES.push(...newSummaries);
       }
 
-      const summaries = CACHED_SUMMARIES.filter(summary => productIds.includes(summary.id));
-      setProductSummaries(summaries);
+      const summarized = products.map(product => ({
+        ...product,
+        ...CACHED_SUMMARIES.find(summary => summary.id === product.id)
+      }))
+
+      setSummarizedProducts(summarized);
     };
 
     if (products.length > 0) {
@@ -31,9 +35,9 @@ export const ProductProvider: FunctionComponent<ProductProviderProps> = ({ produ
     }
   }, [products]);
 
-  return products ? products.map((product, i) => (
-    <Fragment key={product.id}>
-      <ProductCard {...product} {...productSummaries[i]} {...additional} />
+  return products.length > 0 ? summarizedProducts.map(summarizedProduct => (
+    <Fragment key={summarizedProduct.id}>
+      <ProductCard {...summarizedProduct} {...additional} />
     </Fragment>
   )) : null;
 };
