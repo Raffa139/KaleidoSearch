@@ -14,7 +14,7 @@ export const Bookmarks: FunctionComponent = () => {
         <h2 className="title-header">Bookmarks</h2>
 
         <div className="results-container">
-          <ProductProviderByIds productIds={productIds} />
+          <ProductProviderByIds productIds={productIds} showBookmarkDate />
         </div>
       </div>
     </div>

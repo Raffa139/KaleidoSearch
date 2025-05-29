@@ -19,27 +19,29 @@ export class BookmarksClient extends Http.ClientBase {
 
   async getAll(): Promise<Bookmark[]> {
     const bookmarks: Bookmark[] = await Http.get(`${this.baseUrl()}`);
-
-    // Map date from UTC to browsers timezone
-    return bookmarks.map((bookmark) => ({
-      ...bookmark,
-      created_at: new Date(`${bookmark.created_at}Z`)
-    }));
+    return bookmarks.map(this.toLocalTime);
   }
 
   async getByProductId(productId: number): Promise<Bookmark | null> {
     try {
-      return await Http.get(`${this.baseUrl()}/${productId}`);
+      return this.toLocalTime(await Http.get(`${this.baseUrl()}/${productId}`));
     } catch (error) {
       return null;
     }
   }
 
-  create(productId: number): Promise<Bookmark> {
-    return Http.post(`${this.baseUrl()}`, { product_id: productId });
+  async create(productId: number): Promise<Bookmark> {
+    return this.toLocalTime(await Http.post(`${this.baseUrl()}`, { product_id: productId }));
   }
 
   delete(id: number | string): Promise<void> {
     return Http.delete_(`${this.baseUrl()}/${id}`)
+  }
+
+  private toLocalTime(bookmark: Bookmark): Bookmark {
+    return {
+      ...bookmark,
+      created_at: new Date(`${bookmark.created_at}Z`)
+    };
   }
 }

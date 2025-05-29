@@ -13,25 +13,27 @@ export const ProductSkeleton: FunctionComponent<ProductSkeletonProps> = ({ loadi
     <>
       {skeletons.map((i) => (
         <div key={i} className="search-result" >
-          <div className="result-image">
-            <Skeleton className="result-image" />
-          </div>
+          <div className="result-content">
+            <div className="result-image">
+              <Skeleton className="result-image" />
+            </div>
 
-          <div className="result-content" >
-            <Skeleton width={300} />
+            <div className="result-text-content" >
+              <Skeleton width={300} />
 
-            <span className="shop-tag">
-              <Skeleton width={100} />
-            </span>
+              <span className="shop-tag">
+                <Skeleton width={100} />
+              </span>
 
-            <span className="price-tag">
-              <Skeleton width={50} />
-            </span>
+              <span className="price-tag">
+                <Skeleton width={50} />
+              </span>
 
-            <p className="result-description">
-              <Skeleton width={400} />
-              <Skeleton width={350} />
-            </p>
+              <span className="result-description">
+                <Skeleton width={400} />
+                <Skeleton width={350} />
+              </span>
+            </div>
           </div>
         </div>
       ))}

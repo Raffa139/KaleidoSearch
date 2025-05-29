@@ -21,7 +21,8 @@ ServiceDep = Annotated[ProductService, Depends(product_service)]
 def get_products(service: ServiceDep, ids: Annotated[str | None, Query(pattern="[\d]+,?")] = None):
     if ids:
         product_ids = [int(id) for id in ids.split(",") if id]
-        return service.find_by_ids(product_ids)
+        products = service.find_by_ids(product_ids)
+        return sorted(products, key=lambda p: product_ids.index(p.id))
 
     return service.find_all()
 
