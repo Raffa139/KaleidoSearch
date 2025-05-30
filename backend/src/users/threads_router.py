@@ -48,6 +48,14 @@ def create_search_service(
 SearchServiceDep = Annotated[SearchService, Depends(create_search_service)]
 
 
+def user_has_thread_access(tid: int, user: CurrentUserDep, user_service: UserServiceDep):
+    if not user_service.has_user_access_to_thread(user.id, tid):
+        raise HTTPException(status_code=403)
+
+
+UserHasThreadAccess = Depends(user_has_thread_access)
+
+
 @router.get("/", response_model=list[ThreadOut])
 def get_user_threads(user: CurrentUserDep, user_service: UserServiceDep):
     threads = user_service.find_user_threads(user.id)
@@ -71,52 +79,39 @@ def create_thread(
             follow_up_questions=[]
         )
 
-    return handle_thread_posts(user.id, None, user_search, search_service, user_service)
+    return handle_thread_posts(user.id, None, user_search, search_service)
 
 
-@router.get("/{tid}", response_model=QueryEvaluationOut)
-def get_user_thread(
-        tid: int,
-        user: CurrentUserDep,
-        search_service: SearchServiceDep,
-        user_service: UserServiceDep
-):
-    if tid and not user_service.has_user_access_to_thread(user.id, tid):
-        raise HTTPException(status_code=403)
-
+@router.get("/{tid}", dependencies=[UserHasThreadAccess], response_model=QueryEvaluationOut)
+def get_user_thread(tid: int, search_service: SearchServiceDep):
     return search_service.get_query_evaluation(tid)
 
 
-@router.post("/{tid}", response_model=QueryEvaluationOut)
+@router.post("/{tid}", dependencies=[UserHasThreadAccess], response_model=QueryEvaluationOut)
 def post_to_thread(
         tid: int,
         user: CurrentUserDep,
         user_search: UserSearch,
-        search_service: SearchServiceDep,
-        user_service: UserServiceDep
+        search_service: SearchServiceDep
 ):
-    return handle_thread_posts(user.id, tid, user_search, search_service, user_service)
+    return handle_thread_posts(user.id, tid, user_search, search_service)
 
 
-@router.delete("/{tid}")
-def delete_thread(tid: int, user: CurrentUserDep, user_service: UserServiceDep):
-    if tid and not user_service.has_user_access_to_thread(user.id, tid):
-        raise HTTPException(status_code=403)
-
+@router.delete("/{tid}", dependencies=[UserHasThreadAccess])
+def delete_thread(tid: int, user_service: UserServiceDep):
     user_service.delete_thread(tid)
 
 
-@router.get("/{tid}/recommendations", response_model=list[ProductRecommendation])
+@router.get(
+    "/{tid}/recommendations",
+    dependencies=[UserHasThreadAccess],
+    response_model=list[ProductRecommendation]
+)
 def get_recommendations_from_thread(
         tid: int,
-        user: CurrentUserDep,
         search_service: SearchServiceDep,
-        user_service: UserServiceDep,
         rerank: bool = False
 ):
-    if not user_service.has_user_access_to_thread(user.id, tid):
-        raise HTTPException(status_code=403)
-
     return search_service.get_recommendations(tid, rerank=rerank)
 
 
@@ -124,10 +119,6 @@ def handle_thread_posts(
         uid: int,
         tid: int | None,
         user_search: BaseUserSearch,
-        search_service: SearchServiceDep,
-        user_service: UserServiceDep
+        search_service: SearchServiceDep
 ) -> QueryEvaluationOut:
-    if tid and not user_service.has_user_access_to_thread(uid, tid):
-        raise HTTPException(status_code=403)
-
     return search_service.evaluate_user_query(user_search, uid, tid)

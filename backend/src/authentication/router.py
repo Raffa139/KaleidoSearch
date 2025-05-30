@@ -16,8 +16,7 @@ from backend.src.users.models import User, UserIn
 from backend.src.environment import google_client_id, secret_key, access_token_expire_minutes, \
     algorithm, admin_password
 
-router = APIRouter(prefix="/auth", tags=["authentication"],
-                   responses={498: {"description": "Token expired"}})
+router = APIRouter(prefix="/auth", tags=["authentication"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
