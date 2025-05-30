@@ -1,13 +1,13 @@
-import * as Http from "./clientBase";
+import { BaseClient } from "./baseClient";
 import type { Product, QueryEvaluation, Thread, UserAnswer } from "./types";
 
-export class ThreadsClient extends Http.ClientBase {
+export class ThreadsClient extends BaseClient {
   resource(): string {
     return "me/threads";
   }
 
   async getAll(): Promise<Thread[]> {
-    const threads: Thread[] = await Http.get(`${this.baseUrl()}`);
+    const threads: Thread[] = await this.Http.get();
 
     // Map dates from UTC to browsers timezone
     return threads.map((thread: Thread) => ({
@@ -18,11 +18,11 @@ export class ThreadsClient extends Http.ClientBase {
   }
 
   create(query?: string): Promise<QueryEvaluation> {
-    return Http.post(`${this.baseUrl()}`, query ? { query: query.trim() } : undefined);
+    return this.Http.post(query ? { query: query.trim() } : undefined);
   }
 
   getQueryEvaluation(tid: number | string): Promise<QueryEvaluation> {
-    return Http.get(`${this.baseUrl()}/${tid}`);
+    return this.Http.get(`${tid}`);
   }
 
   post(tid: number | string, content: { query?: string, answers?: UserAnswer[] }): Promise<QueryEvaluation> {
@@ -39,14 +39,14 @@ export class ThreadsClient extends Http.ClientBase {
 
     console.log("Payload:", payload);
 
-    return Http.post(`${this.baseUrl()}/${tid}`, payload);
+    return this.Http.post(payload, `${tid}`);
   }
 
   delete(tid: number | string): Promise<void> {
-    return Http.delete_(`${this.baseUrl()}/${tid}`);
+    return this.Http.delete_(`${tid}`);
   }
 
   getRecommendations(tid: number | string, rerank: boolean = false): Promise<Product[]> {
-    return Http.get(`${this.baseUrl()}/${tid}/recommendations?rerank=${rerank}`);
+    return this.Http.get(`${tid}`, `recommendations?rerank=${rerank}`);
   }
 }

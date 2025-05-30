@@ -1,30 +1,30 @@
-import * as Http from "./clientBase";
+import { BaseClient } from "./baseClient";
 import type { Bookmark } from "./types";
 
-export class BookmarksClient extends Http.ClientBase {
+export class BookmarksClient extends BaseClient {
   resource(): string {
     return "me/bookmarks";
   }
 
   async getAll(): Promise<Bookmark[]> {
-    const bookmarks: Bookmark[] = await Http.get(`${this.baseUrl()}`);
+    const bookmarks: Bookmark[] = await this.Http.get();
     return bookmarks.map(this.toLocalTime);
   }
 
   async getByProductId(productId: number): Promise<Bookmark | null> {
     try {
-      return this.toLocalTime(await Http.get(`${this.baseUrl()}/${productId}`));
+      return this.toLocalTime(await this.Http.get(`${productId}`));
     } catch (error) {
       return null;
     }
   }
 
   async create(productId: number): Promise<Bookmark> {
-    return this.toLocalTime(await Http.post(`${this.baseUrl()}`, { product_id: productId }));
+    return this.toLocalTime(await this.Http.post({ product_id: productId }));
   }
 
   delete(id: number | string): Promise<void> {
-    return Http.delete_(`${this.baseUrl()}/${id}`)
+    return this.Http.delete_(`${id}`)
   }
 
   private toLocalTime(bookmark: Bookmark): Bookmark {

@@ -1,12 +1,12 @@
-import * as Http from "./clientBase";
+import { BaseClient } from "./baseClient";
 import type { Token } from "./types";
 
-export class AuthClient extends Http.ClientBase {
+export class AuthClient extends BaseClient {
   resource(): string {
-    return "auth";
+    return "auth/token";
   }
 
   googleLogin(idToken: string): Promise<Token> {
-    return Http.post(`${this.baseUrl()}/token/google`, { id_token: idToken });
+    return this.Http.post({ id_token: idToken }, "google");
   }
 }

@@ -1,9 +1,9 @@
 import { BookmarksClient } from "./bookmarksClient";
-import * as Http from "./clientBase";
+import { BaseClient } from "./baseClient";
 import { ThreadsClient } from "./threadsClient";
 import type { User } from "./types";
 
-export class UsersClient extends Http.ClientBase {
+export class UsersClient extends BaseClient {
   Bookmarks: BookmarksClient;
   Threads: ThreadsClient;
 
@@ -18,10 +18,10 @@ export class UsersClient extends Http.ClientBase {
   }
 
   create(sub_id: string, username: string, picture_url: string | null): Promise<User> {
-    return Http.post(`${this.baseUrl()}`, { sub_id, username, picture_url });
+    return this.Http.post({ sub_id, username, picture_url });
   }
 
   getAuthenticated(): Promise<User> {
-    return Http.get(`${this.baseUrl()}/me`);
+    return this.Http.get("me");
   }
 }
