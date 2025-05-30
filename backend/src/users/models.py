@@ -15,7 +15,7 @@ class UserIn(UserBase):
 
 
 class UserOut(UserBase):
-    id: int
+    pass
 
 
 class User(UserBase, table=True):

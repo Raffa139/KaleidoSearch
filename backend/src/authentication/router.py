@@ -58,9 +58,8 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], user_service
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 
-# TODO: Secure relevant routes
-# TODO: Secure uid based routes with admin permission only (or not have them)
-# TODO: Create "/me" versions of e.g. /threads route
+# TODO: Secure relevant routes with admin permission only
+# TODO: Store username & profile picture from Google in DB
 
 
 def create_access_token(data: dict):
