@@ -64,16 +64,31 @@ search endeavours.
    ```.env
    OPENAI_API_KEY="<Your-API-Key>"
    GOOGLE_API_KEY="<Your-API-Key>"
+   
+   AUTH_GOOGLE_CLIENT_ID="<Optional-Your-Google-Client-ID>"
+   AUTH_SECRET_KEY="<Generate-Using-Openssl>"
+   AUTH_ACCESS_TOKEN_EXPIRE_MINUTES=60
+   AUTH_ALGORITHM="HS256"
+   AUTH_ADMIN_PASSWORD="admin"
+   
    DATASOURCE_URL="postgresql://kaleidosearch:secret@localhost:5432/kaleidosearch"
    CHROMA_HOST="localhost"
    CHROMA_PORT=5000
    CHROMA_COLLECTION="kaleido_search_products"
+   
    LLM_MODEL="gemini-2.0-flash"
    LLM_PROVIDER="google_genai"
    ```
-   > **Note:**
+   > **Note to authentication:**
+   > `AUTH_GOOGLE_CLIENT_ID` is only required if you plan to use Google as an ID provider. Here is
+   how to setup your own Google client
+   ID https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid.
+   > The `AUTH_SECRET_KEY` can be generated using `openssl rand -hex 32`.
+
+   > **Note ot LLMs:**
    > To use a LLM from OpenAI, it is sufficient to only put in the model name and omit provider
-   name. For other LLM models/provider refer to https://python.langchain.com/docs/integrations/chat/
+   name. For other LLM models/provider refer
+   to https://python.langchain.com/docs/integrations/chat/.
 
 ### Running the Application
 

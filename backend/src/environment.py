@@ -24,6 +24,22 @@ def google_client_id() -> str:
     return os.getenv("AUTH_GOOGLE_CLIENT_ID")
 
 
+def secret_key() -> str:
+    return os.getenv("AUTH_SECRET_KEY")
+
+
+def access_token_expire_minutes() -> int:
+    return int(os.getenv("AUTH_ACCESS_TOKEN_EXPIRE_MINUTES"))
+
+
+def algorithm() -> str:
+    return os.getenv("AUTH_ALGORITHM")
+
+
+def admin_password() -> str:
+    return os.getenv("AUTH_ADMIN_PASSWORD")
+
+
 def gemini_api_key() -> str:
     return os.getenv("GEMINI_API_KEY")
 

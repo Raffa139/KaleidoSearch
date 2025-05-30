@@ -13,11 +13,8 @@ from backend.src.products.service import ProductService
 from backend.src.shops.service import ShopService
 from backend.src.users.service import UserService
 from backend.src.users.models import User, UserIn
-from backend.src.environment import google_client_id
-
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-ALGORITHM = "HS256"
+from backend.src.environment import google_client_id, secret_key, access_token_expire_minutes, \
+    algorithm, admin_password
 
 router = APIRouter(prefix="/auth", tags=["authentication"],
                    responses={498: {"description": "Token expired"}})
@@ -45,7 +42,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], user_service
     exception_headers = {"WWW-Authenticate": "Bearer"}
 
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, secret_key(), algorithms=[algorithm()])
         token_data = TokenData(user_id=payload.get("sub"))
 
         if user := user_service.find_user_by_id(token_data.user_id):
@@ -61,7 +58,6 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], user_service
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 
-# TODO: Make constants configurable
 # TODO: Secure relevant routes
 # TODO: Secure uid based routes with admin permission only (or not have them)
 # TODO: Create "/me" versions of e.g. /threads route
@@ -69,16 +65,16 @@ CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 def create_access_token(data: dict):
     payload = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=access_token_expire_minutes())
     payload.update({"exp": expire})
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(payload, secret_key(), algorithm=algorithm())
 
 
 @router.post("/token")
 def admin_login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> BearerToken:
     password = form_data.password
 
-    if password != "admin":
+    if password != admin_password():
         raise HTTPException(status_code=401, detail="Could not validate credentials")
 
     access_token = create_access_token({"sub": "2"})
