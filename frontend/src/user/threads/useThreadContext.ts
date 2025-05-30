@@ -1,28 +1,27 @@
 import { useContext } from "react";
 import { ThreadContext, type ThreadContextProps } from "./ThreadContext";
-import type { Product, QueryEvaluation, User, UserAnswer } from "../../client/types";
+import type { Product, QueryEvaluation, UserAnswer } from "../../client/types";
 import { client } from "../../client/kaleidoClient";
-import type { ThreadsClient } from "../../client/threadsClient";
 
 interface UseThreadContext {
-  (props: { user: User }): {
+  (): {
     isBusy: boolean;
     rerank: boolean;
     setRerank: (rerank: boolean) => void;
-    getRecommendations: typeof ThreadsClient.prototype.getRecommendations;
-    postToThread: typeof ThreadsClient.prototype.post;
-    createThread: typeof ThreadsClient.prototype.create;
+    getRecommendations: typeof client.Users.Threads.getRecommendations;
+    postToThread: typeof client.Users.Threads.post;
+    createThread: typeof client.Users.Threads.create;
   };
 }
 
-export const useThreadContext: UseThreadContext = ({ user: { id: uid } }) => {
+export const useThreadContext: UseThreadContext = () => {
   const { isBusy, setBusy, rerank, setRerank } = useContext(ThreadContext) as ThreadContextProps;
 
   const getRecommendations = async (tid: number): Promise<Product[]> => {
     setBusy(true);
 
     try {
-      const response = await client.Users.Threads(uid).getRecommendations(tid, rerank);
+      const response = await client.Users.Threads.getRecommendations(tid, rerank);
       setBusy(false);
       return response;
     } catch (error) {
@@ -34,14 +33,14 @@ export const useThreadContext: UseThreadContext = ({ user: { id: uid } }) => {
 
   const postToThread = async (tid: number, content: { query?: string, answers?: UserAnswer[] }): Promise<QueryEvaluation> => {
     setBusy(true);
-    const response = await client.Users.Threads(uid).post(tid, content);
+    const response = await client.Users.Threads.post(tid, content);
     setBusy(false);
     return response;
   };
 
   const createThread = async (query?: string): Promise<QueryEvaluation> => {
     setBusy(true);
-    const response = await client.Users.Threads(uid).create(query);
+    const response = await client.Users.Threads.create(query);
     setBusy(false);
     return response;
   };

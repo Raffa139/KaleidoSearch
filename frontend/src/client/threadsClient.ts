@@ -2,19 +2,8 @@ import * as Http from "./clientBase";
 import type { Product, QueryEvaluation, Thread, UserAnswer } from "./types";
 
 export class ThreadsClient extends Http.ClientBase {
-  uid: number | string;
-
-  constructor(host: string, port: number, uid: number | string, rootPath: string = "") {
-    super(host, port, rootPath);
-    this.uid = uid;
-  }
-
   resource(): string {
-    return "threads";
-  }
-
-  baseUrl(): string {
-    return super.baseUrl().replace("{uid}", String(this.uid));
+    return "me/threads";
   }
 
   async getAll(): Promise<Thread[]> {

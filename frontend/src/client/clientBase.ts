@@ -1,7 +1,3 @@
-const DEFAULT_HEADERS = {
-  "Content-Type": "application/json"
-};
-
 export class ClientBase {
   host: string;
   port: number;
@@ -23,41 +19,43 @@ export class ClientBase {
 }
 
 export const get = async <T>(url: string): Promise<T> => {
-  const response = await fetch(url, { headers: DEFAULT_HEADERS });
-
-  if (!response.ok) {
-    console.error(response.status, await response.text());
-    throw new Error();
-  }
-
+  const response = await fetch_(url);
   return response.json();
 };
 
 export const post = async <T>(url: string, body?: object): Promise<T> => {
-  const response = await fetch(url, {
+  const response = await fetch_(url, {
     method: "POST",
-    headers: DEFAULT_HEADERS,
     body: body ? JSON.stringify(body) : undefined
   });
-
-  if (!response.ok) {
-    console.error(response.status, await response.text());
-    throw new Error();
-  }
 
   return response.json();
 };
 
 export const delete_ = async (url: string): Promise<void> => {
+  const response = await fetch_(url, { method: "DELETE" });
+  return response.json();
+};
+
+const fetch_ = async (url: string, init?: RequestInit): Promise<Response> => {
   const response = await fetch(url, {
-    method: "DELETE",
-    headers: DEFAULT_HEADERS
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+      ...init?.headers
+    }
   });
+
+  if (response.status === 498) {
+    console.error("Token expired, redirect to login");
+    window.location.replace("/");
+  }
 
   if (!response.ok) {
     console.error(response.status, await response.text());
     throw new Error();
   }
 
-  return response.json();
-};
+  return response;
+}

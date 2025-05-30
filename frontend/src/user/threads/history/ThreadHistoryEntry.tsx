@@ -8,11 +8,10 @@ import "./threadHistoryEntry.css";
 
 interface ThreadHistoryEntryProps {
   thread: Thread;
-  user_id: number;
   onDelete: (thread_id: number) => void;
 }
 
-export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({ user_id, thread, onDelete }) => {
+export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({ thread, onDelete }) => {
   const [title, setTitle] = useState<string | null>();
 
   const capitalizeSentence = (sentence: string) => {
@@ -23,7 +22,7 @@ export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({
 
   useEffect(() => {
     const fetchThreadTitle = async () => {
-      const queryEvaluation = await client.Users.Threads(user_id).getQueryEvaluation(thread.thread_id);
+      const queryEvaluation = await client.Users.Threads.getQueryEvaluation(thread.thread_id);
       if (queryEvaluation.cleaned_query) {
         setTitle(capitalizeSentence(queryEvaluation.cleaned_query));
       } else {
@@ -35,7 +34,7 @@ export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({
   }, [thread.thread_id]);
 
   const handleDelete = () => {
-    client.Users.Threads(user_id).delete(thread.thread_id);
+    client.Users.Threads.delete(thread.thread_id);
     onDelete(thread.thread_id);
   };
 
@@ -47,7 +46,7 @@ export const ThreadHistoryEntry: FunctionComponent<ThreadHistoryEntryProps> = ({
       </div>
 
       <div className="thread-history-entry-icon-btns">
-        <Link to={`/users/${user_id}/threads/${thread.thread_id}`}>
+        <Link to={`/user/threads/${thread.thread_id}`}>
           <button className="thread-history-entry-icon-btn success">
             <i className="fa-solid fa-paper-plane"></i>
           </button>

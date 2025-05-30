@@ -24,23 +24,23 @@ export const router = createBrowserRouter([
     Component: Login
   },
   {
-    path: "users/:uid",
-    loader: ({ params }) => client.Users.getById(params.uid!),
+    path: "user",
+    loader: () => client.Users.getAuthenticated(),
     Component: Layout,
     children: [
       {
         path: "home",
-        loader: ({ params }) => client.Users.Threads(params.uid!).getAll(),
+        loader: () => client.Users.Threads.getAll(),
         Component: Home
       },
       {
         path: "bookmarks",
-        loader: ({ params }) => client.Users.Bookmarks(params.uid!).getAll(),
+        loader: () => client.Users.Bookmarks.getAll(),
         Component: Bookmarks
       },
       {
         path: "threads/:tid",
-        loader: ({ params }) => client.Users.Threads(params.uid!).getQueryEvaluation(params.tid!),
+        loader: ({ params }) => client.Users.Threads.getQueryEvaluation(params.tid!),
         Component: Thread
       }
     ]

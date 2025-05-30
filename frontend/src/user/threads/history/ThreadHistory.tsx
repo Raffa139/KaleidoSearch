@@ -1,6 +1,6 @@
 import { Fragment, useState, type FunctionComponent } from "react";
-import { useLoaderData, useNavigate, useOutletContext } from "react-router";
-import type { Thread, User } from "../../../client/types";
+import { useLoaderData, useNavigate } from "react-router";
+import type { Thread } from "../../../client/types";
 import { useThreadContext } from "../useThreadContext";
 import { SearchInput } from "../search/SearchInput";
 import { ThreadHistoryEntry } from "./ThreadHistoryEntry";
@@ -9,11 +9,10 @@ import "./threadHistory.css";
 
 export const ThreadHistory: FunctionComponent = () => {
   const loadedThreads = useLoaderData<Thread[]>();
-  const user = useOutletContext<User>();
 
   const navigate = useNavigate();
 
-  const { isBusy, createThread } = useThreadContext({ user });
+  const { isBusy, createThread } = useThreadContext();
 
   const [threads, setThreads] = useState<Thread[]>(loadedThreads);
   const [newSearch, setNewSearch] = useState<string>("");
@@ -21,7 +20,7 @@ export const ThreadHistory: FunctionComponent = () => {
   const handleNewSearch = async () => {
     if (newSearch.trim()) {
       const { thread_id } = await createThread(newSearch);
-      navigate(`/users/${user.id}/threads/${thread_id}`);
+      navigate(`/user/threads/${thread_id}`);
     }
   };
 
@@ -39,7 +38,7 @@ export const ThreadHistory: FunctionComponent = () => {
         <div className="thread-list">
           {threads.map((thread) => (
             <Fragment key={thread.thread_id}>
-              <ThreadHistoryEntry user_id={user.id} thread={thread} onDelete={handleDelete} />
+              <ThreadHistoryEntry thread={thread} onDelete={handleDelete} />
             </Fragment>
           ))}
 

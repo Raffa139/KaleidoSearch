@@ -1,9 +1,8 @@
 import { useEffect, useState, type FunctionComponent } from "react";
-import { useOutletContext } from "react-router";
 import TimeAgo from "react-timeago";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import Skeleton from "react-loading-skeleton";
-import type { Bookmark, Product, ProductSummary, User } from "../client/types";
+import type { Bookmark, Product, ProductSummary } from "../client/types";
 import { client } from "../client/kaleidoClient";
 import "./productCard.css";
 
@@ -27,13 +26,11 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
   onBookmarkAdd,
   onBookmarkRemove
 }) => {
-  const { id: uid } = useOutletContext<User>();
-
   const [bookmark, setBookmark] = useState<Bookmark>();
 
   useEffect(() => {
     const fetchBookmark = async () => {
-      const bookmark = await client.Users.Bookmarks(uid).getByProductId(productId);
+      const bookmark = await client.Users.Bookmarks.getByProductId(productId);
       if (bookmark) {
         setBookmark(bookmark);
       }
@@ -45,11 +42,11 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
   const handleBookmarking = async () => {
     if (bookmark) {
       onBookmarkRemove?.(productId);
-      client.Users.Bookmarks(uid).delete(bookmark.id);
+      client.Users.Bookmarks.delete(bookmark.id);
       setBookmark(undefined);
     } else {
       onBookmarkAdd?.(productId);
-      const bookmark = await client.Users.Bookmarks(uid).create(productId);
+      const bookmark = await client.Users.Bookmarks.create(productId);
       setBookmark(bookmark);
     }
   };

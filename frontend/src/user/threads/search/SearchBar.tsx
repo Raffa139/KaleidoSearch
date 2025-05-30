@@ -1,6 +1,6 @@
 import { Fragment, useState, type FunctionComponent } from "react";
-import { useLoaderData, useNavigate, useOutletContext } from "react-router";
-import type { QueryEvaluation, User, UserAnswer } from "../../../client/types";
+import { useLoaderData, useNavigate } from "react-router";
+import type { QueryEvaluation, UserAnswer } from "../../../client/types";
 import { useThreadContext } from "../useThreadContext";
 import { Question } from "./Question";
 import { SearchInput } from "./SearchInput";
@@ -13,12 +13,11 @@ interface SearchBarProps {
 }
 
 export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, onSearch }) => {
-  const user = useOutletContext<User>();
   const { thread_id } = useLoaderData();
 
   const navigate = useNavigate();
 
-  const { isBusy, rerank, setRerank, postToThread } = useThreadContext({ user });
+  const { isBusy, rerank, setRerank, postToThread } = useThreadContext();
 
   const [search, setSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [lastSearch, setLastSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");

@@ -11,7 +11,7 @@ export const Thread: FunctionComponent = () => {
   const thread = useLoaderData<QueryEvaluation>();
   const user = useOutletContext<User>();
 
-  const { isBusy, getRecommendations } = useThreadContext({ user });
+  const { isBusy, getRecommendations } = useThreadContext();
 
   const [queryEvaluation, setQueryEvaluation] = useState<QueryEvaluation | undefined>(thread);
   const [products, setProducts] = useState<Product[]>([]);
