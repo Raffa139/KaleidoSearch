@@ -1,3 +1,8 @@
+export interface Token {
+  access_token: string;
+  token_type: string;
+}
+
 export interface User {
   id: number;
   sub_id: string;
