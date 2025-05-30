@@ -17,3 +17,6 @@ langgraph==0.4.1
 langgraph-checkpoint-postgres
 chromadb==0.6.3
 tiktoken
+google-auth
+pyjwt
+python-multipart

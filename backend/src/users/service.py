@@ -16,6 +16,9 @@ class UserService:
     def find_user_by_id(self, id: int) -> User | None:
         return self._session.get(User, id)
 
+    def find_user_by_sub_id(self, sub_id: str) -> User | None:
+        return self._query(select(User).where(User.sub_id == sub_id)).first()
+
     def find_thread_by_id(self, id: int) -> Thread | None:
         return self._session.get(Thread, id)
 

@@ -20,6 +20,10 @@ def chroma_collection() -> str:
     return os.getenv("CHROMA_COLLECTION")
 
 
+def google_client_id() -> str:
+    return os.getenv("AUTH_GOOGLE_CLIENT_ID")
+
+
 def gemini_api_key() -> str:
     return os.getenv("GEMINI_API_KEY")
 

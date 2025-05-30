@@ -6,6 +6,7 @@ from backend.src.app.dependencies import db_engine
 from backend.src.products.router import router as products_router
 from backend.src.shops.router import router as shops_router
 from backend.src.users.router import router as users_router
+from backend.src.authentication.router import router as auth_router
 
 
 def initialize_db():
@@ -19,6 +20,7 @@ def handle_value_error(_, error: Exception):
 def create_app():
     app = FastAPI()
 
+    app.include_router(auth_router)
     app.include_router(products_router)
     app.include_router(shops_router)
     app.include_router(users_router)
@@ -27,6 +29,7 @@ def create_app():
         CORSMiddleware,
         allow_origins=["http://localhost:5173"],
         allow_credentials=True,
+        allow_headers=["Authorization"],
         allow_methods=["GET", "POST", "DELETE"]
     )
 

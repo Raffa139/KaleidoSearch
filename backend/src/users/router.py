@@ -2,12 +2,15 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
 from backend.src.app.dependencies import SessionDep, SearchGraphDep, RetrieveGraphDep, \
     SummarizeGraphDep
+from backend.src.authentication.router import CurrentUserDep
 from backend.src.search.service import SearchService, ProductRecommendation
 from backend.src.search.models import QueryEvaluationOut, UserSearch, BaseUserSearch, NewUserSearch
 from backend.src.products.service import ProductService
 from backend.src.shops.service import ShopService
 from backend.src.users.service import UserService
 from backend.src.users.models import UserOut, UserIn, ThreadOut, BookmarkOut, BookmarkIn
+
+# TODO: Split into separate router for threads & bookmarks
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -95,27 +98,21 @@ def delete_bookmark(uid: int, bookmark_id: int, user_service: UserServiceDep):
     user_service.delete_bookmark(bookmark_id)
 
 
-@router.get("/{uid}/threads", response_model=list[ThreadOut])
-def get_user_threads(uid: int, user_service: UserServiceDep):
-    if not user_service.find_user_by_id(uid):
-        raise HTTPException(status_code=401)
-
-    threads = user_service.find_user_threads(uid)
+@router.get("/me/threads", response_model=list[ThreadOut])
+def get_user_threads(user: CurrentUserDep, user_service: UserServiceDep):
+    threads = user_service.find_user_threads(user.id)
     return map(lambda thread: ThreadOut(**thread.model_dump(), thread_id=thread.id), threads)
 
 
-@router.post("/{uid}/threads", response_model=QueryEvaluationOut)
+@router.post("/me/threads", response_model=QueryEvaluationOut)
 def create_thread(
-        uid: int,
+        user: CurrentUserDep,
         search_service: SearchServiceDep,
         user_service: UserServiceDep,
         user_search: NewUserSearch | None = None
 ):
     if not user_search:
-        if not user_service.find_user_by_id(uid):
-            raise HTTPException(status_code=401)
-
-        thread = user_service.create_thread(uid)
+        thread = user_service.create_thread(user.id)
 
         return QueryEvaluationOut(
             thread_id=thread.id,
@@ -124,59 +121,50 @@ def create_thread(
             follow_up_questions=[]
         )
 
-    return handle_thread_posts(uid, None, user_search, search_service, user_service)
+    return handle_thread_posts(user.id, None, user_search, search_service, user_service)
 
 
-@router.get("/{uid}/threads/{tid}", response_model=QueryEvaluationOut)
+@router.get("/me/threads/{tid}", response_model=QueryEvaluationOut)
 def get_user_thread(
-        uid: int,
         tid: int,
+        user: CurrentUserDep,
         search_service: SearchServiceDep,
         user_service: UserServiceDep
 ):
-    if not user_service.find_user_by_id(uid):
-        raise HTTPException(status_code=401)
-
-    if tid and not user_service.has_user_access_to_thread(uid, tid):
+    if tid and not user_service.has_user_access_to_thread(user.id, tid):
         raise HTTPException(status_code=403)
 
     return search_service.get_query_evaluation(tid)
 
 
-@router.post("/{uid}/threads/{tid}", response_model=QueryEvaluationOut)
+@router.post("/me/threads/{tid}", response_model=QueryEvaluationOut)
 def post_to_thread(
-        uid: int,
         tid: int,
+        user: CurrentUserDep,
         user_search: UserSearch,
         search_service: SearchServiceDep,
         user_service: UserServiceDep
 ):
-    return handle_thread_posts(uid, tid, user_search, search_service, user_service)
+    return handle_thread_posts(user.id, tid, user_search, search_service, user_service)
 
 
-@router.delete("/{uid}/threads/{tid}")
-def delete_thread(uid: int, tid: int, user_service: UserServiceDep):
-    if not user_service.find_user_by_id(uid):
-        raise HTTPException(status_code=401)
-
-    if tid and not user_service.has_user_access_to_thread(uid, tid):
+@router.delete("/me/threads/{tid}")
+def delete_thread(tid: int, user: CurrentUserDep, user_service: UserServiceDep):
+    if tid and not user_service.has_user_access_to_thread(user.id, tid):
         raise HTTPException(status_code=403)
 
     user_service.delete_thread(tid)
 
 
-@router.get("/{uid}/threads/{tid}/recommendations", response_model=list[ProductRecommendation])
+@router.get("/me/threads/{tid}/recommendations", response_model=list[ProductRecommendation])
 def get_recommendations_from_thread(
-        uid: int,
         tid: int,
+        user: CurrentUserDep,
         search_service: SearchServiceDep,
         user_service: UserServiceDep,
         rerank: bool = False
 ):
-    if not user_service.find_user_by_id(uid):
-        raise HTTPException(status_code=401)
-
-    if not user_service.has_user_access_to_thread(uid, tid):
+    if not user_service.has_user_access_to_thread(user.id, tid):
         raise HTTPException(status_code=403)
 
     return search_service.get_recommendations(tid, rerank=rerank)
@@ -189,9 +177,6 @@ def handle_thread_posts(
         search_service: SearchServiceDep,
         user_service: UserServiceDep
 ) -> QueryEvaluationOut:
-    if not user_service.find_user_by_id(uid):
-        raise HTTPException(status_code=401)
-
     if tid and not user_service.has_user_access_to_thread(uid, tid):
         raise HTTPException(status_code=403)
 
