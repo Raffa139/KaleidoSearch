@@ -37,8 +37,6 @@ export class ThreadsClient extends BaseClient {
         .filter(a => a.remove || a.answer)
     };
 
-    console.log("Payload:", payload);
-
     return this.Http.post(payload, `${tid}`);
   }
 

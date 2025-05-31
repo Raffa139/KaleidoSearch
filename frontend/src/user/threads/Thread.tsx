@@ -1,15 +1,14 @@
 import { useState, type FunctionComponent } from "react";
-import { useLoaderData, useOutletContext } from "react-router";
+import { useLoaderData } from "react-router";
 import { SearchBar } from "./search/SearchBar";
 import { useThreadContext } from "./useThreadContext";
-import type { Product, QueryEvaluation, User } from "../../client/types";
+import type { Product, QueryEvaluation } from "../../client/types";
 import { ProductSkeleton } from "../../products/ProductSkeleton";
 import { ProductProvider } from "../../products/ProductProvider";
 import "./thread.css";
 
 export const Thread: FunctionComponent = () => {
   const thread = useLoaderData<QueryEvaluation>();
-  const user = useOutletContext<User>();
 
   const { isBusy, getRecommendations } = useThreadContext();
 
@@ -17,8 +16,6 @@ export const Thread: FunctionComponent = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const [hasSearchResults, setHasSearchResults] = useState<boolean>(false);
-
-  console.log("Logged in as", user, "in thread", thread);
 
   const handleSearch = async (queryEvaluation?: QueryEvaluation) => {
     setQueryEvaluation(queryEvaluation);

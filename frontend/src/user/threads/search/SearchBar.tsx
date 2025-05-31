@@ -13,7 +13,7 @@ interface SearchBarProps {
 }
 
 export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, onSearch }) => {
-  const { thread_id } = useLoaderData();
+  const { thread_id } = useLoaderData<QueryEvaluation>();
 
   const navigate = useNavigate();
 
@@ -26,13 +26,17 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
 
   const handleSearch = async () => {
     try {
-      const content = { query: lastSearch !== search ? search : undefined, answers };
-      const result = await postToThread(thread_id, content);
-      console.log("Search result:", result);
-      console.log("Answers:", answers);
-      onSearch(result);
-      setAnswers([]);
-      setLastSearch(search);
+      const newSearch = lastSearch !== search ? search : undefined;
+
+      if (newSearch || answers.length > 0) {
+        const content = { query: newSearch, answers };
+        const result = await postToThread(thread_id, content);
+        onSearch(result);
+        setAnswers([]);
+        setLastSearch(search);
+      } else {
+        onSearch(queryEvaluation);
+      }
     } catch (error) {
       onSearch(queryEvaluation);
     }
