@@ -58,7 +58,6 @@ CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 
 # TODO: Secure relevant routes with admin permission only
-# TODO: Store username & profile picture from Google in DB
 
 
 def create_access_token(data: dict):
@@ -92,7 +91,11 @@ def login_with_google(google_login: GoogleLogin, user_service: UserServiceDep) -
         user = user_service.find_user_by_sub_id(sub_id)
 
         if not user:
-            user = user_service.create_user(UserIn(sub_id=sub_id))
+            username = id_info.get("given_name")
+            picture_url = id_info.get("picture")
+            user = user_service.create_user(
+                UserIn(sub_id=sub_id, username=username, picture_url=picture_url)
+            )
 
         access_token = create_access_token({"sub": str(user.id)})
         return BearerToken(access_token=access_token)
