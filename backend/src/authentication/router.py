@@ -6,7 +6,7 @@ from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from backend.src.app.dependencies import SessionDep, SummarizeGraphDep
 from backend.src.authentication.models import TokenData, BearerToken, GoogleLogin
 from backend.src.products.service import ProductService
@@ -14,7 +14,7 @@ from backend.src.shops.service import ShopService
 from backend.src.users.service import UserService
 from backend.src.users.models import User, UserIn
 from backend.src.environment import google_client_id, secret_key, access_token_expire_minutes, \
-    algorithm, admin_password
+    algorithm
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -57,25 +57,11 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], user_service
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 
-# TODO: Secure relevant routes with admin permission only
-
-
 def create_access_token(data: dict):
     payload = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(minutes=access_token_expire_minutes())
     payload.update({"exp": expire})
     return jwt.encode(payload, secret_key(), algorithm=algorithm())
-
-
-@router.post("/token")
-def admin_login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> BearerToken:
-    password = form_data.password
-
-    if password != admin_password():
-        raise HTTPException(status_code=401, detail="Could not validate credentials")
-
-    access_token = create_access_token({"sub": "2"})
-    return BearerToken(access_token=access_token)
 
 
 @router.post("/token/google")

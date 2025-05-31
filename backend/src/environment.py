@@ -36,10 +36,6 @@ def algorithm() -> str:
     return os.getenv("AUTH_ALGORITHM")
 
 
-def admin_password() -> str:
-    return os.getenv("AUTH_ADMIN_PASSWORD")
-
-
 def gemini_api_key() -> str:
     return os.getenv("GEMINI_API_KEY")
 

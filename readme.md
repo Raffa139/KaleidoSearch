@@ -69,7 +69,6 @@ search endeavours.
    AUTH_SECRET_KEY="<Generate-Using-Openssl>"
    AUTH_ACCESS_TOKEN_EXPIRE_MINUTES=60
    AUTH_ALGORITHM="HS256"
-   AUTH_ADMIN_PASSWORD="admin"
    
    DATASOURCE_URL="postgresql://kaleidosearch:secret@localhost:5432/kaleidosearch"
    CHROMA_HOST="localhost"

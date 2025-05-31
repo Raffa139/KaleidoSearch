@@ -19,4 +19,3 @@ chromadb==0.6.3
 tiktoken
 google-auth
 pyjwt
-python-multipart

@@ -1,5 +1,5 @@
 import { useEffect, type FunctionComponent } from "react";
-import { Form, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { client } from "../client/kaleidoClient";
 import logo from "/logo.svg";
@@ -41,16 +41,6 @@ export const Login: FunctionComponent = () => {
         theme="filled_blue"
         shape="circle"
       />
-
-      <div className="separator">
-        <span>Or</span>
-      </div>
-
-      <Form action="/" method="post" className="login-form">
-        <input type="hidden" name="username" value="Admin User" className="login-input" />
-        <input type="password" name="password" placeholder="Admin Password" required className="login-input" />
-        <button type="submit" className="login-button">Log In</button>
-      </Form>
     </div>
   );
 };
