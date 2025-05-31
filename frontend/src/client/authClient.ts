@@ -9,4 +9,8 @@ export class AuthClient extends BaseClient {
   googleLogin(idToken: string): Promise<Token> {
     return this.Http.post({ id_token: idToken }, "google");
   }
+
+  verifyToken(): Promise<Boolean> {
+    return this.Http.get("verify");
+  }
 }

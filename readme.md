@@ -60,7 +60,7 @@ search endeavours.
    pip install -r requirements.txt
    # Configure database settings in config file or environment variables
    ```
-3. Set up your environment:
+3. Set up your environment in `/backend/.env`:
    ```.env
    OPENAI_API_KEY="<Your-API-Key>"
    GOOGLE_API_KEY="<Your-API-Key>"
@@ -89,6 +89,14 @@ search endeavours.
    > To use a LLM from OpenAI, it is sufficient to only put in the model name and omit provider
    name. For other LLM models/provider refer
    to https://python.langchain.com/docs/integrations/chat/.
+4. Set up your environment in `/frontend/.env`:
+   ```.env
+   VITE_GOOGLE_CLIENT_ID="<Optional-Your-Google-Client-ID>"
+   ```
+   > **Note:**
+   > `VITE_GOOGLE_CLIENT_ID` should be the same value as in the backend .env, it is only required if
+   you plan to use Google as an ID provider. Here is how to setup your own Google client
+   ID https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid.
 
 ### Running the Application
 
@@ -110,7 +118,7 @@ To populate the product catalog you can download amazon product metadata from th
 Choose a category of your likings (or all) and download the product metadata via the 'meta' link.
 
 1. Put the downloaded product metadata files into the `/backend/data` directory
-2. Provide the file names and max. token limit/minute in `.env`
+2. Provide the file names and max. token limit/minute in `/backend/.env`
    ```.env
    IMPORT_PRODUCT_CATALOGUES="<Filenames-Separated-By-Comma>"
    IMPORT_MAX_TOKENS_PER_MINUTE=100_000

@@ -1,6 +1,6 @@
-import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { RouterProvider } from "react-router";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import "react-photo-view/dist/react-photo-view.css";
@@ -8,9 +8,9 @@ import { router } from "./routes.ts"
 import "./index.css"
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <SkeletonTheme baseColor="#6c627f" highlightColor="#8e80a9">
       <RouterProvider router={router} />
     </SkeletonTheme>
-  </StrictMode>,
-)
+  </GoogleOAuthProvider>
+);

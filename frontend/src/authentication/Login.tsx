@@ -1,9 +1,34 @@
-import type { FunctionComponent } from "react";
-import { Form } from "react-router";
+import { useEffect, type FunctionComponent } from "react";
+import { Form, useNavigate } from "react-router";
+import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
+import { client } from "../client/kaleidoClient";
 import logo from "/logo.svg";
 import "./login.css";
 
 export const Login: FunctionComponent = () => {
+  const navigate = useNavigate();
+
+  const redirectToHome = () => navigate("/user/home");
+
+  const handleCredentialResponse = async (response: CredentialResponse) => {
+    if (response.credential) {
+      const { access_token } = await client.Auth.googleLogin(response.credential);
+      localStorage.setItem("access_token", access_token);
+      redirectToHome();
+    }
+  };
+
+  useEffect(() => {
+    const verifyAccessToken = async () => {
+      const tokenValid = await client.Auth.verifyToken();
+      if (tokenValid) {
+        redirectToHome();
+      }
+    }
+
+    verifyAccessToken();
+  }, []);
+
   return (
     <div className="login-container">
       <div className="branding-section">
@@ -11,17 +36,19 @@ export const Login: FunctionComponent = () => {
         <h1 className="branding-title">Kaleido</h1>
       </div>
 
-      <button className="google-login-button">
-        <i className="fab fa-google"></i> Sign in with Google
-      </button>
+      <GoogleLogin
+        onSuccess={handleCredentialResponse}
+        theme="filled_blue"
+        shape="circle"
+      />
 
       <div className="separator">
         <span>Or</span>
       </div>
 
       <Form action="/" method="post" className="login-form">
-        <input type="text" name="username" placeholder="Username" required className="login-input" />
-        <input type="password" name="password" placeholder="Password" required className="login-input" />
+        <input type="hidden" name="username" value="Admin User" className="login-input" />
+        <input type="password" name="password" placeholder="Admin Password" required className="login-input" />
         <button type="submit" className="login-button">Log In</button>
       </Form>
     </div>

@@ -1,5 +1,6 @@
 import type { FunctionComponent } from "react";
-import { NavLink, Outlet, useLoaderData, useNavigation } from "react-router";
+import { NavLink, Outlet, useLoaderData, useNavigate, useNavigation } from "react-router";
+import { googleLogout } from "@react-oauth/google";
 import type { User } from "../client/types";
 import { GlobalSpinner } from "./GlobalSpinner";
 import { ThreadContextWrapper } from "../user/threads/ThreadContext";
@@ -7,9 +8,16 @@ import logo from "/logo.svg";
 import "./layout.css";
 
 export const Layout: FunctionComponent = () => {
+  const navigate = useNavigate();
   const navigation = useNavigation();
   const isNavigating = Boolean(navigation.location);
   const user = useLoaderData<User>();
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    googleLogout();
+    navigate("/");
+  }
 
   return (
     <>
@@ -21,7 +29,7 @@ export const Layout: FunctionComponent = () => {
 
         <div className="profile-section">
           <img src={user.picture_url ?? "/placeholder-profile.jpg"} alt="User Profile" className="profile-picture" />
-          <span className="username">{user.username}</span>
+          <span className="username">{user.username ?? "Anonymous"}</span>
         </div>
 
         <ul className="nav-links">
@@ -32,7 +40,7 @@ export const Layout: FunctionComponent = () => {
         </ul>
 
         <div className="logout-section">
-          <button className="logout-button">
+          <button onClick={handleLogout} className="logout-button">
             <i className="fas fa-sign-out-alt"></i> Logout
           </button>
         </div>

@@ -98,3 +98,12 @@ def login_with_google(google_login: GoogleLogin, user_service: UserServiceDep) -
         return BearerToken(access_token=access_token)
     except ValueError:
         raise HTTPException(status_code=401, detail="Invalid ID token")
+
+
+@router.get("/token/verify")
+def verify_token(token: Annotated[str, Depends(oauth2_scheme)]) -> bool:
+    try:
+        jwt.decode(token, secret_key(), algorithms=[algorithm()])
+        return True
+    except InvalidTokenError:
+        return False
