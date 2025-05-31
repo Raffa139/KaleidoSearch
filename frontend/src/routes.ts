@@ -5,6 +5,7 @@ import { Thread } from './user/threads/Thread';
 import { client } from './client/kaleidoClient';
 import { Home } from './user/home/Home';
 import { Bookmarks } from './user/bookmarks/Bookmarks';
+import { Error } from './error/Error';
 
 export const router = createBrowserRouter([
   {
@@ -16,6 +17,7 @@ export const router = createBrowserRouter([
     path: "user",
     loader: () => client.Users.getAuthenticated(),
     Component: Layout,
+    ErrorBoundary: Error,
     children: [
       {
         path: "home",

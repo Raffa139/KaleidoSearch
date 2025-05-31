@@ -1,23 +1,16 @@
 import type { FunctionComponent } from "react";
-import { NavLink, Outlet, useLoaderData, useNavigate, useNavigation } from "react-router";
-import { googleLogout } from "@react-oauth/google";
+import { NavLink, Outlet, useLoaderData, useNavigation } from "react-router";
 import type { User } from "../client/types";
 import { GlobalSpinner } from "./GlobalSpinner";
 import { ThreadContextWrapper } from "../user/threads/ThreadContext";
+import { LogoutButton } from "./LogoutButton";
 import logo from "/logo.svg";
 import "./layout.css";
 
 export const Layout: FunctionComponent = () => {
-  const navigate = useNavigate();
   const navigation = useNavigation();
   const isNavigating = Boolean(navigation.location);
   const user = useLoaderData<User>();
-
-  const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    googleLogout();
-    navigate("/");
-  }
 
   return (
     <>
@@ -40,9 +33,7 @@ export const Layout: FunctionComponent = () => {
         </ul>
 
         <div className="logout-section">
-          <button onClick={handleLogout} className="logout-button">
-            <i className="fas fa-sign-out-alt"></i> Logout
-          </button>
+          <LogoutButton />
         </div>
       </nav>
 
