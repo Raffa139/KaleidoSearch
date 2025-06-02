@@ -1,13 +1,8 @@
-from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
-from backend.src.app.dependencies import SessionDep, SearchGraphDep, RetrieveGraphDep, \
-    SummarizeGraphDep
+from backend.src.app.dependencies import UserServiceDep, SearchServiceDep
 from backend.src.authentication.router import CurrentUserDep
-from backend.src.search.service import SearchService, ProductRecommendation
+from backend.src.search.service import ProductRecommendation
 from backend.src.search.models import QueryEvaluationOut, UserSearch, BaseUserSearch, NewUserSearch
-from backend.src.products.service import ProductService
-from backend.src.shops.service import ShopService
-from backend.src.users.service import UserService
 from backend.src.users.models import ThreadOut
 
 router = APIRouter(
@@ -19,33 +14,6 @@ router = APIRouter(
         403: {"description": "Forbidden"},
     }
 )
-
-
-def create_product_service(session: SessionDep, summarize_graph: SummarizeGraphDep):
-    shop_service = ShopService(session)
-    return ProductService(session, shop_service, summarize_graph)
-
-
-ProductServiceDep = Annotated[ProductService, Depends(create_product_service)]
-
-
-def create_user_service(session: SessionDep, product_service: ProductServiceDep):
-    return UserService(session, product_service)
-
-
-UserServiceDep = Annotated[UserService, Depends(create_user_service)]
-
-
-def create_search_service(
-        search_graph: SearchGraphDep,
-        retrieve_graph: RetrieveGraphDep,
-        product_service: ProductServiceDep,
-        user_service: UserServiceDep
-):
-    return SearchService(product_service, user_service, search_graph, retrieve_graph)
-
-
-SearchServiceDep = Annotated[SearchService, Depends(create_search_service)]
 
 
 def user_has_thread_access(tid: int, user: CurrentUserDep, user_service: UserServiceDep):

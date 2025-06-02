@@ -1,11 +1,7 @@
-from typing import Annotated
-from fastapi import APIRouter, HTTPException, Depends
-from backend.src.app.dependencies import SessionDep, SummarizeGraphDep
+from fastapi import APIRouter, HTTPException
+from backend.src.app.dependencies import UserServiceDep
 from backend.src.authentication.router import CurrentUserDep
 from backend.src.users.models import BookmarkOut, BookmarkIn
-from backend.src.products.service import ProductService
-from backend.src.shops.service import ShopService
-from backend.src.users.service import UserService
 
 router = APIRouter(
     prefix="/me/bookmarks",
@@ -16,21 +12,6 @@ router = APIRouter(
         403: {"description": "Forbidden"},
     }
 )
-
-
-def create_product_service(session: SessionDep, summarize_graph: SummarizeGraphDep):
-    shop_service = ShopService(session)
-    return ProductService(session, shop_service, summarize_graph)
-
-
-ProductServiceDep = Annotated[ProductService, Depends(create_product_service)]
-
-
-def create_user_service(session: SessionDep, product_service: ProductServiceDep):
-    return UserService(session, product_service)
-
-
-UserServiceDep = Annotated[UserService, Depends(create_user_service)]
 
 
 @router.get("/", response_model=list[BookmarkOut])

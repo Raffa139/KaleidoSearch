@@ -10,14 +10,16 @@ from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langgraph.checkpoint.postgres import PostgresSaver
+from backend.src.search.service import SearchService
+from backend.src.shops.service import ShopService
+from backend.src.users.service import UserService
+from backend.src.products.service import ProductService
 from backend.src.search.graphs.search_graph import SearchGraph, build as build_search_graph
 from backend.src.search.graphs.retrieve_graph import RetrieveGraph, build as build_retrieve_graph
 from backend.src.products.graphs.summarize_graph import SummarizeGraph, \
     build as build_summarize_graph
 from backend.src.environment import datasource_url, chroma_host, chroma_port, chroma_collection, \
     llm_model, llm_provider
-
-# TODO: Maybe create all dependencies here and none inside routers?
 
 db_engine = create_engine(datasource_url())
 
@@ -74,3 +76,40 @@ SearchGraphDep = Annotated[SearchGraph, Depends(search_graph)]
 RetrieveGraphDep = Annotated[RetrieveGraph, Depends(retrieve_graph)]
 
 SummarizeGraphDep = Annotated[SummarizeGraph, Depends(summarize_graph)]
+
+
+def create_shop_service(session: SessionDep):
+    return ShopService(session)
+
+
+ShopServiceDep = Annotated[ShopService, Depends(create_shop_service)]
+
+
+def create_product_service(
+        session: SessionDep,
+        shop_service: ShopServiceDep,
+        summarize_graph: SummarizeGraphDep
+):
+    return ProductService(session, shop_service, summarize_graph)
+
+
+ProductServiceDep = Annotated[ProductService, Depends(create_product_service)]
+
+
+def create_user_service(session: SessionDep, product_service: ProductServiceDep):
+    return UserService(session, product_service)
+
+
+UserServiceDep = Annotated[UserService, Depends(create_user_service)]
+
+
+def create_search_service(
+        search_graph: SearchGraphDep,
+        retrieve_graph: RetrieveGraphDep,
+        product_service: ProductServiceDep,
+        user_service: UserServiceDep
+):
+    return SearchService(product_service, user_service, search_graph, retrieve_graph)
+
+
+SearchServiceDep = Annotated[SearchService, Depends(create_search_service)]

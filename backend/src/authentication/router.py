@@ -7,11 +7,8 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
-from backend.src.app.dependencies import SessionDep, SummarizeGraphDep
+from backend.src.app.dependencies import UserServiceDep
 from backend.src.authentication.models import TokenData, BearerToken, GoogleLogin
-from backend.src.products.service import ProductService
-from backend.src.shops.service import ShopService
-from backend.src.users.service import UserService
 from backend.src.users.models import User, UserIn
 from backend.src.environment import google_client_id, secret_key, access_token_expire_minutes, \
     algorithm
@@ -19,21 +16,6 @@ from backend.src.environment import google_client_id, secret_key, access_token_e
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
-
-
-def create_product_service(session: SessionDep, summarize_graph: SummarizeGraphDep):
-    shop_service = ShopService(session)
-    return ProductService(session, shop_service, summarize_graph)
-
-
-ProductServiceDep = Annotated[ProductService, Depends(create_product_service)]
-
-
-def create_user_service(session: SessionDep, product_service: ProductServiceDep):
-    return UserService(session, product_service)
-
-
-UserServiceDep = Annotated[UserService, Depends(create_user_service)]
 
 
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], user_service: UserServiceDep):
