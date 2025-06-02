@@ -1,3 +1,12 @@
+export class HttpError extends Error {
+  code: number;
+
+  constructor(code: number, message: string = "") {
+    super(message);
+    this.code = code;
+  }
+}
+
 export class BaseClient {
   host: string;
   port: number;
@@ -64,7 +73,7 @@ class HttpMethods {
 
     if (!response.ok) {
       console.error(response.status, await response.text());
-      throw new Error();
+      throw new HttpError(response.status);
     }
 
     return response;

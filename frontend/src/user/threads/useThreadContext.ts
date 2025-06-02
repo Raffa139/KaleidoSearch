@@ -25,9 +25,8 @@ export const useThreadContext: UseThreadContext = () => {
       setBusy(false);
       return response;
     } catch (error) {
-      // TODO: Display that search needs refinement
       setBusy(false);
-      return [];
+      throw error;
     }
   };
 
