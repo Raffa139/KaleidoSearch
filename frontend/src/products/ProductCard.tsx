@@ -51,6 +51,10 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
     }
   };
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(url);
+  }
+
   return (
     <div className="search-result">
       {bookmark && showBookmarkDate && (
@@ -86,7 +90,9 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
                 <i className="fas fa-bookmark"></i>
               </button>
 
-              <button className="icon-btn"><i className="fa-solid fa-share-nodes"></i></button>
+              <button onClick={handleShare} className="icon-btn">
+                <i className="fa-solid fa-share-nodes"></i>
+              </button>
             </div>
           </div>
 

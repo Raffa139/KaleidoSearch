@@ -38,6 +38,7 @@ export const Login: FunctionComponent = () => {
 
       <GoogleLogin
         onSuccess={handleCredentialResponse}
+        locale="en"
         theme="filled_blue"
         shape="circle"
       />

@@ -28,8 +28,6 @@ export const Layout: FunctionComponent = () => {
         <ul className="nav-links">
           <li><NavLink to="home"><i className="fas fa-home"></i> Home</NavLink></li>
           <li><NavLink to="bookmarks"><i className="fas fa-bookmark"></i> Bookmarks</NavLink></li>
-          <li><a href="#"><i className="fas fa-cog"></i> Settings</a></li>
-          <li><a href="#"><i className="fas fa-question-circle"></i> Help</a></li>
         </ul>
 
         <div className="logout-section">
