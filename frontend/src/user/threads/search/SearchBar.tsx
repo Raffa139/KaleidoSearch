@@ -4,6 +4,7 @@ import type { QueryEvaluation, UserAnswer } from "../../../client/types";
 import { useThreadContext } from "../useThreadContext";
 import { Question } from "./Question";
 import { SearchInput } from "./SearchInput";
+import { ToggleSwitch } from "./ToggleSwitch";
 import { ModalPuffLoader } from "../ModalPuffLoader";
 import "./searchBar.css";
 
@@ -72,15 +73,16 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
 
       <div className="search-options">
         <div className="search-option">
-          <div onClick={() => setRerank(!rerank)}>
-            <input type="checkbox" checked={rerank} />
+          <div onClick={() => setRerank(!rerank)} style={{ display: "flex", gap: 5 }}>
+            <ToggleSwitch checked={rerank} />
             <span>Rerank results</span>
           </div>
+
           <i title="Enabling this option might improve search results at the cost of speed, depending on the specific search term(s)." className="fas fa-question-circle icon-btn" />
         </div>
 
-        <div onClick={() => setHideAnswers(!hideAnswers)} className="search-option">
-          <input type="checkbox" checked={hideAnswers} />
+        <div onClick={() => setHideAnswers(!hideAnswers)} className="search-option" style={{ gap: 5 }}>
+          <ToggleSwitch checked={hideAnswers} />
           <span>Hide answers</span>
         </div>
       </div>
