@@ -39,7 +39,3 @@
 .answered:focus-within {
   opacity: 1;
 }
-
-.hidden {
-  display: none;
-}

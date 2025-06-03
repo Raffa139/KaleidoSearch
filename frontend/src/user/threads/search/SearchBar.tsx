@@ -1,6 +1,6 @@
 import { useState, type FunctionComponent } from "react";
 import { useLoaderData, useNavigate } from "react-router";
-import { useTransition, animated } from "@react-spring/web";
+import { useTransition, useSpring, animated } from "@react-spring/web";
 import type { QueryEvaluation, UserAnswer } from "../../../client/types";
 import { useThreadContext } from "../useThreadContext";
 import { Question } from "./Question";
@@ -26,19 +26,34 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
   const [answers, setAnswers] = useState<UserAnswer[]>([]);
   const [hideAnswers, setHideAnswers] = useState<boolean>(false);
 
-  const questionTransitions = useTransition(
-    [
-      ...queryEvaluation?.answered_questions ?? [],
-      ...queryEvaluation?.follow_up_questions ?? []
-    ],
-    {
-      keys: question => question.id,
-      from: { opacity: 0, transform: "translateY(20px) scale(0.9)" },
-      enter: { opacity: 1, transform: "translateY(0px) scale(1)" },
-      leave: { opacity: 0, transform: "translateY(-20px) scale(0.9)" },
-      config: { tension: 200, friction: 20 }
-    }
-  );
+  const hideAnswersSpring = useSpring({
+    from: {
+      height: "100%",
+      opacity: 1
+    },
+    to: {
+      height: hideAnswers ? "0" : "100%",
+      opacity: hideAnswers ? 0 : 1
+    },
+    config: { tension: 200, friction: 25 }
+  });
+
+  const transitionConfig = {
+    from: { opacity: 0, transform: "translateY(20px) scale(0.9)" },
+    enter: { opacity: 1, transform: "translateY(0px) scale(1)" },
+    leave: { opacity: 0, transform: "translateY(-20px) scale(0.9)" },
+    config: { tension: 200, friction: 25 }
+  };
+
+  const answeredQuestionTransitions = useTransition(queryEvaluation?.answered_questions ?? [], {
+    keys: question => question.id,
+    ...transitionConfig
+  });
+
+  const followUpQuestionTransitions = useTransition(queryEvaluation?.follow_up_questions ?? [], {
+    keys: question => question.id,
+    ...transitionConfig
+  });
 
   const handleSearch = async () => {
     try {
@@ -104,9 +119,17 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
 
       {queryEvaluation && (
         <div className="follow-up-questions">
-          {questionTransitions((style, question) => (
+          <animated.div style={hideAnswersSpring} className="follow-up-questions">
+            {answeredQuestionTransitions((style, question) => (
+              <animated.div key={question.id} style={style}>
+                <Question onAnswerChange={handleAnswerChange} {...question} />
+              </animated.div>
+            ))}
+          </animated.div>
+
+          {followUpQuestionTransitions((style, question) => (
             <animated.div key={question.id} style={style}>
-              <Question onAnswerChange={handleAnswerChange} hideAnswered={hideAnswers} {...question} />
+              <Question onAnswerChange={handleAnswerChange} {...question} />
             </animated.div>
           ))}
         </div>

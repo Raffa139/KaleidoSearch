@@ -4,11 +4,10 @@ import "./question.css";
 
 interface QuestionProps extends FollowUpQuestion {
   answer?: string;
-  hideAnswered: boolean;
   onAnswerChange: (id: number, answer: string, remove: boolean, hasChanged: boolean) => void;
 }
 
-export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, answer, hideAnswered, onAnswerChange }) => {
+export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, answer, onAnswerChange }) => {
   const [newAnswer, setNewAnswer] = useState<string>(answer ?? "");
   const shortText = short.endsWith("?") ? short.substring(0, short.length - 1) : short;
 
@@ -22,7 +21,7 @@ export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, an
   };
 
   return (
-    <div className={`question-container ${answer ? "answered" : ""} ${hideAnswered && answer ? "hidden" : ""}`}>
+    <div className={`question-container ${answer ? "answered" : ""}`}>
       <span className="question-short text-ellipsis">{shortText}</span>
       <i title={`${shortText}: ${long}`} className="fas fa-question-circle icon-btn"></i>
       <input type="text" value={newAnswer} onChange={handleChange} className="input" />
