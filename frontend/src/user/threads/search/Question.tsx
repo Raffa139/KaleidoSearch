@@ -9,7 +9,14 @@ interface QuestionProps extends FollowUpQuestion {
 
 export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, answer, onAnswerChange }) => {
   const [newAnswer, setNewAnswer] = useState<string>(answer ?? "");
-  const shortText = short.endsWith("?") ? short.substring(0, short.length - 1) : short;
+
+  const capitalize = (question: string) => {
+    const capitalizeWord = (word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    const capitalizedWords = question.split(" ").map(word => capitalizeWord(word));
+    return capitalizedWords.join(" ");
+  };
+
+  const shortText = short.endsWith("?") ? capitalize(short.substring(0, short.length - 1)) : capitalize(short);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

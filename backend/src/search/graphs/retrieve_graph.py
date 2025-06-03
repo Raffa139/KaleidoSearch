@@ -10,7 +10,7 @@ FILTER_DOCS_PROMPT = (
     """
 You are an expert grader tasked with evaluating the relevance of retrieved documents to a given 
 user query. Your goal is to determine, for each document individually, whether it shares 
-significant semantic meaning or keywords with the query.
+meaningful semantic overlap, related concepts, or pertinent keywords with the query.
 
 Each document is presented in the following format:
 
@@ -25,13 +25,15 @@ Here is the user query:
 
 {query}
 
-For each document listed above, carefully analyze its content and compare it to the user query. 
-Consider both the presence of specific keywords and the overall semantic similarity.
+For each document listed above, analyze its content and compare it to the user query. Consider 
+both the presence of specific keywords and the overall semantic similarity. Even if the 
+connection isn't immediately obvious, look for implied relationships or broader contextual 
+relevance.
 
-Provide your evaluation for each document, where 'True' indicates that the document is highly 
-relevant to the user query (sharing significant semantic meaning or keywords), and 'False' 
-indicates that the document is not relevant. Ensure you provide a True/False evaluation for every 
-document presented.
+Provide your evaluation for each document, where 'True' indicates that the document is relevant 
+to the user query (sharing meaningful semantic overlap, related concepts, or pertinent keywords), 
+and 'False' indicates that the document is not relevant. Ensure you provide a True/False 
+evaluation for every document presented.
     """
 )
 
