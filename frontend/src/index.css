@@ -1,21 +1,6 @@
-/* :root {
-  --primary-bg-color: #252525;
-  --secondary-bg-color: #3c3f43;
-  --accent-color: #ffad9d;
-  --accent-color-hover: #ff785e;
-  --text-color: #ffffff;
-  --light-text-color: #efefef;
-  --border-color: #74787f;
-  --shadow-color: rgba(0, 0, 0, 0.05);
-  --success-bg: #28a745;
-  --success-hover-bg: #218838;
-  --destructive-bg: #dc3545;
-  --destructive-hover-bg: #c82333;
-} */
-
 :root {
-  --primary-bg-color: #6c627f;
-  --secondary-bg-color: #8e80a9;
+  --primary-bg-color: #4c455a;
+  --secondary-bg-color: #75698b;
   --accent-color: #ffad9d;
   --accent-color-hover: #ff785e;
   --text-color: #ffffff;
@@ -53,7 +38,7 @@ main {
 
 .container {
   width: 100%;
-  max-width: 600px;
+  max-width: 650px;
   height: 100vh;
   margin: 0 auto;
   display: flex;

@@ -74,6 +74,8 @@ search endeavours.
    CHROMA_HOST="localhost"
    CHROMA_PORT=5000
    CHROMA_COLLECTION="kaleido_search_products"
+
+   SEARCH_MAX_RESULTS=4
    
    LLM_MODEL="gemini-2.0-flash"
    LLM_PROVIDER="google_genai"

@@ -20,6 +20,10 @@ def chroma_collection() -> str:
     return os.getenv("CHROMA_COLLECTION")
 
 
+def search_max_results() -> int:
+    return int(os.getenv("SEARCH_MAX_RESULTS"))
+
+
 def google_client_id() -> str:
     return os.getenv("AUTH_GOOGLE_CLIENT_ID")
 

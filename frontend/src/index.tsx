@@ -9,7 +9,7 @@ import "./index.css"
 
 createRoot(document.getElementById("root")!).render(
   <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-    <SkeletonTheme baseColor="#6c627f" highlightColor="#8e80a9">
+    <SkeletonTheme baseColor="#4c455a" highlightColor="#75698b">
       <RouterProvider router={router} />
     </SkeletonTheme>
   </GoogleOAuthProvider>

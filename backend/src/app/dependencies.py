@@ -19,7 +19,7 @@ from backend.src.search.graphs.retrieve_graph import RetrieveGraph, build as bui
 from backend.src.products.graphs.summarize_graph import SummarizeGraph, \
     build as build_summarize_graph
 from backend.src.environment import datasource_url, chroma_host, chroma_port, chroma_collection, \
-    llm_model, llm_provider
+    llm_model, llm_provider, search_max_results
 
 db_engine = create_engine(datasource_url())
 
@@ -27,7 +27,7 @@ llm = init_chat_model(llm_model(), model_provider=llm_provider(), temperature=0)
 
 bi_encoder = OpenAIEmbeddings(model="text-embedding-3-small")
 cross_encoder = HuggingFaceCrossEncoder(model_name="cross-encoder/ms-marco-MiniLM-L6-v2")
-reranker = CrossEncoderReranker(model=cross_encoder, top_n=4)
+reranker = CrossEncoderReranker(model=cross_encoder, top_n=search_max_results())
 
 chroma = Chroma(
     client=chromadb.HttpClient(host=chroma_host(), port=chroma_port()),
@@ -35,7 +35,7 @@ chroma = Chroma(
     embedding_function=bi_encoder
 )
 
-chroma_retriever = chroma.as_retriever(search_kwargs={"k": 4})
+chroma_retriever = chroma.as_retriever(search_kwargs={"k": search_max_results()})
 rerank_retriever = ContextualCompressionRetriever(
     base_compressor=reranker,
     base_retriever=chroma.as_retriever(search_kwargs={"k": 20})
