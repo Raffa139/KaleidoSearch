@@ -10,6 +10,7 @@ interface QuestionProps extends FollowUpQuestion {
 
 export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, answer, hideAnswered, onAnswerChange }) => {
   const [newAnswer, setNewAnswer] = useState<string>(answer ?? "");
+  const shortText = short.endsWith("?") ? short.substring(0, short.length - 1) : short;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -22,8 +23,8 @@ export const Question: FunctionComponent<QuestionProps> = ({ id, short, long, an
 
   return (
     <div className={`question-container ${answer ? "answered" : ""} ${hideAnswered && answer ? "hidden" : ""}`}>
-      <span className="question-short text-ellipsis">{short}</span>
-      <i title={`${short}: ${long}`} className="fas fa-question-circle icon-btn"></i>
+      <span className="question-short text-ellipsis">{shortText}</span>
+      <i title={`${shortText}: ${long}`} className="fas fa-question-circle icon-btn"></i>
       <input type="text" value={newAnswer} onChange={handleChange} className="input" />
     </div>
   );

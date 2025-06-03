@@ -8,7 +8,7 @@ from backend.src.data_import.service import ImportService
 from backend.src.data_import.stopwatch import Stopwatch
 from backend.src.products.service import ProductService
 from backend.src.shops.service import ShopService
-from backend.src.app.dependencies import db_session, chroma, summarize_graph
+from backend.src.app.dependencies import create_db_session, chroma, create_summarize_graph
 
 logging.basicConfig(format="%(asctime)s [%(name)s] %(levelname)s: %(message)s", level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -25,9 +25,9 @@ def always_accept() -> bool:
 def main():
     watch = Stopwatch(units="s")
 
-    with next(db_session()) as session:
+    with next(create_db_session()) as session:
         shop_service = ShopService(session)
-        product_service = ProductService(session, shop_service, summarize_graph())
+        product_service = ProductService(session, shop_service, create_summarize_graph())
         import_service = ImportService(product_service, shop_service, chroma)
 
         data_files = get_data_files()

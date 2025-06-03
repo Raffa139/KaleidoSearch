@@ -42,7 +42,7 @@ rerank_retriever = ContextualCompressionRetriever(
 )
 
 
-def search_graph():
+def create_search_graph():
     with ConnectionPool(
             datasource_url(),
             max_size=20,
@@ -56,26 +56,26 @@ def search_graph():
         yield build_search_graph(llm, memory)
 
 
-def retrieve_graph():
+def create_retrieve_graph():
     return build_retrieve_graph(llm, chroma_retriever, rerank_retriever)
 
 
-def summarize_graph():
+def create_summarize_graph():
     return build_summarize_graph(llm, chroma)
 
 
-def db_session():
+def create_db_session():
     with Session(db_engine) as session:
         yield session
 
 
-SessionDep = Annotated[Session, Depends(db_session)]
+SessionDep = Annotated[Session, Depends(create_db_session)]
 
-SearchGraphDep = Annotated[SearchGraph, Depends(search_graph)]
+SearchGraphDep = Annotated[SearchGraph, Depends(create_search_graph)]
 
-RetrieveGraphDep = Annotated[RetrieveGraph, Depends(retrieve_graph)]
+RetrieveGraphDep = Annotated[RetrieveGraph, Depends(create_retrieve_graph)]
 
-SummarizeGraphDep = Annotated[SummarizeGraph, Depends(summarize_graph)]
+SummarizeGraphDep = Annotated[SummarizeGraph, Depends(create_summarize_graph)]
 
 
 def create_shop_service(session: SessionDep):

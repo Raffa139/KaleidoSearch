@@ -1,5 +1,6 @@
-import { Fragment, useState, type FunctionComponent } from "react";
+import { useState, type FunctionComponent } from "react";
 import { useLoaderData, useNavigate } from "react-router";
+import { useTransition, animated } from "@react-spring/web";
 import type { QueryEvaluation, UserAnswer } from "../../../client/types";
 import { useThreadContext } from "../useThreadContext";
 import { Question } from "./Question";
@@ -24,6 +25,20 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
   const [lastSearch, setLastSearch] = useState<string>(queryEvaluation?.cleaned_query ?? "");
   const [answers, setAnswers] = useState<UserAnswer[]>([]);
   const [hideAnswers, setHideAnswers] = useState<boolean>(false);
+
+  const questionTransitions = useTransition(
+    [
+      ...queryEvaluation?.answered_questions ?? [],
+      ...queryEvaluation?.follow_up_questions ?? []
+    ],
+    {
+      keys: question => question.id,
+      from: { opacity: 0, transform: "translateY(20px) scale(0.9)" },
+      enter: { opacity: 1, transform: "translateY(0px) scale(1)" },
+      leave: { opacity: 0, transform: "translateY(-20px) scale(0.9)" },
+      config: { tension: 200, friction: 20 }
+    }
+  );
 
   const handleSearch = async () => {
     try {
@@ -89,10 +104,10 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
 
       {queryEvaluation && (
         <div className="follow-up-questions">
-          {[...queryEvaluation.answered_questions, ...queryEvaluation.follow_up_questions].map((question) => (
-            <Fragment key={question.id}>
+          {questionTransitions((style, question) => (
+            <animated.div key={question.id} style={style}>
               <Question onAnswerChange={handleAnswerChange} hideAnswered={hideAnswers} {...question} />
-            </Fragment>
+            </animated.div>
           ))}
         </div>
       )}

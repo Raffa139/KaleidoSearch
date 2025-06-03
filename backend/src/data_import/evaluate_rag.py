@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from backend.src.definitions import DATA_DIR
 from backend.src.environment import product_catalogues
 from backend.src.data_import.stopwatch import Stopwatch
-from backend.src.app.dependencies import llm, chroma, retrieve_graph as build_retrieve_graph
+from backend.src.app.dependencies import llm, chroma, create_retrieve_graph as build_retrieve_graph
 
 logging.basicConfig(format="%(asctime)s [%(name)s] %(levelname)s: %(message)s", level=logging.INFO)
 log = logging.getLogger(__name__)
