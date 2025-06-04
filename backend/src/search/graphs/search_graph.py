@@ -1,5 +1,9 @@
+from typing import Annotated
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import ToolMessage
+from langchain_core.tools import tool, InjectedToolCallId
+from langgraph.types import Command
+from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.checkpoint.base import BaseCheckpointSaver
@@ -107,6 +111,18 @@ Your response should be structured as follows:
 )
 
 
+@tool
+def structured_response(
+        query_evaluation: QueryEvaluation,
+        tool_call_id: Annotated[str, InjectedToolCallId]
+):
+    """Outputs the latest message into the structured format as defined in the parameters."""
+    return Command(update={
+        "query_evaluation": query_evaluation,
+        "messages": [ToolMessage("Success", tool_call_id=tool_call_id)]
+    })
+
+
 def chat_model(llm: BaseChatModel, s: SearchGraphState):
     def invoke(state: SearchGraphState):
         return {"messages": [llm.invoke(state.messages)]}
@@ -114,29 +130,15 @@ def chat_model(llm: BaseChatModel, s: SearchGraphState):
     return invoke(s)
 
 
-def structured_response(llm: BaseChatModel, s: SearchGraphState):
-    # TODO: Maybe can be called as tool to remove extra llm call
-    #       Custom tool condition that wires to END after tool called
-    #       Custom tool node that saves evaluation in state
-
-    def invoke(state: SearchGraphState):
-        last_message = state.messages[-1].content
-        response = llm.with_structured_output(QueryEvaluation).invoke(
-            [HumanMessage(content=last_message)]
-        )
-        return {"query_evaluation": response}
-
-    return invoke(s)
-
-
 def build_graph(llm: BaseChatModel, memory: BaseCheckpointSaver) -> CompiledStateGraph:
+    llm_with_tools = llm.bind_tools([structured_response], tool_choice="any")
     graph_builder = StateGraph(SearchGraphState)
 
-    graph_builder.add_node("llm", lambda state: chat_model(llm, state))
-    graph_builder.add_node("respond", lambda state: structured_response(llm, state))
+    graph_builder.add_node("llm", lambda state: chat_model(llm_with_tools, state))
+    graph_builder.add_node("tools", ToolNode(tools=[structured_response]))
     graph_builder.add_edge(START, "llm")
-    graph_builder.add_edge("llm", "respond")
-    graph_builder.add_edge("respond", END)
+    graph_builder.add_conditional_edges("llm", tools_condition)
+    graph_builder.add_edge("tools", END)
 
     return graph_builder.compile(checkpointer=memory)
 

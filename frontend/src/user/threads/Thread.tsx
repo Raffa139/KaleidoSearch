@@ -48,8 +48,8 @@ export const Thread: FunctionComponent = () => {
           <p>No results found. Please try a different search.</p>
         )}
 
-        {searchNeedsRefinement && (
-          <p>Search needs refinement. Please provide a search query or more details.</p>
+        {searchNeedsRefinement && !isBusy && (
+          <p>Search needs refinement. Please provide more details.</p>
         )}
       </div>
     </div>

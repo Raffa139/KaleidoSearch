@@ -64,7 +64,8 @@ export const SearchBar: FunctionComponent<SearchBarProps> = ({ queryEvaluation, 
         const result = await postToThread(thread_id, content);
         onSearch(result);
         setAnswers([]);
-        setLastSearch(search);
+        setSearch(result.cleaned_query ?? search)
+        setLastSearch(result.cleaned_query ?? search);
       } else {
         onSearch(queryEvaluation);
       }

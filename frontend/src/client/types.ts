@@ -10,7 +10,7 @@ export interface User {
   picture_url: string | null;
 }
 
-interface HasId {
+export interface HasId {
   id: number;
 }
 
